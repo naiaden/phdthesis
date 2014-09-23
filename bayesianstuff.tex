@@ -1,0 +1,111 @@
+\chapter{Introduction to the Bayesian Stuff}
+
+In this chapter we will look at the processes underlying a Bayesian language model. In many other references the work is either considered from a bottom-up approach, or from a top-down approach. The first approach is really useful if you have a strong mathematical background, whereas the latter is much more convenient if you already have (vaguely) heard about the processes involved. The approach of this chapter is to make the processes understandable if neither of the previous two properties are applicable.
+
+Remember that our goal is to devise a language model within a non-parametric Bayesian (BNP) framework. In many statistical inference problems, we expect that structures or patterns continue to emerge, as data accrue, perhaps even without limit. We want a modelling framework that supplies a growing, unbounded number of degrees of freedom to the data analysis. However, if we allow the degrees of freedom to accrue too quickly, we risk finding structures that are statistical artifacts; a typical example of such artifact is overfitting. Overfitting is a serious problem, and it motivates the Bayesian aspect of non-parametrics. In many parametric setting, you choose a number of parameters which optimises a certain value. However, more of different data might already require another number of parameters. The BNP approach is an alternative to this parametric modelling and model selection. Although Bayesian methods are by no means immune to overfitting, they provide a natural resilience to overfitting. By using a model with an unbounded complexity, underfitting is migitated, and computing, or approximating, the full posterior over parameters migitates overfitting.
+
+A common misconception about non-parametrics is that it means that there are no parameters. Instead, it means that the model is not parametric, which in turn means that the number of parameters is not fixed once and for all. If the amount of training data is fixed, there is no difference between parametric and non-parametric models. The difference is there when you add new training data. The non-parametric model can adapt to the influx of new data points, whereas the parametric model does not have the flexibility to add parameters. So the non-parametric framework is not opposed to parameters, to the contrary: the framework can be viewed as allowing an infinite number of parameters, or rather, as an finite but unbounded number of parameters.
+
+The chapter is built as one large explanation of how to build a language model within a Bayesian non-parametric framework. Many of the concepts are introduced sideways, but we tried to separate them into sections as well. If a concept is explained in more detail in another section, we have listed a reference. Although it is a custom in Bayesian literature to first specify a generative model, we start from an example, only to derive at the generative model at the end.
+
+\section{A Bayesian Approach to Language Modelling}
+
+Just as we have to have a unigram language model to build a $n$-gram language model, for our Bayesian approach, we have to start with a unigram language model as well.
+
+Assume we have a data set $\mathcal{D}$ of $n$ data points $x_1, x_2, \ldots, x_n$, with $W$ unique words comprising a vocabulary $V$, and each word type can be denoted as $w_i$ for $0 < i < W$. The count of word type $w_i$ in $\mathcal{D}$ is denoted as $c(w_i)$. Our data set $\mathcal{D}$ consists of documents which in turn consist of words $x$. We can aggregrate over these words, by storing for each word type $
+w_i$ its frequency $c(w_i)$\footnote{$c(w_i) = \sum_{x\in\mathcal{D}} x = w_i$}. In this abstraction we lose the sense of origin, the documents that contained the word, and we lose any positional information. But for our unigram language model, this is of no concern. We will store the words and their frequencies by means of the Chinese restaurant process.
+
+\section{The Chinese Restaurant Process}
+The Chinese restaurant process (CRP)\footnote{The restaurant metaphore was attributed to Jim Pitman by Aldous (1983)} is one of the many metaphores to make difficult concepts, and their underlying mathematical principles, easier to explain. 
+
+Imagine a restaurant with an infinite number of round tables, with enough space to host an infinite number of guests. Each table in the restaurant serves one dish, but multiple tables may serve the same dish.
+
+Now imagine that each dish $\theta$ represents one of the word types $w_i \in V$, and each customer is a data point $x_j\in\mathcal{D}$ that enters the restaurant, and gets to pick a table $t$. In the case of our unigram language model we have $W$ tables, and customer $x_j$ represents the occurrence of $w_i$, so he sits at the table where $\theta = 
+w_i$. Now if all customers $x\in\mathcal{D}$ do this, we end up with at each table as many customers as there are occurrences of that word: $|t_{\theta = w_i}| = c(w_i)$.
+
+Here we can already see the advantage of having a non-parametric framework. If we would have used a parametric model, we could not have dealt with additional data containing new word types: in a parametric model $W$ is fixed. Since we are using a non-parametric model, we now have the means to facilitate additional data without having to resort to another (parametrised) model.
+
+What we have now is a partition of the data points assigned to $W$ clusters. Henceforth we will (interchangeably) call such a partition a seating arrangement $\mathcal{S}$, as the way people sit around the tables forms the partition, with each table being a cluster. More formally, the probability of being assigned to a cluster $k$ is $w_k$, for $k = 1, 2, \ldots, K$ and $\sum_{k=1}^K = 1$, and additionally, each data point can only be in one cluster.\footnote{In our case $K$ would take on the value of $W$.} The order of clusters in the partition is arbitrary, as is the order of customers within a cluster.\footnote{But we come back to that later.} Let $N$ denote the number of customers: $|x\in\mathcal{D}|$, and a partition of size $n$ as $\pi_{[n]}$. 
+
+For example, a restaurant that represents 4 words and that seats 12 customers, might look like this: 
+\begin{equation}\label{eq:partitionexample}
+	\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
+\end{equation}
+This restaurant might for instance represent the data set ``aabbacdbabdd''. 
+
+It is easy to see that for each $n$, we have different seating arrangement $\pi_{[n]}$. Each $n$ describes a different restaurant, so we call the CRP a family of distributions.
+
+The \emph{process} in CRP comes from the generative model. There the CRP is a discrete-time stochastic process whose value at any positive-integer time $n$ is a partition $\pi_{[n]}$ of the set $\{1,2,\ldots,n\}$. This means that the CRP is a sequence of distributions, for $1\leq n \leq\infty$, and if we talk about a specific $n$, the CRP reduces to a Chinese restaurant distribution. The probability distribution is then determined as follows. At time $n=1$ the trivial partition $\pi_{[1]}=\{\{1\}\}$ is obtained with probability $1$. 
+Now at time $n+1$ customer $x_{n+1}$ sits at table $t$ with probability $\frac{|t|}{n+1}$, or sits at an empty table probability $\frac{1}{n+1}$: 
+\begin{equation}\label{eq:crp-table}
+	p(x_{n+1}\text{ seats at }t|\pi_{[n]}) = 
+    \begin{cases}
+    	\frac{|t|}{n+1}, & \text{if }t\in\pi_{[n]},\\
+    	\frac{1}{n+1}, & \text{otherwise}.
+  	\end{cases}
+\end{equation}
+
+In \cref{eq:crp-table} the probability of joining a table $t$ is expressed. But we can also compute the chance of $x_{n+1}$ seating at $x_i$'s table. Now at time $n+1$ customer $x_{n+1}$ sits at the same table as customer $x_i$ with probability $\frac{1}{n}$ for each $i<(n+1)$, or sits at an empty table with probability $\frac{1}{n}$. 
+
+An interesting property of the CRP is exchangeability. Although the CRP is specified using an ordering of the customers, exchangeability states that the distribution on partitions defined by the CRP is invariant to the ordering, in the sense that only the size of the clusters determines the probability of the partition. For example, consider the probability that customers 1 and 2 will be found sitting together at the same table after $N$ customers have entered the restaurant. This probability is $\frac{1}{2}$ because customer 1 sits at an arbitrary table with probability $1$, and customer 2 joins the table with probability $1\cdot\frac{1}{2}$. Now, by exchangeability, this probability does not change if the customers were to enter the restaurant in a different order. Put differently, the probability of any two customers $i$ and $j$ sitting at the same table is $\frac{1}{2}$.
+
+For example for the partition $\pi_{[12]}$ from \cref{eq:partitionexample}, the probability of this assignment is:
+\begin{equation}\label{eq:partitionexampleprobability}
+	p(\pi_{[12]}) = \frac{1}{1}\frac{1}{2}\frac{1}{3}\frac{1}{4}\frac{2}{5}\frac{1}{6}\frac{1}{7}\frac{2}{8}\frac{3}{9}\frac{3}{10}\frac{1}{11}\frac{2}{12}
+\end{equation}
+From these products, it also becomes clear that the order in which the customers enter does not matter, as long as they join the same tables. This also follows from the definition of exchangeability, which states that $X_1, X_2, \ldots$ is infinitely exchangeable if for any $n$, $p(X_1,\ldots,X_n)$ is invariant under permutation. More precise: a finite sequence $(X_1, \ldots, X_n)$ of random variables is called exchangeable if $p(X_1,\ldots,X_n) = p(X_{\sigma(1)},\ldots,X_{\sigma(n)})$, for each permutation $\sigma$ of $\{1,\ldots,n\}$. An infinite sequence $(X_1,X_2,\ldots)$ is called exchangeable if $p(X_1,X_2,\ldots)=p(X_{\sigma(1)},X_{\sigma(2)},\ldots)$ for each finite permutation $\sigma$ of $\{1,2,\ldots\}$, that is, each permutation for which $\#\{i: \sigma(i)\neq i\} < \infty$.
+
+The part on infinite exchangeability is relevant because the CRP defines a distribution over ``infinite partitions'', even if you only observe a finite number of data points. The CRP commits to the idea that there is an infinitely large partition. By restraining to a finite number of $x$ data points, we essentially ask how much of the latent infinite partition do we expect to observe if we only have $x$ data points?
+
+We can generalise \cref{eq:partitionexampleprobability} as:
+\begin{equation}\label{eq:partitionprobability}
+	p(\pi_{[n]}) = \frac{\prod_{t\in\pi{[n]}} (|t|-1)!}{n!}
+\end{equation}
+
+So now that we know about exchangeability, we can turn the argument around and recover the CRP update formula in \cref{eq:crp-table} with \cref{eq:partitionprobability}. We add customer $n+1$ to $\pi_{[n]}$ at table $T$, and we call the new partition $\pi'_{[n+1]}$. If $T$ is an existing table, we find that:
+\begin{equation}
+\begin{split}
+	p(x_{n+1}\text{ seats at }T|\pi_{[n]}) &= \frac{p(\pi'_{[n+1]})}{p(\pi_{[n]}} \\
+     &= \frac{n!}{(n+1)!}\frac{\prod_{t'\in\pi'_{[n+1]}}(|t'|-1)!}{\prod_{t\in\pi_{[n]}}(|t|-1)!} \\
+     &= \frac{1}{n+1}\frac{(|t_0|-1)! \cdot \ldots (|T|-1)! \cdot\ldots\cdot (|t_\infty|-1)!}{(|t_0|-1)! \cdot \ldots (|T-1|-1)! \cdot\ldots\cdot (|t_\infty|-1)!} \\
+     &= \frac{1}{n+1}|T|
+\end{split}
+\end{equation}
+
+Here we use the $\infty$-sign colloquially. The product $\prod_{t\in\pi_{[n]}}$ is a product over an unbounded number of tables. For the probability of $T$ being empty and $x_{n+1}$ starting a new table, we can do a similar exercise:
+\begin{equation}
+\begin{split}
+	p(x_{n+1}\text{ seats a new table }T|\pi_{[n]}) &= \frac{p(\pi'_{[n+1]})}{p(\pi_{[n]}} \\
+    &= \frac{n!}{(n+1)!}\frac{\prod_{t'\in\pi'_{[n+1]}}(|t'|-1)!}{\prod_{t\in\pi_{[n]}}(|t|-1)!} \\
+    &= \frac{1}{n+1}\frac{(|t_0|-1)! \cdot (|t_\infty|-1)! \cdot (1-1)!}{(|t_0|-1)! \cdot (|t_\infty|-1)!} \\
+	&= \frac{1}{n+1}
+\end{split}
+\end{equation}
+
+Some readers may notice that although we filled restaurants with customers, and let them take place at tables, we did not mention anything about their food yet. Strictly, serving the dishes is not part of the CRP, but in many literature it is a combined process: serving customers by providing tables and providing dishes. This combined process is also called the CRP mixture model. In this example, and in the remainder of this thesis, we assume that the dishes can be drawn from a distribution.
+
+The idea is that we assign a parameter vector $\phi_t$ to each table $t\in\pi_{[N]}$, and table $t$ hosts $x_i$ if $i\in t$. Additionally, we assume that the data points at table $t$ are generated independently from a common probability distribution indexed by $\phi_t$. So now for each $i\in t$, we let $f(x_i|\phi_t)$ denote the probability density for generating data point $x_i$, and we take the product over $i\in t$ to obtain the total probability of generating the data associated with table $t$. The product over clusters and over data points within clusters is the overall conditional probability of the data:
+\begin{equation}
+	p(x|\phi,\pi_{[N]}) = \prod_{t\in\pi_{[N]}}\prod_{i\in t} f(x_i|\phi_t),
+\end{equation}
+with $\phi=(\phi_1,\ldots,\phi_K)$ and $K$ the number of occupied tables. If we fix $x$, then this probability density is known as the likelihood function.
+
+This is almost a complete probability model, however we first need to specify a distribution for the parameters $\phi$. We assume that these parameters are drawn independently from a distribution $G_0$:
+\begin{align}
+	\pi_{[N]} &\sim \operatorname{CRP}(N) \\
+    \phi_t | \pi_{[N]} &\overset{\text{iid}}{\sim} G_0 && \text{ for }t\in\pi_{[N]}, \\
+    x_i|\phi,\pi_{[N]} &\overset{\text{ind}}{\sim} F(\phi_t) && \text{ for }t\in\pi_{[N]}\text{ and }i\in t,
+\end{align}
+with $F(\phi_t)$ being the distribution with density $f(\cdot|\phi_t)$. The linked conditional probabilities yield a joint probability distribution on the collection of variables $(x,\phi,\pi_{[N]})$. Naturally, we are mostly interested in the posterior probability of $\pi_{[N]}$ given $x$.
+
+This model is called the CRP mixture model because in a mixture model each data point is generated from one of a set of mixture components, and the choice of mixture component is made randomly for each data point. In this case, $\phi$ defines the mixture components, and $\pi_{[N]}$ selects randomly among these mixture components by assigning a table to each data point, and each data point is generated from the selected mixture component with a draw from $F(\phi_t)$.
+
+The expected number of tables as $N \rightarrow \infty$ is... This can be seen as follows: let $\tau_i$ be the event that the $i$th customer starts a new table. The probability of this happening is $p(\tau_i = 1) = \frac{1}{(i-1)+1}$. We can denote the number of tables $K$ after $n$ customers as $k_n = \sum_i \tau_i$, which is equal to $\sum_i \frac{1}{(i-1)+1}$ which is in turn upper bounded by $O(H_n)$ where $H_n$ is the $n$th harmonic sum\footnote{The harmonic series is defined as: $\sum_{n=1}^\infty \frac{1}{n} = 1 + \frac{1}{2} + \frac{1}{3} + \cdots$. The $n$th partial sum is then $H_n=\sum_{k=1}^n \frac{1}{k}$.} which grows logarithmically with $O(\ln n+1)$. 
+
+\section{Stick-breaking Process}
+
+\section{Urn Representation}
+
+\section{Dirichlet Process}
+
+\section{Pitman-Yor Process}
