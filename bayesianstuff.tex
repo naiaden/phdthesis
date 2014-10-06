@@ -18,7 +18,7 @@ Assume we have a data set $\mathcal{D}$ of $M$ data points $x_1, x_2, \ldots, x_
 v_i$ its frequency $c(w_i)$\footnote{$c(v_i) = \sum_{x\in\mathcal{D}} x = v_i$}. In this abstraction we lose the sense of origin, the documents that contained the word, and we lose any positional information. But for our unigram language model, this is of no concern. We will store the words and their frequencies by means of the Chinese restaurant process.
 
 \section{The Chinese Restaurant Process}\marginnote{The Chinese restaurant process describes a family of probability distributions over partitions.}
-The Chinese restaurant process (CRP)\footnote{The restaurant metaphore was attributed to Jim Pitman by Aldous (1983)} is one of the many metaphores to make difficult concepts, and their underlying mathematical principles, easier to explain. 
+The Chinese restaurant process (CRP)\footnote{The restaurant metaphore was attributed to Jim Pitman by \cite{Aldous1985Exchangeability}} is one of the many metaphores to make difficult concepts, and their underlying mathematical principles, easier to explain. 
 
 Imagine a restaurant with an infinite number of round tables, with enough space to host an infinite number of guests. Each table in the restaurant serves one dish, but multiple tables may serve the same dish.
 
@@ -110,8 +110,7 @@ The expected number of tables as $M \rightarrow \infty$ is... This can be seen a
 \section{Stick-breaking}\marginnote{The stick-breaking process describes a probability distribution over partition sizes.}
 In the previous section we defined a process to generate a distribution over partitions by means of a seating arrangement. In this section we introduce a new metaphore called the stick-breaking distribution which defines the distribution of customers sitting at the tables, without generating an explicit seating arrangement.
 
-The stick-breaking is a distribution on the infinite sequence  $\xi = (\xi_1,\xi_2,\ldots)$; it is also known as the GEM distribution.\footnote{The GEM distribution is named after Griffiths, Engen, and McCloskey, cf.\ \ref{PitmanYor1997}}
-% The two-parameter Poisson-Dirichlet distribution derived from a stable subordinator
+The stick-breaking process\cite{Ishwaran2001Gibbs} is a distribution on the infinite sequence  $\xi = (\xi_1,\xi_2,\ldots)$; it is also known as the GEM distribution.\footnote{The GEM distribution is named after Griffiths, Engen, and McCloskey, cf.\ \cite{Pitman1997The}}
 
 The metaphore is as follows: imagine you have a stick of length $1$. You generate $\xi_1$ by snapping the stick into two pieces. The length of one of the two pieces becomes the value $\xi_1$. To generate $\xi_2$ you then snap the other piece in two; again the length of one of these pieces becomes $\xi_2$. As you repeat this stick-breaking, the length of the stick that you have left approaches zero.
 
@@ -141,6 +140,26 @@ with $\delta(\cdot)$ being the Dirac delta measure, used as an indicator functio
 
 
 \section{Urn Representation}
+Another way to fill the Chinese restaurant is by means of drawing balls from an urn. Different from the CRP where we assigned each customer to its table, with the urn representation we have a process where we select a table, and consequently assign a customer to that table.
+
+The urn works as follows. An urn contains objects of various types, where the objects are customarily called the balls, and each ball type can be distinguished by its colour. In general the content of an urn can change over time, subject to rules of placing balls into the urn, or drawing balls under predesignated replacement schemes. A simple example is when there is a particular distribution $P$ of balls in the urn, and you immediately replace the drawn ball after noting its colour; drawing a ball from the urn is then the same as drawing from distribution $P$. In this case $P$ is a fixed distribution. By adding or removing balls after each draw, the distribution can also be dynamic.
+
+In the section on CRP mixture models we saw that the underlying distributions were far from static, hence we need a replacement scheme that matches this distribution: the P\'olya urn model\footnote{The P\'olya urn is a distribution on sequences of random variables.}. The P\'olya urn model comprises an initially empty urn of solid coloured balls, and a corresponding replacement scheme. The balls are drawn randomly from the urn, and for each drawn ball with colour $c$, the drawn ball is placed back into the urn, and an additional ball with colour $c$ is also placed in the urn. 
+
+The problem with this scheme is that there seems to be no way to introduce new colours. To undermine this problem, we do not start with an initially empty urn, but we add a white dotted\footnote{The colour of the ball is not important; we use the fact that it is dotted to discriminate it from all the other balls which are solidly coloured.}. Everytime the dotted ball is drawn, the ball is placed back, and an additional ball is placed into the urn, with its coloured determined by an external distribution.
+
+\textcite{Blackwell1973Ferguson} define the P\'olya urn scheme as follows. Let $\mu$ be any finite positive measure on a complete separable metric space $X$, and $(B_1,\dots,B_r)$ a finite partition of $X$. Now every sequence $\{X_n,n\geq 1\}$ of random variables with values in $X$ is a P\'olya sequence with parameter $\mu$ if for every $B\subset X$:
+\begin{equation}
+	p(X_1\in B) = \frac{\mu(B)}{\mu(X)}
+\end{equation}
+and
+\begin{equation}
+	p\{X_{n+1}\in B | X_1,\ldots,X_n\} = \frac{\mu_n(B)}{\mu_n(X)}.
+\end{equation}
+with $\mu_n = \mu + \sum_{i=1}^n \delta(X_i)$ and $\delta(x)$ denoting the unit measure concentrating at $x$. For every finite $X$, the sequence $\{X_n\}$ represents the results of successive draws from an urn where initially the urn has $\mu(x)$ balls of colour $x$, and after each draw, the ball drawn is replaced and another ball of its same colour is added to the urn.
+
+
+
 
 \section{Dirichlet Process}
 
