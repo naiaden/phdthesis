@@ -116,16 +116,16 @@ The metaphore is as follows: imagine you have a stick of length $1$. You generat
 
 $\xi_k$ can then be interpretated as the length of the piece of unit-length stick assigned to the $k$th value.\footnote{$k$ can be considered to be the $k$th table in the CRP, with $\xi_k$ being the number of customers seated at $t_k$.} After the first $(k-1)$ values have their portions assigned, the length of the remainder of the stick, $\prod_{i=1}^{k-1}(1-\xi'_i)$, is broken according to a sample $\xi'_k$ from a beta distribution, where $\xi'_k$ indicates the portion of the remainder to be assigned to the $k$th value. The beta distribution is defined as follows:
 \begin{equation} 
-	\operatorname{Beta}(x; \alpha, \beta) = \frac{1}{\operatorname{B}(\alpha,\beta)}x^{\alpha-1}(1-x)^{\beta-1}
+	\operatorname{Beta}(x; \alpha, \beta) = \frac{1}{\operatorname{B}(\alpha,\beta)}x^{\alpha-1}(1-x)^{\beta-1}\label{eq:betad}
 \end{equation}
-with $\operatorname{B}(\alpha,\beta)$ being the beta function
+with $\alpha,\beta >0$ and $\operatorname{B}(\alpha,\beta)$ being the beta function
 \begin{equation}
-	\operatorname{B}(\alpha,\beta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}
+	\operatorname{B}(\alpha,\beta) = \frac{\Gamma(\alpha+\beta)}{\Gamma(\alpha)\Gamma(\beta)}\label{eq:betaf}
 \end{equation}
-and $\Gamma(n)$ denoting the Gamma function:
+and for $\Gamma(n)$ denoting the Gamma function for $n>0$:
 \begin{equation}
-	\Gamma(n) = (n-1)!
-\end{equation} 
+	\Gamma(n) = (n-1)!\label{eq:gammaf}
+\end{equation}
 Just as in the CRP, the probability space is uniformly distributed over the number of customers. This uniform distribution can be represented as a beta distribution with parameters $(1,1)$, such that 
 \begin{equation}
 	\operatorname{Beta}(1,1)=\frac{1}{\operatorname{B}(1,1)} = \frac{1}{(1-1)!} = 1
@@ -144,9 +144,13 @@ Another way to fill the Chinese restaurant is by means of drawing balls from an 
 
 The urn works as follows. An urn contains objects of various types, where the objects are customarily called the balls, and each ball type can be distinguished by its colour. In general the content of an urn can change over time, subject to rules of placing balls into the urn, or drawing balls under predesignated replacement schemes. A simple example is when there is a particular distribution $P$ of balls in the urn, and you immediately replace the drawn ball after noting its colour; drawing a ball from the urn is then the same as drawing from distribution $P$. In this case $P$ is a fixed distribution. By adding or removing balls after each draw, the distribution can also be dynamic.
 
-In the section on CRP mixture models we saw that the underlying distributions were far from static, hence we need a replacement scheme that matches this distribution: the P\'olya urn model\footnote{The P\'olya urn is a distribution on sequences of random variables.}. The P\'olya urn model comprises an initially empty urn of solid coloured balls, and a corresponding replacement scheme. The balls are drawn randomly from the urn, and for each drawn ball with colour $c$, the drawn ball is placed back into the urn, and an additional ball with colour $c$ is also placed in the urn. 
+In the section on CRP mixture models we saw that the underlying distributions were far from static, hence we need a replacement scheme that matches this distribution: Hoppe-P\'olya urn.\footnote{The Hoppe-P\'olya urn is a distribution on sequences of random variables.} In the literature this scheme is often simply called the P\'olya urn.\footnote{Compare this to the interchangeability of CRP and the Dirichlet Process CRP in the literature. We will also undo this unclarity in a later section.} In this section we will introduce the P\'olya urn, the Hoppe-P\'olya urn, and the missing link between the two urn schemes, the multivariate P\'olya urn scheme.
 
-The problem with this scheme is that there seems to be no way to introduce new colours. To undermine this problem, we do not start with an initially empty urn, but we add a white dotted\footnote{The colour of the ball is not important; we use the fact that it is dotted to discriminate it from all the other balls which are solidly coloured.}. Everytime the dotted ball is drawn, the ball is placed back, and an additional ball is placed into the urn, with its coloured determined by an external distribution.
+The P\'olya urn scheme\cite{Johnson1977Urn} is the simplest of the three schemes. The urn contains only white and black balls. For each ball that is drawn (randomly) from the urn, we observe its colour,  replace\footnote{Read: put back into the urn.} it, and add an additional ball of the same colour to the urn. 
+
+A modest generalisation of the P\'olya urn scheme is the multivariate P\'olya urn scheme. Here the generalisation entails that the balls can have other colours as well, although each ball still has only one colour. Image a Chinese restaurant where the number of tables is limited to $\kappa$ and $\kappa$ unique dishes are served; each table has a unique dish. The restaurant hosts $\nu$ customers. We can translate this scenario to the multivariate P\'olya urn, where we have $\kappa$ different colours, and $\nu$ balls. In the CRP\footnote{And in our reduced example.} we modelled the types as tables, and the tokens as the customers sitting around the same table. In the urn metaphore, the colours are the types, and the number of balls with a colour as the tokens. Since we limited $K=\kappa$ in this example, customers cannot choose to join a new table. The chance of joining another word is now $\frac{1}{\nu}$, and the chance of being of the same colour $h$ as ball $b$ is $\frac{c(h)}{\nu}$ with $c(x)$ denoting the count of balls with colour $x$. 
+
+More interesting is a generalisation of the P\'olya urn scheme that can behave the same way as a CRP. With the multivariate P\'olya urn scheme, we came close, but lacked the means to generate new tables.\footnote{And thus also the means to generate new dishes.} With the Hoppe-P\'olya urn scheme\cite{Hoppe1984Polya}, we can overcome this problem as follows. We start with an urn with one black\footnote{Read black as uncoloured, as we also do not take it into account when we count the number of different colours in the urn.} ball. When drawing from the urn, if we draw a black ball, we replace the ball, and alongside add a new ball of a new non-black colour randomly generated from a probability distribution. Otherwise, we put the ball back along with another ball of the same colour, as for the standard multivariate P\'olya urn scheme. The colours of an infinite sequence of draws from the Hoppe-P\'olya urn scheme follow a CRP. If instead of generating new colours (tables in the CRP), we draw a random value from a given base distribution such as $G_0$, we can model a CRPMM.\footnote{Compare this to \cref{eq:CRPMMlatent}. Also note that the P\'olya urn scheme models a beta-binomial distribution, with the parameters of the beta distribution depending on the initial layout of the urn. The multivariate P\'olya urn models a Dirichlet-multinomial distribution, where we set the Dirichlet parameter vector $\alpha=1$. The Hoppe-P\'olya urn scheme models the Dirichlet process, with $\alpha=1$. We will come back to this in a later section on the Dirichlet Process.} Similar to the CRP, the number of colours grows logarithmically to infinity, as the expected number of colours at time $n$ is $\sum_{i=1}^n i^{-1}$
 
 \textcite{Blackwell1973Ferguson} define the P\'olya urn scheme as follows. Let $\mu$ be any finite positive measure on a complete separable metric space $X$, and $(B_1,\dots,B_r)$ a finite partition of $X$. Now every sequence $\{X_n,n\geq 1\}$ of random variables with values in $X$ is a P\'olya sequence with parameter $\mu$ if for every $B\subset X$:
 \begin{equation}
@@ -158,9 +162,92 @@ and
 \end{equation}
 with $\mu_n = \mu + \sum_{i=1}^n \delta(X_i)$ and $\delta(x)$ denoting the unit measure concentrating at $x$. For every finite $X$, the sequence $\{X_n\}$ represents the results of successive draws from an urn where initially the urn has $\mu(x)$ balls of colour $x$, and after each draw, the ball drawn is replaced and another ball of its same colour is added to the urn.
 
+The Hoppe-P\'olya stochastic process can be formalised as follows. Let $C = \{1,2,\ldots\}$ be the set of colours and $X_n$ the random variable which indicates the colour of the new ball added to the urn after the $n$th draw. Let $K$ be the random number of distinct colours that are in the urn at time $n$, then the urn can be described as a configuration of $n$ tokens in $K$ cells $\{n_1, n_2, \ldots, n_K\}$ where $\sum_{i=1}^K n_i = n$ are the occupancy numbers of the $K$ cells, which form a partition\footnote{A partition of an integer $n$, is one way of writing $n$ as the sum of positive integers where the
+order of the addends (terms being added) does not matter.} of the integer $n$. The sequence $\{X_j\}_{j=1}^n$ determines the random partition $\pi_{n}$.
+
+Consider a partition $a = (a_1,a_2,\ldots,a_n)$ with $K$ distinct colours and a sequence of draws $\pi_{n} = \{X_j\}_{j=1}^n$ generating it. The probability of obtaining this sequence is then:
+\begin{equation}
+	p(\pi_n) = \frac{1^K}{n!}\prod_{j=1}^K (n_j-1)!
+\end{equation}
+The $\frac{1}{n!}$ comes from the fact that in order to get $K$ colours, the black ball must be drawn $K$ times. Then in order to get exactly the required partition, each colour must be drawn at exactly $n_j-1$ times. Not surprisingly, but a confirmation nonetheless, this models the same probability as \cref{eq:partitionprobability}: the probability of a partition in the CRP.
+
+%http://ofce-skema.org/wp-content/uploads/2013/06/marengo.pdf
+%https://stat.duke.edu/courses/Fall09/sta205/lec/exchange.pdf
+
+%http://www.stat.berkeley.edu/~pitman/blmq.pdf
+%
+%http://www.artofproblemsolving.com/Resources/Papers/LaurendiPartitions.pdf
+%http://mlss11.bordeaux.inria.fr/docs/mlss11-Teh.pdf
+
+
+\section{The Dirichlet Process: a Complete Prior}
+In the Chinese restaurant process we observed a language model from the perspective of the customers, representing the word occurrences. There we saw that according to the CRP, they all have an equal probability of joining another customer, and the probability of joining an existing table was proportional to the number of customers already sitting at that table. In the Hoppe-P\'olya urn scheme, we watched the same process from the table point-of-view; here we saw customers joining tables or starting new tables. By means of the stick-breaking process, we observed a way to describe the distribution over number of customers sitting at tables.
+
+Now, saying that customers have an equal likelihood of sitting at eachother's tables is a strong limitation. Therefore we introduce a parametrised generalisation of the previous priors, called the Dirichlet Process, that encompasses all of the above. Historically the Dirichlet process was invented first, and the other processes were all invented to provide tractable methods for using the Dirichlet process. 
+
+To come to the Dirichlet process from the line of processes that we followed in this thesis, we introduce a concentration parameter $\alpha $. If we set $\alpha = 1$, we reduce the Dirichlet process to a process coherent with the CRP, stick-breaking process, and Hoppe-P\'olya urn scheme that we saw in the previous sections.  
+
+The Dirichlet Process is a way of assigning a probability distribution over probability distributions. It is similar to the CRP, the stick-breaking process, and the urn schemes, in a sense that it is often used as a prior distribution. In this section we will briefly introduce the Dirichlet Process, and show the relations and differences with the priors we introduced in the previous sections.
+
+We will start with a somewhat informal introduction. The Dirichlet Process is a stochastic process, and is often coined the cornerstone of Bayesian nonparametric models. It represents a distribution over distributions, such that each draw from a Dirichlet process is a distribution itself. It is called a Dirichlet process because it has Dirichlet distributed finite dimensional marginal distributions. The distributions drawn from a Dirichlet process are discrete, but cannot be described using a finite number of parameters, hence the Dirichlet process is classified as a nonparametric model.
+
+\subsection{Dirichlet Process}
+
+Assume we have a corpus $\mathcal{C}$ with $W$ words and vocabulary $V$, and we want to compare two documents $\mathcal{D}_1$ and $\mathcal{D}_2$ from this corpus. In a Bayesian setting we again assume some underlying probability mass function $q$ generating the documents, sampled from the random probability mass function $Q$, such that $q_1,q_2\in Q$. With the Dirichlet distribution we can model the randomness between the two documents. If we assume that all words have an equal probability, then we can imagine a fair $W$-sided die. A document is then generated by rolling the die, and each outcome is a word token $v\in V$. The die can be represented by a probability mass function of length $W$, with a uniform distribution. Now we have for both $\mathcal{C}_1$ and $\mathcal{C}_2$ a probability mass function, and we can use the Dirichlet distribution to capture the variability.
+
+In practice the distribution of words is not uniform, and the probability mass function is then of length $W$ but normalised over the empirical word frequencies. 
+
+More formally, let $Q = [Q_1, Q_2, \ldots, Q_K]$ be a random pmf with $K$ components, with $Q_i \geq 0$ for $i = 1,2,\ldots,K$ and $\sum_{i=1}^K Q_i = 1$. In addition, suppose that $\alpha = [\alpha_1,\alpha_2,\ldots,\alpha_K]$,\footnote{Although perhaps confusing, this is not necessarily the same $\alpha$ as the Dirichlet process concentration parameter, although in practice this is often the case. Here we just follow the convention of the literature, where $\alpha$ is also used to denote the concentration parameter of the Dirichlet distribution.} with $\alpha_i > 0$ for each $i$ and let $\alpha_0 = \sum_{i=1}^K \alpha_i$.\footnote{If $\alpha_1=\alpha_2=\ldots=\alpha_K$, then we call $\alpha$ symmetric, and the distribution a symmetric Dirichlet distribution.} Then $Q$ is said to have a Dirichlet distribution with parameter $\alpha$, which we can denote by $Q \sim \operatorname{Dir}(\alpha)$:\footnote{See Section 2 of \citet{Ferguson1973A} for a more elaborate introduction, with many technicalities that we assume to be true; where not, we will indicate this.\cite{Ferguson1973A}}
+\begin{equation}
+	\operatorname{Dir}(q; \alpha) = \frac{\Gamma(\alpha_0)}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}
+\end{equation}
+with $\Gamma(\cdot)$ denoting the gamma function (see~\cref{eq:gammaf}).
+
+The Dirichlet distribution can be thought of as a probability distribution over the $(K-1)$-dimensional probability simplex\footnote{The $k$-simplex is a geometrical $(k-1)$-dimensional object ($k$ follows from $k=1-\sum_{i=1}^{k-1} q_i$), which is a generalisation of the notion of a triangle to $k$ dimensions. It is defined as the point set consisting of the convex hull of a set of linear independent points in $\mathbb{R}^k$, with its $k$ components being non-negative and summing to $1$: $\Delta_k = \{q\in\mathbb{R}^k|\sum_{i=1}^k q_i=1,q_i\geq0\text{ for }i=1,2,\ldots,k\}$.} $\Delta_K$; put otherwise, as a distribution over pmfs of length $K$. With $K=2$, the Dirichlet distribution reduces to a Beta distribution (see~\cref{eq:betad}), thus if $X\sim\operatorname{Beta}(a,b)$ then $Q=(X,1-X)\sim\operatorname{Dir}(\{a,b\})$, and vice versa.
+
+With $\alpha = \{1\}_{i=1}^K$, the Dirichlet distribution reduces to the uniform distribution over the simplex. When the components of $\alpha$ are all greater then $1$, the density has one mode being somewhere in the interior of the simplex. With the components of $\alpha$ being all less than $1$, the density has sharp peaks around the edges of the simplex. However it should be noted that the support of the Dirichlet is open, and does not include the edges of the simplex, and therefore a component drawn from a Dirichlet will never be $0$. Note the difference between $\alpha$ being only $1$s, and all $\alpha_i$ going to infinity. In the first case all sets of distributions are equally likely\footnote{The distribution over distributions is uniform.}, whereas in the latter case only near-uniform distributions\footnote{The distribution over distributions is peaked around the uniform distribution.} are likely.
+
+One of the properties of the Dirichlet distribution is that it is the conjugate prior for the multinomial distribution. The multinomial distribution is parametrised by an integer $n$ and a pmf $q = [q_1, q_2, \ldots, q_3]$. $n$ denotes the number of independent events, and for each event, the probability of outcome $i$ is $q_i$. The multinomial distribution then specifies the probability that outcome $i$ occurs $x_i$ times, for $i=1,2,\ldots,K$.\footnote{The multinomial distribution can model the probability of an $n$-sample empirical histogram, if each sample is drawn iid from $q$.} If $X\sim\operatorname{Mult}(n,q)$, then its probability mass function is given by
+\begin{equation}
+	\operatorname{Mult}(x_1,x_2,\ldots,x_K|n, q_1,q_2,\ldots,q_K) = \frac{n!}{x_1!x_2!\ldots x_K!}\prod_{i=1}^K q_i^{x_i}
+\end{equation}
+when $\sum_{i=1}^K x_i = n$, $0$ otherwise. We can also express this with gamma functions to shows it correspondence to the Dirichlet distribution:
+\begin{equation}
+	\operatorname{Mult}(x_1, x_2,\ldots,x_K|n, q_1,q_2,\ldots,q_K) = \frac{\Gamma(\sum_{i=1}^K x_i+1)}{\prod_{i=1}^K \Gamma(x_i+1)}\prod_{i=1}^K q_i^{x_1}.
+\end{equation}
+
+\begin{equation}
+	\left(\frac{\Gamma(\sum_{i=1}^K x_i+1)}{\prod_{i=1}^K \Gamma(x_i+1)}\prod_{i=1}^K q_i^{x_1}\right)\left(\frac{\Gamma(\alpha_0)}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}\right)
+\end{equation}
+
+Now consider an example in which we have $L$ documents, each assigned to a pmf $q^{(1)}, \ldots, q^{(L)}$, each $q^{(i)} \overset{\text{iid}}{\leftarrow} Q$, and $Q\sim\operatorname{Dir}(\alpha)$. If we draw iid $n_i$ samples from each pmf $q^{(i)}$
+\begin{equation}
+	\operatorname{Dir}(\alpha) \overset{\text{iid}}{\rightarrow}
+    \begin{cases}
+    q^{(1)} \overset{\text{iid}}{\rightarrow} x_{1,1}, x_{1,2},\ldots,x_{1,n_1} \triangleq x_1\\
+    q^{(2)} \overset{\text{iid}}{\rightarrow} x_{2,1}, x_{2,2},\ldots,x_{2,n_2} \triangleq x_2 \\
+    \vdots \\
+    q^{(L)} \overset{\text{iid}}{\rightarrow} x_{L,1}, x_{L,2},\ldots,x_{L,n_L} \triangleq x_L \\
+  \end{cases}
+\end{equation}
+then $\{x_i\}$ are the realisation of a compound Dirichlet distribution, also known as the multivariate P\'olya distribution that we saw earlier with $L$ different balls and $n_i$ colours. Now the distributions over distributions is not uniform, but concentrated around certain distributions by means of the concentration parameter $\alpha$.
+
+\subsection{The Dirichlet distribution as a parametrised prior}
+
+In the previous sections we discussed the CRP, stick-breaking process, and urn schemes. In the remainer of this section we briefly discuss the same concepts, but now in the context of the Dirichlet distribution with the new concentration parameter $\alpha$. 
+
+If we start with the urn scheme, then we want to generate a realisation $Q\sim\operatorname{Dir}(\alpha)$. That is, we put $\alpha_i$ balls of colour $i$ for $i=1,2,\ldots,K$ in an urn. Note that $\alpha_i>0$ and is not necessarily an integer. The process of drawing balls is similar to the multivariate P\'olya urn discussed earlier, but now we can have a different number of coloured balls.\footnote{The distribution is not uniform anymore, but now models a Dirichlet-multinomial distribution with concentration parameter $\alpha$.} At each iteration, we draw one ball uniformly at random from the urn, and then place it back into the urn along with an additional ball of the same colour. As we iterate this process, the proportions of balls of each colour will converge to a pmf that is a sample from the distribution $\operatorname{Dir}(\alpha)$. Let $Q_n = (Q_{n1}, Q_{n2},\ldots,Q_{nk})$, where $Q_{ni}$ is the proportion of balls of colour $i$ after $n$ balls are in the urn. Then $Q_n \rightarrow_\text{d} Q \sim \operatorname{Dir}(\alpha)$ as $n\rightarrow\infty$, with $\rightarrow_\text{d}$ denoting convergence in distribution.\footnote{$p(Q_{n1}\leq z_1, Q_{n2}\leq z_2, \ldots, Q_{nk}\leq z_k) \rightarrow p(Q_1\leq z_1, Q_2\leq z_2,\ldots,Q_K\leq z_K)$ as $n\rightarrow\infty$ for all $(z_1,z_2,\ldots,z_3)$.} 
+
+%For the parametric version of the CRP, with the number of tables and dishes fixed, the process of introducing the concentration parameter $\alpha$ is quite similar. In a restaurant with $n$ customers, the probability of joining a table $t$ is still proportional to $|t|$. However, the chance of joining a new table is now proportional to $\alpha$. The new probabilities are thus:
+%\begin{itemize}
+%	\item Joining another customer: $\frac{1}{n+\alpha}$;
+%    \item Joining table $t$: $\frac{|t|}{n+\alpha}$;
+%    \item Starting a new table: $\frac{\alpha}{n+\alpha}$.
+%\end{itemize}
+
+For the CRP in a parametric setting, with the number of tables and dishes fixed, there is no analog for introducing the concentration parameter.
 
 
 
-\section{Dirichlet Process}
 
 \section{Pitman-Yor Process}
