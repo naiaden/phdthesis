@@ -8,7 +8,7 @@ A common misconception about non-parametrics is that it means that there are no 
 
 The chapter is built as one large explanation of how to build a language model within a Bayesian non-parametric framework. Many of the concepts are introduced sideways, but we tried to separate them into sections as well. If a concept is explained in more detail in another section, we have listed a reference. Although it is a custom in Bayesian literature to first specify a generative model, we start from an example, only to derive at the generative model at the end.
 
-\section{A Bayesian Approach to Language Modelling}
+\section{A Bayesian Approach to Unigram Language Modelling}
 
 Different from the standard frequentist approach to language modelling, which in essence is based on estimating the maximum likelihood estimate for a pattern, in a Bayesian approach we assume that the pattern comes from a certain distribution and that the texts are generated according to some underlying process. This process is latent, and the same process can generate different texts. The frequentist approach is to model the observed texts, and estimate the probabilities of unseen text based on these observations. The Bayesian way is to infer the underlying process and its pattern distributions. Of course any process could have been used, and if we choose a process, there is no garantuee that it is the best process. One of the most widely used processes to describe such underlying models for textual data is the Chinese Restaurant Process, which we will introduce in the next section. We will show that some of its properties are different from real-life observations, and show how we can adapt the process to model this real-life behaviour.
 
@@ -107,7 +107,7 @@ The expected number of tables as $M \rightarrow \infty$ is... This can be seen a
 
 
 
-\section{Stick-breaking}\marginnote{The stick-breaking process describes a probability distribution over partition sizes.}
+\subsection{Stick-breaking}\marginnote{The stick-breaking process describes a probability distribution over partition sizes.}
 In the previous section we defined a process to generate a distribution over partitions by means of a seating arrangement. In this section we introduce a new metaphore called the stick-breaking distribution which defines the distribution of customers sitting at the tables, without generating an explicit seating arrangement.
 
 The stick-breaking process\cite{Ishwaran2001Gibbs} is a distribution on the infinite sequence  $\xi = (\xi_1,\xi_2,\ldots)$; it is also known as the GEM distribution.\footnote{The GEM distribution is named after Griffiths, Engen, and McCloskey, cf.\ \cite{Pitman1997The}}
@@ -139,7 +139,7 @@ with $\delta(\cdot)$ being the Dirac delta measure, used as an indicator functio
 
 
 
-\section{Urn Representation}
+\subsection{Urn Representation}
 Another way to fill the Chinese restaurant is by means of drawing balls from an urn. Different from the CRP where we assigned each customer to its table, with the urn representation we have a process where we select a table, and consequently assign a customer to that table.
 
 The urn works as follows. An urn contains objects of various types, where the objects are customarily called the balls, and each ball type can be distinguished by its colour. In general the content of an urn can change over time, subject to rules of placing balls into the urn, or drawing balls under predesignated replacement schemes. A simple example is when there is a particular distribution $P$ of balls in the urn, and you immediately replace the drawn ball after noting its colour; drawing a ball from the urn is then the same as drawing from distribution $P$. In this case $P$ is a fixed distribution. By adding or removing balls after each draw, the distribution can also be dynamic.
@@ -180,10 +180,10 @@ The $\frac{1}{n!}$ comes from the fact that in order to get $K$ colours, the bla
 %http://mlss11.bordeaux.inria.fr/docs/mlss11-Teh.pdf
 
 
-\section{The Dirichlet Process: a Complete Prior}
+\subsection{The Dirichlet Process: a Complete Prior}
 In the Chinese restaurant process we observed a language model from the perspective of the customers, representing the word occurrences. There we saw that according to the CRP, they all have an equal probability of joining another customer, and the probability of joining an existing table was proportional to the number of customers already sitting at that table. In the Hoppe-P\'olya urn scheme, we watched the same process from the table point-of-view; here we saw customers joining tables or starting new tables. By means of the stick-breaking process, we observed a way to describe the distribution over number of customers sitting at tables.
 
-Now, saying that customers have an equal likelihood of sitting at eachother's tables is a strong limitation. Therefore we introduce a parametrised generalisation of the previous priors, called the Dirichlet Process, that encompasses all of the above. Historically the Dirichlet process was invented first, and the other processes were all invented to provide tractable methods for using the Dirichlet process. 
+Now, saying that customers have an equal likelihood of starting a new table is a strong limitation. Therefore we introduce a parametrised generalisation of the previous priors, called the Dirichlet Process, that encompasses all of the above. Historically the Dirichlet process was invented first, and the other processes were all invented to provide tractable methods for using the Dirichlet process. 
 
 To come to the Dirichlet process from the line of processes that we followed in this thesis, we introduce a concentration parameter $\alpha $. If we set $\alpha = 1$, we reduce the Dirichlet process to a process coherent with the CRP, stick-breaking process, and Hoppe-P\'olya urn scheme that we saw in the previous sections.  
 
@@ -191,15 +191,15 @@ The Dirichlet Process is a way of assigning a probability distribution over prob
 
 We will start with a somewhat informal introduction. The Dirichlet Process is a stochastic process, and is often coined the cornerstone of Bayesian nonparametric models. It represents a distribution over distributions, such that each draw from a Dirichlet process is a distribution itself. It is called a Dirichlet process because it has Dirichlet distributed finite dimensional marginal distributions. The distributions drawn from a Dirichlet process are discrete, but cannot be described using a finite number of parameters, hence the Dirichlet process is classified as a nonparametric model.
 
-\subsection{Dirichlet Process}
+\subsection{Introduction to the Dirichlet Distribution}
 
 Assume we have a corpus $\mathcal{C}$ with $W$ words and vocabulary $V$, and we want to compare two documents $\mathcal{D}_1$ and $\mathcal{D}_2$ from this corpus. In a Bayesian setting we again assume some underlying probability mass function $q$ generating the documents, sampled from the random probability mass function $Q$, such that $q_1,q_2\in Q$. With the Dirichlet distribution we can model the randomness between the two documents. If we assume that all words have an equal probability, then we can imagine a fair $W$-sided die. A document is then generated by rolling the die, and each outcome is a word token $v\in V$. The die can be represented by a probability mass function of length $W$, with a uniform distribution. Now we have for both $\mathcal{C}_1$ and $\mathcal{C}_2$ a probability mass function, and we can use the Dirichlet distribution to capture the variability.
 
 In practice the distribution of words is not uniform, and the probability mass function is then of length $W$ but normalised over the empirical word frequencies. 
 
-More formally, let $Q = [Q_1, Q_2, \ldots, Q_K]$ be a random pmf with $K$ components, with $Q_i \geq 0$ for $i = 1,2,\ldots,K$ and $\sum_{i=1}^K Q_i = 1$. In addition, suppose that $\alpha = [\alpha_1,\alpha_2,\ldots,\alpha_K]$,\footnote{Although perhaps confusing, this is not necessarily the same $\alpha$ as the Dirichlet process concentration parameter, although in practice this is often the case. Here we just follow the convention of the literature, where $\alpha$ is also used to denote the concentration parameter of the Dirichlet distribution.} with $\alpha_i > 0$ for each $i$ and let $\alpha_0 = \sum_{i=1}^K \alpha_i$.\footnote{If $\alpha_1=\alpha_2=\ldots=\alpha_K$, then we call $\alpha$ symmetric, and the distribution a symmetric Dirichlet distribution.} Then $Q$ is said to have a Dirichlet distribution with parameter $\alpha$, which we can denote by $Q \sim \operatorname{Dir}(\alpha)$:\footnote{See Section 2 of \citet{Ferguson1973A} for a more elaborate introduction, with many technicalities that we assume to be true; where not, we will indicate this.\cite{Ferguson1973A}}
+More formally, let $Q = [Q_1, Q_2, \ldots, Q_K]$ be a random pmf with $K$ components, with $Q_i \geq 0$ for $i = 1,2,\ldots,K$ and $\sum_{i=1}^K Q_i = 1$. In addition, suppose that parameter vector $\alpha = [\alpha_1,\alpha_2,\ldots,\alpha_K]$,\footnote{Although perhaps confusing, this is not necessarily the same $\alpha$ as the Dirichlet process concentration parameter, although in practice this is often the case. Here we just follow the convention of the literature, where $\alpha$ is also used to denote the concentration parameter of the Dirichlet distribution.} with $\alpha_i > 0$ for each $i$ and let $\hat{\alpha} = \sum_{i=1}^K \alpha_i$.\footnote{If $\alpha_1=\alpha_2=\ldots=\alpha_K$, then we call $\alpha$ symmetric, and the distribution a symmetric Dirichlet distribution.} Then $Q$ is said to have a Dirichlet distribution with parameter $\alpha$, which we can denote by $Q \sim \operatorname{Dir}(\alpha)$:\footnote{See Section 2 of \citet{Ferguson1973A} for a more elaborate introduction, with many technicalities that we assume to be true; where not, we will indicate this.\cite{Ferguson1973A}}
 \begin{equation}
-	\operatorname{Dir}(q; \alpha) = \frac{\Gamma(\alpha_0)}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}
+	\operatorname{Dir}(q; \alpha) = \frac{\Gamma(\hat{\alpha})}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}
 \end{equation}
 with $\Gamma(\cdot)$ denoting the gamma function (see~\cref{eq:gammaf}).
 
@@ -220,7 +220,7 @@ when $\sum_{i=1}^K x_i = n$, $0$ otherwise. We can also express this with gamma 
 	\left(\frac{\Gamma(\sum_{i=1}^K x_i+1)}{\prod_{i=1}^K \Gamma(x_i+1)}\prod_{i=1}^K q_i^{x_1}\right)\left(\frac{\Gamma(\alpha_0)}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}\right)
 \end{equation}
 
-Now consider an example in which we have $L$ documents, each assigned to a pmf $q^{(1)}, \ldots, q^{(L)}$, each $q^{(i)} \overset{\text{iid}}{\leftarrow} Q$, and $Q\sim\operatorname{Dir}(\alpha)$. If we draw iid $n_i$ samples from each pmf $q^{(i)}$
+Now consider an example in which we have $L$ documents, each assigned to a pmf $q^{(1)}, \ldots, q^{(L)}$, each drawn from the a distribution $Q$ such that $q^{(i)} \overset{\text{iid}}{\leftarrow} Q$, and $Q\sim\operatorname{Dir}(\alpha)$ being a distribution drawn from a distribution over distributions. If we draw iid $n_i$ samples from each pmf $q^{(i)}$
 \begin{equation}
 	\operatorname{Dir}(\alpha) \overset{\text{iid}}{\rightarrow}
     \begin{cases}
@@ -232,22 +232,145 @@ Now consider an example in which we have $L$ documents, each assigned to a pmf $
 \end{equation}
 then $\{x_i\}$ are the realisation of a compound Dirichlet distribution, also known as the multivariate P\'olya distribution that we saw earlier with $L$ different balls and $n_i$ colours. Now the distributions over distributions is not uniform, but concentrated around certain distributions by means of the concentration parameter $\alpha$.
 
-\subsection{The Dirichlet distribution as a parametrised prior}
+\subsection{Dirichlet Multinomial Compound Mixture Model}
 
-In the previous sections we discussed the CRP, stick-breaking process, and urn schemes. In the remainer of this section we briefly discuss the same concepts, but now in the context of the Dirichlet distribution with the new concentration parameter $\alpha$. 
+By means of an example, we show that the multivariate P\'olya urn scheme indeed converges to a Dirichlet distribution in a parametric setting. We can do the same for the stick-breaking process, where we limit the number of breaks to $(k-1)$, which leaves us with $k$ pieces. For the CRP there seems to be no sensible parametric metaphore, so the next step is then to introduce these priors into a nonparametric setting. We will do this in the next section.
 
 If we start with the urn scheme, then we want to generate a realisation $Q\sim\operatorname{Dir}(\alpha)$. That is, we put $\alpha_i$ balls of colour $i$ for $i=1,2,\ldots,K$ in an urn. Note that $\alpha_i>0$ and is not necessarily an integer. The process of drawing balls is similar to the multivariate P\'olya urn discussed earlier, but now we can have a different number of coloured balls.\footnote{The distribution is not uniform anymore, but now models a Dirichlet-multinomial distribution with concentration parameter $\alpha$.} At each iteration, we draw one ball uniformly at random from the urn, and then place it back into the urn along with an additional ball of the same colour. As we iterate this process, the proportions of balls of each colour will converge to a pmf that is a sample from the distribution $\operatorname{Dir}(\alpha)$. Let $Q_n = (Q_{n1}, Q_{n2},\ldots,Q_{nk})$, where $Q_{ni}$ is the proportion of balls of colour $i$ after $n$ balls are in the urn. Then $Q_n \rightarrow_\text{d} Q \sim \operatorname{Dir}(\alpha)$ as $n\rightarrow\infty$, with $\rightarrow_\text{d}$ denoting convergence in distribution.\footnote{$p(Q_{n1}\leq z_1, Q_{n2}\leq z_2, \ldots, Q_{nk}\leq z_k) \rightarrow p(Q_1\leq z_1, Q_2\leq z_2,\ldots,Q_K\leq z_K)$ as $n\rightarrow\infty$ for all $(z_1,z_2,\ldots,z_3)$.} 
 
-%For the parametric version of the CRP, with the number of tables and dishes fixed, the process of introducing the concentration parameter $\alpha$ is quite similar. In a restaurant with $n$ customers, the probability of joining a table $t$ is still proportional to $|t|$. However, the chance of joining a new table is now proportional to $\alpha$. The new probabilities are thus:
-%\begin{itemize}
-%	\item Joining another customer: $\frac{1}{n+\alpha}$;
-%    \item Joining table $t$: $\frac{|t|}{n+\alpha}$;
-%    \item Starting a new table: $\frac{\alpha}{n+\alpha}$.
-%\end{itemize}
-
-For the CRP in a parametric setting, with the number of tables and dishes fixed, there is no analog for introducing the concentration parameter.
-
+The model can be described by:
+\begin{align}
+    Q|\alpha &\sim \operatorname{Dir}(\frac{\alpha}{K},\ldots,\frac{\alpha}{K}) \\
+    q^{(i)}|Q&\sim\operatorname{Mult}(\pi) \\
+    \phi_k | G_0 &\overset{\text{iid}}{\sim} G_0 \\
+    x_i|q^{(i)},\{\phi_K\}&\overset{\text{ind}}{\sim} F(\phi_{z_i}).
+\end{align}
 
 
+\subsection{Formalising The Dirichlet Process}
+Earlier we already made a remark that vocabularies are not necessarily of finite length. With the Dirichlet distribution we have to set $k$ upfront, because it is a parametrised model. In order to facilitate this, we use the Dirichlet process. 
 
-\section{Pitman-Yor Process}
+For a random distribution $G$ to be distributed according to a Dirichlet process, its marginal distributions have to be Dirichlet distributed. Let the Dirichlet process be parametrised by a base distribution $G_0$ and a positive scaling parameter $\alpha$.\footnote{\citet{Ferguson1973A} parametrises the Dirichlet process with a with base measure, which is $\alpha G_0$ is our notation.} Then for any finite partition $A_1,\ldots,A_k$ of $\{\phi\}$ the vector $(G(A_1),\ldots,G(A_k))$ is random since $G$ is random. We then say $G$ is Dirichlet process distributed with base distribution $G_0$ and concentration parameter $\alpha$, which we denote as $G\sim\operatorname{DP}(\alpha, G_0)$, if 
+\begin{align}
+	(G(A_1),\ldots,G(A_k)) \sim \operatorname{Dir}(\alpha G_0(A_1), \ldots,\alpha G_0(A_k)).
+\end{align}
+
+The base distribution $G_0$ is basically the mean of the Dirichlet process, since for any measurable set $A\subset\{\phi\}$ we have $\mathbb{E}[G(A)]=G_0(A)$. The concentration parameter can be understood as the inverse variance: $\operatorname{Var}(G_0(A))= \frac{1-G_0(A)}{\alpha +1 }G_0(A)$. The larger $\alpha$ is, the smaller the variance, and the Dirichlet process will concentrate more of its mass around the mean. Other names for $\alpha$ are the mass parameter, as this prior strength can be measured in units of mass of observations. Sometimes it is also called the strength parameter, when they refer to the strength of the prior when using the Dirichlet process as a nonparametric prior.
+
+For the Dirichlet distribution and the multivariate P\'olya urn scheme, we saw that if we kept on drawing and placing balls according to its replacement scheme, we approached the true underlying distribution. For the Dirichlet process we can do a similar exercise. Let $G$ be a random distribution $G\sim\operatorname{Dir}(\alpha, G_0)$. Let $\theta_1,\ldots,\theta_n$ be a sequence of independent draws from $G$. 
+\textbf{Not finished}
+
+
+Recall the Chinese restaurant process. Now the process for a Dirichlet process CRP (DPCRP) is as follows: the first customer enters the restaurant and sits at the first table. Each $(m+1)$th customer either joins an already occupied table $t$ with a probability $\frac{|t|}{m+\alpha}$, or sits at a new table with a probability $\frac{\alpha}{m+\alpha}$:\footnote{Compare this to the probabilities for the CRP: \cref{eq:crp-table}.}
+\begin{equation}\label{eq:dpcrp-table}
+	p(x_{m+1}\text{ seats at }t|\pi_{[m]}) = 
+    \begin{cases}
+    	\frac{|t|}{m+\alpha}, & \text{if }t\in\pi_{[m]},\\
+    	\frac{\alpha}{m+\alpha}, & \text{otherwise}.
+  	\end{cases}
+\end{equation}
+
+The properties on exchangeability still hold. In \cref{partitionexampleprobability} we computed the probability of $\pi_{[12]}$ (\cref{eq:partitionexample}) as generated by a CRP:
+\begin{equation}
+	\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
+\end{equation}
+We can do the same for a DPCRP:
+\begin{equation}\label{eq:dppartitionexampleprobability}
+	p(\pi_{[12]}) = \frac{\alpha}{\alpha}\frac{1}{1+\alpha}\frac{\alpha}{2+\alpha}\frac{1}{3+\alpha}\frac{2}{4+\alpha}\frac{\alpha}{5+\alpha}\frac{\alpha}{6+\alpha}\frac{2}{7+\alpha}\frac{3}{8+\alpha}\frac{3}{9+\alpha}\frac{1}{10+\alpha}\frac{2}{11+\alpha},
+\end{equation}
+which we can generalise as:
+\begin{align}
+	p(\pi_{[m]}) = \frac{\prod_{t\in\pi_{[m]}}(|t|-1)!}{m!} \frac{a^K}{a^{(K)}}
+\end{align}
+with $a^{(x)} = a(a+1)(a+2)\ldots(a+x-1)$ denoting the rising factorial.\footnote{Also known as the Pochhammer factorial.} It is interesting to look at the expected number of tables after $(m+1)$ customers. Note that for each customer the probability of starting a new table, $\frac{\alpha}{i+\alpha}$, is independent of the number of tables among the previous customers. We use the same notation where we denote the number of tables $K$ after $n$ customers as $k_m = \sum_i \tau_i$, which is equal to
+\begin{align}
+	\sum_i \frac{\alpha}{(i-1)+1} = \alpha(\psi(\alpha+(m+1))-\psi(\alpha))
+\end{align}
+with $\psi(\cdot)$ denoting the digamma function. It grows logarithmically with $O(\alpha \log(1+\frac{m}{\alpha}))$. Note that $\alpha$ controls the number of clusters in a direct manner, with larger $\alpha$ implying a larger number of clusters a priori.
+
+The stick-breaking process is also very similar to the unparametrised prior we saw earlier. Now we parametrise $\operatorname{Beta}$ as follows: $\operatorname{Beta}(1,\alpha)$. The process is then defined as:
+\begin{align}
+	\xi'_k &\sim\operatorname{Beta}(1,\alpha) \\
+    \xi_k &= \xi'_k \prod_{i=1}^{k-1}(1-\xi'_i) \\
+    \phi_k&\sim G_0 \\
+    F &= \sum_{k=1}^\infty \xi_k\cdot\delta_\phi(\phi)
+\end{align}
+Then $G\sim\operatorname{DP}(\alpha,G_0)$. The distribution over $\xi$ is also written as $\xi\sim\operatorname{GEM}(\alpha)$.
+
+For the urn scheme the extension with a concentration parameter $\alpha$ is more straight-forward. Recall the Hoppe-P\'olya urn. In the original model there was only one black ball. If you drew the black ball, you had to put the black ball back, alongside a ball of a new colour. For any other coloured ball that was drawn, two balls of the same colour were placed in the urn. Now in the parametrised version, there are $\alpha$ black balls in the urn. Similar to the DRCRP where the chance of starting a new table was proportional to $\alpha$, independent of what other customers did, the chance in the DP Hoppe-P\'olya urn of adding a new colour is $\alpha$.
+
+\subsection{The Dirichlet Process Mixture Model}
+The moest common application of the Dirichlet process is in clustering data using mixture models. Here the nonparametric nature of the Dirichlet process translates to mixture models with a countably infinite number of components. We model a set of observations $\{x_1, x_2, \ldots, x_n\}$ using a set of latent variables $\{\theta_1,\theta_2,\ldots,\theta_n\}$. Each $\theta_i$ is drawn idd from $G$, while each $x_i$ has distribution $F(\theta_i)$ parametrised by $\theta_i$:
+\begin{align}
+	x_i|\theta_i&\sim F(\theta_i) \\
+    \theta_i|G&\sim G \\
+    G|\alpha,G_0&\sim\operatorname{DP}(\alpha,G_0).
+\end{align}
+Because $G$ is discrete, multiple $\theta_i$s can take on the same value, and the model can be seen as a mixture model, where $x_i$'s with the same value of $\theta_i$ belong to the same cluster. Using the DP stick-breaking prior, we can make the model more in the usual mixture model perspective:
+\begin{align}
+	\pi|\alpha&\sim\operatorname{GEM}(\alpha) \\
+    z_i|\pi&\sim\operatorname{Mult}(\pi) \\
+    \theta_k|G_0&\sim G_0 \\
+    x_i|z_i, \{\theta_k\}&\sim F(\theta_{z_i})
+\end{align}
+with $G = \sum_{k=1}^\infty \pi_k\delta_{\theta_k}$ and $\theta_i = \theta_{z_i}$; $\pi$ is then the mixing proportion, $\theta_k$ the cluster parameters, $F(\theta_k)$ the distribution over data in cluster $k$, and $G_0$ the prior over cluster parameters.
+
+The Dirichlet process mixture model can take on a countably infinite number of clusters, it is therefore called an infinite mixture model. However, the $\pi_k$'s descrease exponentially quick, hence only a small (logarithmic) number of clusters will be used to modle the data a priori.
+
+
+
+\subsection{Pitman-Yor Process: The Process}
+With the Dirichlet process we defined a prior distribution over distributions, where we used the mass parameter $\alpha$ to assign a relative mass to choosing new tables in the DPCRP and new colours in the Hoppe-P\'olya urn. Our goal is to create a language models using Bayesian nonparamatric priors. With the priors we have seen until now, the growth of the number of tables or colors, or in the case of a language model, the occurence of word types, is still logarithmic. However, in language, many patterns seem to follow a power law\footnote{A power law is a relationship between two quantities, where one quantity varies as a power of another, which is typically of the form $f(x)=ax^k$} growth. 
+To achieve a power law growth with the exponential growth Dirichlet process, we have to introduce yet another parameter: the discount parameter $0 \leq \gamma < 1$. The Pitman-Yor process is a generalisation of the Dirichlet process, because if we set $\gamma = 0$, it reduces to a Dirichlet process.
+
+The Pitman-Yor process is thus a distribution over distributions over a probability space $X$. It has three parameters: a discount parameter $0\leq\gamma<1$, a strength parameter $\alpha > -\gamma$, and a base distribution $G_0$ over $X$. 
+
+The Pitman-Yor process can also be described by the Chinese restaurant process (PYCRP). It describes the properties of the Pitman-Yor process in terms of distirbutions over draws from $F$, which correspond to words whose distributions we wish to model. Let $x_1, x_2,\ldots$ be iid draws from $F$. The first customer enters the restaurant and sits at the first table. Each $(m+1)$th customer sits at the $t$th occupied table with a probability proportional to $|t|-\gamma$, and sits at an unoccupied table with a probability proportional to $\alpha+k\gamma$:
+\begin{align}
+	p(x_{m+1}\text{ seats at }t|\pi_{[m]}) = 
+    	\begin{cases}
+        	\frac{|t|-\gamma}{\alpha+m}, & \text{if }t\in\pi_{[m]},\\
+           	\frac{\alpha+k\gamma}{\alpha+m}, & \text{otherwise}\\ 
+        \end{cases}
+\end{align}
+and its conditional distribution is:
+\begin{align}\label{eq:pycrpconddist}
+	x_{m+1}|x_1,\ldots,x_m, \pi_{[m]} \sim \sum_{i=1}^k \frac{|i|-\gamma}{\alpha+m}\delta_\phi(\phi) + \frac{\alpha+k\gamma}{\alpha+m}G_0
+\end{align}
+
+The PYCRP can also be shown to be exchangeable, similar in argument to the CRP and DPCRP. 
+
+An explicit construction of draws from a Pitman-Yor process is given by the stick-breaking construction. It shows that the posterior distribution is a weighted sum of an infinite sequence of points masses with probability one. In the original stick-breaking process we used $\operatorname{Beta}(1,1)$, in the stick-breaking process for the Dirichlet process $\operatorname{Beta}(1,\alpha)$, and now, for the Pitman-Yor process, we use both parameters: $\operatorname{Beta}(1-\gamma, \alpha+k\gamma)$, where $k$ is the number of pieces already broken of stick. Let $\xi_1,\xi_2,\ldots$ and $\phi_1, \phi_2,\ldots$ be two sequnces of independent random variables. The distribution is then given by the density:
+\begin{align}
+	\xi'_k &\sim \operatorname{Beta}(1-\gamma, \alpha+k\gamma)\\
+    \xi_k &= \xi'_k\prod_{i=1}^{k-1}(1-\xi'_i) \\
+	\phi_k &\sim G_0 \\
+	F &= \sum_{k=1}^\infty \xi_k \delta_\phi(\phi)
+\end{align}
+then $F\sim\operatorname{PYP}(\alpha, \gamma, G_0)$.
+
+\subsection{Pitman-Yor Process: The Bayesian Unigram Language Model}
+Throughout this section we introduced three two distributions over distributions: the Dirichlet process and the Pitman-Yor process. For both processes we saw that there are three specific scenarios that we can use to describe the processes, albeit from three different perspectives: the Chinese restaurant process, the stick-breaking process, and the urn scheme.
+
+This all lead to the Pitman-Yor process that shows power law behaviour, similar to patterns we find in language. In the remainder of this section we fulfil our statement from the beginning of this section that we wanted to build a unigram language model, as this is this basis for a $n$-gram language model, which is introduced in the next section.
+
+Consider using the Pitman-Yor process as a prior for unigram word distributions. We use a uniform word distribution over our fixed vocabulary $V$ of $W$ words as the base distribution $G_0$, while the draw from the Pitman-Yor process $F$ is the desired unigram distribution over words. Repeating the beginning of this section; we have  a training corpus $\mathcal{D}$ comprising $M$ datapoints with $c(w)$ occurrences of word $w\in V$. In the PYCRP this is reflected as $c(w)$ customers eating dish $w$, at any table. We now also have the seating arrangement $\pi_{[M]}$ of the $M$ customers $x_1, \ldots, x_M$. Now let $\theta_w$ be the number of any of the $k$ occupied tables in the restaurant serving dish $w$. The predictive probability of a new word given the seating arrangement is given by \cref{eq:pycrpconddist}, which evaluates to:
+\begin{align}
+	p(x_{M+1} = w | \pi_{[M]}) = \frac{c(w)-t_w\gamma}{\alpha+M}+\frac{\alpha+k\gamma}{\alpha+M}G_0(w)
+\end{align}
+by aggregating the probabilities in \cref{eq:pycrpconddist} corresponding to each dish $w$. 
+
+\section{The Bayesian Approach to $n$-gram Language Modelling}
+
+\subsection{Chinese Restaurant Franchise}
+
+\subsection{Tree Stick-breaking Process}
+
+\subsection{Urn?}
+
+\subsection{Hierarchical Dirichlet Process}
+
+\subsection{Hierarchical Pitman-Yor Process: The Bayesian $n$-gram Language Model}
+
+
+
