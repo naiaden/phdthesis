@@ -1,4 +1,15 @@
-\chapter{Introduction to Bayesian $n$-gram and Domain-dependent Language Modelling}
+\chapter{Chapter 2\newline Introduction to Bayesian $n$-gram %and Domain-dependent 
+Language Modelling}
+
+In the previous chapter we introduced language models in which the word probabilities are based on the underlying fixed, but unknown, (joint) distributions from which we assume that we sample our training examples in a frequentist manner. Those distributions are observed by simply counting $n$-grams. If the corpus is too small compared to the model complexity, this yields unreliable counts; smoothing is a technique to rectify these counts.  The downside of most smoothing techniques is that they do not rely on a statistical model, but merely rely on heuristics such as discounting, interpolation, and back-off schemes.
+
+In this chapter we introduce the Bayesian counterpart to language modelling, where we use the posterior distribution to estimate the underlying distribution. We use an approach that allows the model complexity to grow with the corpus size, as to avoid unreliable counts often found by MLE, and to avoid statistical artefacts caused due to overfitting. 
+
+The Bayesian language models have a basis which is firmly nested in probability theory. The literature contains many metaphors to simplify mathematical concepts. The goal of this chapter is twofold. First we want to demystify the metaphors by first introducing them in their simplest form, and from thereon extend them to the variants often found in literature. Second, we show how you can build language models with these concepts, and why these concepts are a good basis for language models. Although this chapter requires some basic knowledge of probability theory, we provide explanations and references where this might be useful.
+
+After reading this chapter, we assume you know about using the Chinese restaurant process, the Hoppe-P\'olya urn, and stick-breaking processes, and how they can be used as a prior in mixture models such as the Dirichlet process mixture model and the nested Pitman-Yor process mixture model, which is the Bayesian $n$-gram language model that we use throughout this thesis.
+
+\newpage
 
 \marginnote{Central to this chapter is the theorem of Bayes, which is a powerful way to relate current belief to prior belief, e.g.~by using new evidence to update prior beliefs into current beliefs. In its simplest form, Bayes' theorem can be stated as:
 \begin{align}
@@ -6,11 +17,9 @@
 \end{align}
 Here $A$ is the proposition, and $B$ the evidence or belief. $p(A)$ is the the prior probability, the initial degree of belief in $A$, and $p(A|B)$ the posterior probability, the degree of belief in $A$, given the evidence $B$.}
 
-
-
 In this chapter we look at the priors and processes underlying a Bayesian language model. In most studies on the topic it is either considered from a bottom-up approach, or from a top-down approach. The first approach is really useful given a strong probabilistic background, whereas the latter is more convenient if the reader already has (vaguely) heard about the priors and processes involved. The approach of this chapter is to make the priors and processes understandable for the reader who has neither.
 
-Recall that our goal is to devise a language model within a non-parametric Bayesian (BNP) framework. The BNP approach is an alternative to parametric modelling and model selection.\footnote{Model selection is the task of selecting a model from a set of candidate models. Given a data set, the goal is to select the model with the best explanatory power, and favourably also the simplest model. Famous criteria are cross-validation and \cite{Kohavi1995A} Akaike information criterion.\cite{Bozdogan1987Model} For a more general introduction see \cite{Burnham2002Model} }
+Recall that our goal is to devise a language model within a non-parametric Bayesian (BNP) framework. The BNP approach is an alternative to parametric modelling and model selection.\footnote[][1em]{Model selection is the task of selecting a model from a set of candidate models. Given a data set, the goal is to select the model with the best explanatory power, and favourably also the simplest model. Famous criteria are cross-validation \citep{Kohavi1995A} and the Akaike information criterion \citep{Bozdogan1987Model}. For a more general introduction see \citep{Burnham2002Model}.}
 In many statistical inference problems, we expect that structures or patterns continue to emerge as data accrue, perhaps even without limit. We want a modelling framework that supplies a growing, unbounded number of degrees of freedom to the data analysis. However, if we allow the degrees of freedom to accrue too quickly, we risk finding structures that are statistical artifacts; a typical example of such artifact is overfitting. Overfitting is a serious problem, and it motivates the Bayesian aspect of non-parametrics. In many parametric paradigms, a number of parameters needs to be set which optimises a certain value. However, more of different data might already require another number of parameters. 
 Although Bayesian methods are by no means immune to overfitting, they provide a natural resilience to it. By using a model with an unbounded complexity, underfitting is migitated, while computing, or approximating, the full posterior over parameters migitates overfitting.
 
@@ -28,7 +37,7 @@ Assume we have a data set $\mathcal{D}$ of $M$ data points $x_1, x_2, \ldots, x_
 v_i$ its frequency $c(v_i)$.\footnote{$c_\mathcal{D}(v_i) = \sum_{x\in\mathcal{D}} [x = v_i]$, with $[\cdot]$ being the indicator function, which returns $1$ if the expression evaluates to true, and returns $0$ otherwise.} In this abstraction we lose the sense of origin, the documents that contained the word, and we lose any positional information. Yet, for our unigram language model this is of no concern. We will store the words and their frequencies by means of the Chinese restaurant process.
 
 \section{The Chinese Restaurant Process}\marginnote{The Chinese restaurant process describes a family of probability distributions over partitions.}
-The Chinese restaurant process (CRP)\footnote{The restaurant metaphor was attributed to Jim Pitman by \cite{Aldous1985Exchangeability}} is one of the many metaphors to simplify difficult concepts and their underlying mathematical principles. 
+The Chinese restaurant process (CRP)\footnote{The restaurant metaphor was attributed to Jim Pitman by \citep{Aldous1985Exchangeability}} is one of the many metaphors to simplify difficult concepts and their underlying mathematical principles. 
 
 Imagine a restaurant with an infinite number of round tables, with enough space to host an infinite number of guests. Each table in the restaurant serves one dish, but multiple tables may serve the same dish.
 
@@ -262,7 +271,7 @@ then $\{x_i\}$ are the realisation of a compound Dirichlet distribution, also kn
 
 \subsection{Dirichlet Multinomial Compound Mixture Model}
 
-By means of an example, we show that the multivariate P\'olya urn scheme indeed converges to a Dirichlet distribution in a parametric setting. We can do the same for the stick-breaking process, where we limit the number of breaks to $(k-1)$, which leaves us with $k$ pieces. For the CRP there seems to be no sensible parametric metaphore, so the next step is then to introduce these priors into a nonparametric setting. We will do this in the next section.
+By means of an example, we show that the multivariate P\'olya urn scheme indeed converges to a Dirichlet distribution in a parametric setting. We can do the same for the stick-breaking process, where we limit the number of breaks to $(k-1)$, which leaves us with $k$ pieces. For the CRP there seems to be no sensible parametric metaphor, so the next step is then to introduce these priors into a nonparametric setting. We will do this in the next section.
 
 If we start with the urn scheme, then we want to generate a realisation $Q\sim\operatorname{Dir}(\alpha)$. That is, we put $\alpha_i$ balls of colour $i$ for $i=1,2,\ldots,K$ in an urn. Note that $\alpha_i>0$ and is not necessarily an integer. The process of drawing balls is similar to the multivariate P\'olya urn discussed earlier, but now we can have a different number of coloured balls.\footnote{The distribution is not uniform anymore, but now models a Dirichlet-multinomial distribution with concentration parameter $\alpha$.} At each iteration, we draw one ball uniformly at random from the urn, and then place it back into the urn along with an additional ball of the same colour. As we iterate this process, the proportions of balls of each colour will converge to a pmf that is a sample from the distribution $\operatorname{Dir}(\alpha)$. Let $Q_n = (Q_{n1}, Q_{n2},\ldots,Q_{nk})$, where $Q_{ni}$ is the proportion of balls of colour $i$ after $n$ balls are in the urn. Then $Q_n \rightarrow_\text{d} Q \sim \operatorname{Dir}(\alpha)$ as $n\rightarrow\infty$, with $\rightarrow_\text{d}$ denoting convergence in distribution.\footnote{$p(Q_{n1}\leq z_1, Q_{n2}\leq z_2, \ldots, Q_{nk}\leq z_k) \rightarrow p(Q_1\leq z_1, Q_2\leq z_2,\ldots,Q_K\leq z_K)$ as $n\rightarrow\infty$ for all $(z_1,z_2,\ldots,z_3)$.} 
 
@@ -398,11 +407,11 @@ by aggregating the probabilities in \cref{eq:pycrpconddist} corresponding to eac
 
 \section{The Bayesian Approach to $n$-gram Language Modelling}
 
-We can achieve hierarchy in a Bayesian model in various ways. In this section, and in the next section, we will discuss two different hierarchical models. The hierarchical Pitman-Yor process will be discussed in the next section, and can be used to model domain knowledge. In the remainder of this section we introduce the nested Pitman-Yor process, which we can use to model $n$-grams.\footnote{The difference can be considered as modelling the hierarchy within data (the nested Pitman-Yor process), and hierarchy between data (the hierarchical Pitman-Yor process). However, note that in the literature the nested Pitman-Yor process as a language model is often referred to as hierachical Pitman-Yor language model.} 
+We can achieve hierarchy in a Bayesian model in various ways. In this section, and in the next section, we will discuss two different hierarchical models. The hierarchical Pitman-Yor process will be discussed in the next section, and can be used to model domain knowledge. In the remainder of this section we introduce the nested Pitman-Yor process, which we can use to model $n$-grams.\footnote[][-24em]{The difference can be considered as modelling the hierarchy within data (the nested Pitman-Yor process), and hierarchy between data (the hierarchical Pitman-Yor process). However, note that in the literature the nested Pitman-Yor process as a language model is often referred to as hierachical Pitman-Yor language model.} 
 
-We introduce dependence between distributions through linear combinations of realisations of independent Pitman-Yor processes, which we call the nested Pitman-Yor process.\cite{Teh2006AHierarchical,Teh2006ATechnical} There is also a body of similar work on nested Dirichlet processes.\cite{Blei2010The,Rodriguez2008The}
+We introduce dependence between distributions through linear combinations of realisations of independent Pitman-Yor processes, which we call the nested Pitman-Yor process.\cite[-19em]{Teh2006AHierarchical,Teh2006ATechnical} There is also a body of similar work on nested Dirichlet processes.\cite[-9em]{Blei2010The,Rodriguez2008The}
 
-Let $x_{ij}$ be the $i$th observation, with $i = 1,\ldots,k_n$ for subjects within layer $n$, for $n=1,\ldots,N$. In the context of our Bayesian language model, $n$ refers to the $n$-grams, $N$ is then the maximum $n$-gram length we model.\footnote{The Sequence memoizer introduced by \citet{Wood2009A} is a nested Pitman-Yor model with $N\rightarrow\infty$. \cite{Wood2009A}} And for each $n$-gram layer $n$ we have $k_n$ observations.
+Let $x_{ij}$ be the $i$th observation, with $i = 1,\ldots,k_n$ for subjects within layer $n$, for $n=1,\ldots,N$. In the context of our Bayesian language model, $n$ refers to the $n$-grams, $N$ is then the maximum $n$-gram length we model.\footnote[][-3em]{The Sequence memoizer introduced by \citet{Wood2009A} is a nested Pitman-Yor model with $N\rightarrow\infty$. \cite{Wood2009A}} And for each $n$-gram layer $n$ we have $k_n$ observations.
 
 From the previous section on Pitman-Yor unigram language models we had a finite vocabulary $V$ with $W$ words. For each word $w\in V$, we have $F(w)$ be the estimated probability of $w$. Now let $F=\{F(w)\}_{w\in V}$ be the vector of unigram probabilities, with a prior distribution given by $G_0$: 
 \begin{align}\label{eq:pypcontext}
@@ -421,13 +430,13 @@ In this definition, where $n$ can take up any value, we do not necessarily know 
 In the paper by \textcite{Teh2006ATechnical}, this process is called the hierarchical Chinese restaurant process. In the remainder of this thesis we will however call it the nested Chinese restaurant process. 
 
 \subsection{Nested Chinese Restaurant Process}
-To get back to the metaphore of the Chinese restaurant process, think of a huge building with multiple floors. Each floor has a different strategy. The first floor $n=1$ only serves one dish. On the second floor they serve two dishes. On the $N$th floor, they serve $N$ dishes. Now recall that the dishes were word types. On the $n$th floor, you get to choose $n-1$ dishes, and the $n$th dish is a desert. The order in which you order the $n-1$ dishes matters, just as it does in an $n$-gram.\footnote{Otherwise we would just have a bag of words.} Each floor consists of an unbounded number of rooms, each hosting a Chinese restaurant for a context $u$.
+To get back to the metaphor of the Chinese restaurant process, think of a huge building with multiple floors. Each floor has a different strategy. The first floor $n=1$ only serves one dish. On the second floor they serve two dishes. On the $N$th floor, they serve $N$ dishes. Now recall that the dishes were word types. On the $n$th floor, you get to choose $n-1$ dishes, and the $n$th dish is a desert. The order in which you order the $n-1$ dishes matters, just as it does in an $n$-gram.\footnote{Otherwise we would just have a bag of words.} Each floor consists of an unbounded number of rooms, each hosting a Chinese restaurant for a context $u$.
 
 The idea is that since $G_u$ is Pitman-Yor process distributed, we can draw words from it using the PYCRP. Furthermore, a floor in the restaurant only directly depends on the floor beneath, and we only need to be able to draw words from that PYCRP, by drawing words from its parent distribution $G_{\pi(u)}$. Since $G_{\pi(u)}$ is itself distributed as a Pitman-Yor process, we can recursively apply this step until we need draws from the global mean distribution $G_0$. This last step is easy, since it is a uniform distribution.
 
 Now let $x_{u1},x_{u2},\ldots$ be the sequence of words for context $u$, drawn iid from $G_u$; let $y_{u1},y_{u2},\ldots$ be another sequence drawn iid from the parent distribution $G_{\pi(u)}$. We use $m$ to index draws from $G_u$, and $n$ to index the draws from $G_{\pi(u)}$.\footnote{Because $n$ is the short version of $m$.} Define $t_{uwn}=1$ if $y_{un}$ takes on the value $m$, and $0$ otherwise. So if $m=\{m_1, m_2, m_3, m_4\}$, $u=\{m_1, m_2, m_3\}$ and $n=m_5$, then $t_{uwn} = 0$, because $y_{un} = \{m_1,m_2,m_3,m_5\}$. If $n=m_4$ then $t_{uwn} = 1$. In other words, if the context $u$ and the focus word $n$ make up the $n$-gram $m$, $t_{uwn} =1$, and otherwise it is $0$.
 
-Each word $x_{um}$ is assigned to one of the draws $y_{un}$ from $G_{\pi(u)}$. In the restaurant metaphore this means that if you have an $4$-gram $\{w_1,w_2,w_3,w_4\}$, its context $\{w_1,w_2,w_3\}$ is assigned to another floor, i.e.~it will sit at a table on the trigram floor.\footnote{Together with the ``real'' trigrams, of which in turn their context will sit be seated on the bigram floor, \&c.}
+Each word $x_{um}$ is assigned to one of the draws $y_{un}$ from $G_{\pi(u)}$. In the restaurant metaphor this means that if you have an $4$-gram $\{w_1,w_2,w_3,w_4\}$, its context $\{w_1,w_2,w_3\}$ is assigned to another floor, i.e.~it will sit at a table on the trigram floor.\footnote{Together with the ``real'' trigrams, of which in turn their context will sit be seated on the bigram floor, \&c.}
 
 If $y_{un}$ takes on value $w$,\footnote{Remember that then $t_{uwn}=1$, which means that $un=w$.} define $c_{uwn}$ as the number of words $x_{um}$ drawn from $G_u$ assigned to $y_{un}$, otherwise let $c_{uwn} = 0$. So if $y_{un}$ is the $n$-gram $w$, then we define $c_{uwn}$ as the number of words that follow $w$. E.g., $y_{un}$ is drawn from $G_{\pi(u)}$ and is the $(n-1)$-gram. $c_{uwn}$ then denotes the number of $n$-grams that can follow from $y_{un}$.
 
@@ -447,65 +456,65 @@ The first clause in \cref{eq:npyp1} states that if the there are no tables in re
 
 
 
-\section{The Bayesian Approach to Domain-dependent $n$-gram Language Modelling}
+% \section{The Bayesian Approach to Domain-dependent $n$-gram Language Modelling}
 
-\subsection{Chinese Restaurant Franchise}
+% \subsection{Chinese Restaurant Franchise}
 
-Recall the Chinese restaurant process, which is a metaphoric restaurant with an infinite number of round tables, with ample space to host an unbounded number of guests. Each table in the restaurant may serve only one dish, however, multiple tables may serve the same dish. We connected this to language modelling by saying that the customers are word tokens, the dishes the word types, and the number of customers eating a dish thus represent the occurrence count of that specific word.
+% Recall the Chinese restaurant process, which is a metaphoric restaurant with an infinite number of round tables, with ample space to host an unbounded number of guests. Each table in the restaurant may serve only one dish, however, multiple tables may serve the same dish. We connected this to language modelling by saying that the customers are word tokens, the dishes the word types, and the number of customers eating a dish thus represent the occurrence count of that specific word.
 
-Each restaurant can then be considered a distribution over words, therefore representing a unigram language model. Now we want to build a hierarchical $n$-gram language model. To this end, we introduce the Chinese restaurant franchise. The layout of this section is similar to the previous section, and follows the same patterns, albeit now for a hierarchical model.
+% Each restaurant can then be considered a distribution over words, therefore representing a unigram language model. Now we want to build a hierarchical $n$-gram language model. To this end, we introduce the Chinese restaurant franchise. The layout of this section is similar to the previous section, and follows the same patterns, albeit now for a hierarchical model.
 
-A Chinese restaurant franchise is a collection of Chinese restaurants, which share a common menu with an infinite number of dishes. Each restaurant operates as an independent Chinese restaurant process with respect to the seating arrangement, but the dishes for each table are chosen by a different method, which depends on the global character of the franchise. 
+% A Chinese restaurant franchise is a collection of Chinese restaurants, which share a common menu with an infinite number of dishes. Each restaurant operates as an independent Chinese restaurant process with respect to the seating arrangement, but the dishes for each table are chosen by a different method, which depends on the global character of the franchise. 
 
-Let $x_{i,j}$ denote the $j$th customer at the $i$th restaurant. When a customer enters, he chooses a table, either sharing it with other people, or an empty table. The probabilities of choosing either are the same as in the Chinese restaurant process.
+% Let $x_{i,j}$ denote the $j$th customer at the $i$th restaurant. When a customer enters, he chooses a table, either sharing it with other people, or an empty table. The probabilities of choosing either are the same as in the Chinese restaurant process.
 
-If the customers sits at an already occupied table, he is served the same dish as the other customers sitting at that table. If he seats at an unoccupied table, he must select a dish. Similar to choosing the table, the customer will also choose a dish with a probability proportional to its popularity. The popularity of a dish is determined by the number of tables across the entire franchise currently serving the dish. The customer can also decide to order a new dish.
+% If the customers sits at an already occupied table, he is served the same dish as the other customers sitting at that table. If he seats at an unoccupied table, he must select a dish. Similar to choosing the table, the customer will also choose a dish with a probability proportional to its popularity. The popularity of a dish is determined by the number of tables across the entire franchise currently serving the dish. The customer can also decide to order a new dish.
 
-Let $K$ be the number of tables $t_1,\ldots,t_K$ in the restaurant serving $|D|$ dishes $D = (d_1,\ldots,d_D)$. $\tau_1,\ldots,\tau_K$ denote the dishes served, with table $i$ serving dish $d_i$. Furthermore, let $|d_i| = \sum_{t=1}^K \mathbb{1}[\tau_t = d_i]$ be the number of tables serving dish $d_i$. The distribution for choosing a dish $d$ at a new table is then:
-\begin{align}
-	p(\theta_{K+1}=d | \tau_1, \ldots, \tau_K) = 
-    	\begin{cases}
-        	\frac{|d|}{\alpha_0+K}, & \text{if }d\in D,\\
-            \frac{\alpha}{\alpha_0+K}, & \text{otherwise.}
-        \end{cases}
-\end{align}
+% Let $K$ be the number of tables $t_1,\ldots,t_K$ in the restaurant serving $|D|$ dishes $D = (d_1,\ldots,d_D)$. $\tau_1,\ldots,\tau_K$ denote the dishes served, with table $i$ serving dish $d_i$. Furthermore, let $|d_i| = \sum_{t=1}^K \mathbb{1}[\tau_t = d_i]$ be the number of tables serving dish $d_i$. The distribution for choosing a dish $d$ at a new table is then:
+% \begin{align}
+% 	p(\theta_{K+1}=d | \tau_1, \ldots, \tau_K) = 
+%     	\begin{cases}
+%         	\frac{|d|}{\alpha_0+K}, & \text{if }d\in D,\\
+%             \frac{\alpha}{\alpha_0+K}, & \text{otherwise.}
+%         \end{cases}
+% \end{align}
 
-As for the customer, he has three options to consider:
-\begin{enumerate*} 
-\item join an already occupied table and choose locally from the dishes already being served at restaurant $i$;
-\item start a new table and choose a dish from the global menu;
-\item start a new table and select a new dish.
-\end{enumerate*}
-Let $z_{ij}$ denote the dish chosen by the $j$th customer at restaurant $i$ and $c(d_s) = \sum_{n=1}^{j-1}\mathbb{1}[z_{in}=d_s]$ the number of customers eating dish $s$. The distribution on $z_{ij}$ is then:
-\begin{align}
-	p(z_{ij} = d | \alpha_0, \alpha ) = 
-    \begin{cases}
-    	\frac{c(d)}{\alpha+(j-1)}+\frac{\alpha}{(\alpha+(j-1)}\frac{|d|}{\alpha_0 + K}, & \text{if }d\in D,\\
-	    \frac{\alpha}{\alpha+(j-1)}\frac{\alpha_0}{\alpha_0 + K}, & \text{otherwise.}
-    \end{cases}
-\end{align}
+% As for the customer, he has three options to consider:
+% \begin{enumerate*} 
+% \item join an already occupied table and choose locally from the dishes already being served at restaurant $i$;
+% \item start a new table and choose a dish from the global menu;
+% \item start a new table and select a new dish.
+% \end{enumerate*}
+% Let $z_{ij}$ denote the dish chosen by the $j$th customer at restaurant $i$ and $c(d_s) = \sum_{n=1}^{j-1}\mathbb{1}[z_{in}=d_s]$ the number of customers eating dish $s$. The distribution on $z_{ij}$ is then:
+% \begin{align}
+% 	p(z_{ij} = d | \alpha_0, \alpha ) = 
+%     \begin{cases}
+%     	\frac{c(d)}{\alpha+(j-1)}+\frac{\alpha}{(\alpha+(j-1)}\frac{|d|}{\alpha_0 + K}, & \text{if }d\in D,\\
+% 	    \frac{\alpha}{\alpha+(j-1)}\frac{\alpha_0}{\alpha_0 + K}, & \text{otherwise.}
+%     \end{cases}
+% \end{align}
 
-Put into words, dishes are chosesn according to their popularity, since the weight for a dish $d\in D$ is the sum of the number of customers at restaurant $i$ eating that dish plus $\alpha$ times the number of tables in the franchise serving that dish. The concentration parameter $\alpha$ specifies the relative importance of the local-level and global-level mixtures.
+% Put into words, dishes are chosesn according to their popularity, since the weight for a dish $d\in D$ is the sum of the number of customers at restaurant $i$ eating that dish plus $\alpha$ times the number of tables in the franchise serving that dish. The concentration parameter $\alpha$ specifies the relative importance of the local-level and global-level mixtures.
 
-To specify the Chinese restaurant franchise mixture model, we associate each dish with a class parameter drawn independently from a base measure $G_0$
+% To specify the Chinese restaurant franchise mixture model, we associate each dish with a class parameter drawn independently from a base measure $G_0$
 
-The conditional distribution is:
-\begin{align}
-	a | b, \alpha_0, G_0 &\sim \sum_{}^{} \frac{}{(i-1)+\alpha_0}\delta_\phi(\phi) + \frac{\alpha_0}{(i-1)+\alpha_0}G_0
-\end{align}
+% The conditional distribution is:
+% \begin{align}
+% 	a | b, \alpha_0, G_0 &\sim \sum_{}^{} \frac{}{(i-1)+\alpha_0}\delta_\phi(\phi) + \frac{\alpha_0}{(i-1)+\alpha_0}G_0
+% \end{align}
 
-Since $G_0$ is drawn from another Dirichlet process $\operatorname{DP}(\alpha, H)$, we want to integrate it out. Notice that $G_0$ only appears in its role as the distribution of variables $\psi_{jt}$. To integrate $G_0$ out, we use the conditional probability of the Dirichlet process \cref{?}, and write the conditional distribution of $\psi_{jt}$ directly:
-\begin{align}
-%	\psi_{jt} | \psi_{11},\psi_{12},\ldots,\psi_{21},\ldots,\psi_{j(t-1)},\alpha,H &\sim\sum_{k=1}^K\frac{m_k}{\alpha+\sum__{i=1}^K m_i}\delta_{\theta_k}+\frac{\alpha}{\alpha+\sum_{i=1}^K m_i}H.
-\end{align}
+% Since $G_0$ is drawn from another Dirichlet process $\operatorname{DP}(\alpha, H)$, we want to integrate it out. Notice that $G_0$ only appears in its role as the distribution of variables $\psi_{jt}$. To integrate $G_0$ out, we use the conditional probability of the Dirichlet process \cref{?}, and write the conditional distribution of $\psi_{jt}$ directly:
+% \begin{align}
+% %	\psi_{jt} | \psi_{11},\psi_{12},\ldots,\psi_{21},\ldots,\psi_{j(t-1)},\alpha,H &\sim\sum_{k=1}^K\frac{m_k}{\alpha+\sum__{i=1}^K m_i}\delta_{\theta_k}+\frac{\alpha}{\alpha+\sum_{i=1}^K m_i}H.
+% \end{align}
 
-\subsection{Tree Stick-breaking Process}
+% \subsection{Tree Stick-breaking Process}
 
-\subsection{Urn?}
+% \subsection{Urn?}
 
-\subsection{Hierarchical Dirichlet Process}
+% \subsection{Hierarchical Dirichlet Process}
 
-\subsection{Hierarchical Pitman-Yor Process: The Bayesian $n$-gram Language Model}
+% \subsection{Hierarchical Pitman-Yor Process: The Bayesian $n$-gram Language Model}
 
 
 
