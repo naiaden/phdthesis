@@ -1,4 +1,5 @@
-Statistical language modelling is a technique that attempts to measure how likely any given piece of text is by building a probabilistic model and assigning a probability value to the text. These models are generally very large and are generated from a very large collection of documents.
+\chapter{Chapter 1\newline Introduction to $n$-gram language modelling}\label{chap:introlm}
+\newthought{Statistical language modelling is a technique} that attempts to measure how likely any given piece of text is by building a probabilistic model and assigning a probability value to the text. These models are generally very large and are generated from a very large collection of documents.
 
 A statistical language model is a probability distribution $P(s)$ over possible sentences $S$.\footnote{In this thesis sentences represent linguistic units, such as spoken utterances, or in some case even documents.} Its task can be shown with an example from automated speech recognition (ASR)\footnote{ASR is the process of converting a speech signal to a sequence of words, by means of an algorithm implemented as a computer program.}. Imagine that one day you walk on the beach, and you find a bottle. Although that in itself is not really surprising, you also find that the bottle contains a note. You can make out the script; the language is unknown to you, but in the address you recognise the sender's country. Eager as you are, you want to decipher the message. With sophisticated translation services as Google Translate you could at least get an idea of what the note says in an instant. These translation services work bidirectionally, but you decide to learn the language, as to write your reply.
 
@@ -6,9 +7,9 @@ One of the first things you will probably do is getting started with some basic 
 
 For statistical language models this is the same. Producing the translation of a word $w$, goes right with the probability $p(w)=\frac{1}{W}$, as there is no prior knowledge. If we tell the system that it has to produce the translation of a number between \emph{one} and \emph{ten}, then chance that he has it right if it memorised all ten digits is $p(w)=\frac{1}{10}$. If $W$ is much larger than $10$, this is really an improvement. If we now ask the system to finish the following sequence: \emph{one} \emph{two} \emph{three} $\ldots$, it can choose between two strategies. The first one is just filling in one of the $W$ words. A smarter approach however, is to use the information of the sequence. Let's call this sequence $s = (w_1, w_2, w_3)$ and we want to predict $w_4$. We want the word $w_4$ that out of all words in $V$ has the highest likelihood of following $s$: $w_4 = \argmax_{w}^{V} p(w|s)$. So with a statistical language model we can investigate how likely a word is given its context, and if we do that for each word we know, we can also pick the best one.
 
-But this method has also some downsides. First, since most languages have an unbounded number of words, it is impossible to know the complete vocabulary. This has the consequence that not only you do not recognise the word, you also cannot evaluate its likelihood. The second problem is that since we model probabilities of words, we are never sure. This is especially true if we also want to model for out-of-vocabulary (OOV) words\footnote{Out-of-vocabulary words are unknown words that can either be learned (added to the vocabulary) or be denoted as a special word that will never occur in the vocabulary.}, for which we then must sacrifice a part of the probability space. For a human it is hard to say exactly how likely $p(w_4|s)$ is, but for a computer this is just the result of a computation. Another downside of having an unbounded number of words is that the vocabulary can get very big. As we saw, we do not want to only store the words, but also other information that allow us the make an educated guess. This can range from having knowledge of the previous words, but also syntax rules, or knowing the specific domain for which you are computing the word probabilities help. All these context information takes a lot of memory, both for the translator as for the computer.
+But this method has also some downsides. First, since most languages have an unbounded number of words, it is impossible to know the complete vocabulary. This has the consequence that not only you do not recognise the word, you also cannot evaluate its likelihood. The second problem is that since we model probabilities of words, we are never sure. This is especially true if we also want to model for out-of-vocabulary (OOV) words\footnote{Out-of-vocabulary words are unknown words that can either be learned (added to the vocabulary) or be denoted as a special word that will never occur in the vocabulary.}, for which we then must sacrifice a part of the probability space. For a human it is hard to say exactly how likely $p(w_4|s)$ is, but for a computer this is just the result of a computation. Another downside of having an unbounded number of words is that the vocabulary can get very large. As we saw, we do not want to only store the words, but also other information that allow us the make an educated guess. This can range from having knowledge of the previous words, but also syntax rules, or knowing the specific domain for which you are computing the word probabilities help. All these context information takes a lot of memory, both for the translator as for the computer.
 
-For the rest of this thesis, we assume that we learn the language by reading a lot. This ignores other valuable resources such as grammar, speech, and cultural influences. But we have a dictionary, so we can at least get an idea of what's in the text. Again, we focus on two things. First we want to recognise the words, and second, we want to recognise patterns that preceed a word. This will be our approximation of the language. This approximation of patterns and their words can be modelled in many ways. In the next section we introduce the models that are the foundation of this thesis.
+For the rest of this thesis, we assume that we learn the language by reading a lot. This ignores other valuable resources such as grammar, speech, and cultural influences. But we have a dictionary, so we can at least get an idea of what's in the text. Again, we focus on two things. First we want to recognise the words, and second, we want to recognise patterns that precede a word. This will be our approximation of the language. This approximation of patterns and their words can be modelled in many ways. In the next section we introduce the models that are the foundation of this thesis.
 
 %\begin{itemize}
 %	\item What is SLM?
@@ -18,9 +19,9 @@ For the rest of this thesis, we assume that we learn the language by reading a l
 
 \section{Patterns in Language}
 The goal of a statistical language model to assign a probability to a sequence of words. Say we have a sentence $s$ of $m=5$ words: \emph{Bananas are his favourite fruit.} If we want to compute the query likelihood of $s$, $p(s)$, we have to start 
-at the first word: \emph{Bananas}. For now assume that we know every word that we might encounter. What is the chance that the first word was \emph{Bananas}? $p(\mathit{Bananas})$. The same goes for the second word: the chance of the second word being \emph{are} is $p(\mathit{are})$. We can do this for every word $m_i$ in $s$. This results in\footnote{$p(s)=\prod_{i=1}^m P(w_i)$}
+at the first word: \emph{Bananas}. For now assume that we know every word that we might encounter. What is the chance that the first word was \emph{Bananas}? $p(\mathit{Bananas})$. The same goes for the second word: the chance of the second word being \emph{are} is $p(\mathit{are})$. We can do this for every word $m_i$ in $s$. This results in\footnote{$p(s)=\prod_{i=1}^m p(w_i)$}
 \begin{equation}
-P(s) = P(\mathit{Bananas})P(\mathit{are})P(\mathit{his})P(\mathit{favourite})P(\mathit{fruit})\label{eq:unigramexample}
+p(s) = p(\mathit{Bananas})p(\mathit{are})p(\mathit{his})p(\mathit{favourite})p(\mathit{fruit})\label{eq:unigramexample}
 \end{equation}
 
 In \cref{eq:unigramexample} we use our knowledge of how likely it is to use each of the words. But as clear from the example, it does not take into relation the word order\footnote{The sentence \emph{his are favourite Bananas fruit} yields the same query likelihood, but lacks semantic and syntactic coherency.}, nor the context in which the words where said.
@@ -29,9 +30,11 @@ This very simple and naive language model is called a unigram language model\foo
 
 The other end of the spectrum is to use all the information that one has, to predict the next word. This is of course not possible to story in memory, let alone do computations with it.
 
-\begin{equation}
-p(s) = 
-\end{equation}
+This would not only require knowledge of all written and spoken texts even produced, but also insight in the mind of the writer or speaker, alongside the context in which the text was uttered. Texts produced by humans are always sensitive to context, as they are used to convey a message. However hard it is for humans to understand the message (and to be able to predict the probability of the next word), for the computer it is even harder.
+
+%\begin{equation}
+%p(s) = 
+%\end{equation}
 
 As we can see, words as patterns without any context are too limited as a language model.
 In this section we will introduce some language models that use more contextual information than the unigrams models, yet keep the space and time complexity feasible.
@@ -47,13 +50,14 @@ $n$-gram language models generalise unigram language models, by implicitly takin
     \item \emph{Bananas are my favourite} fruit
 \end{enumerate}
 
-The problem here is that if you want to predict in a 5-gram language model that \emph{Bananas} is the first word in a sentence, it must take the role of the focus word. The context is then filled with markers\footnote{These tokens are usually called begin of sentence (BOS) markers, and end of sentence (EOS) markers when they signal the end of a sentence.} that denote they are not part of the sentence. This is useful to query the likelihood of the first $n-1$ words in an $n$-gram language model, but in practice the influence is negligible\footnote{is that so? I believe so.}. In the examples we will mention the markers if they add to the understanding.
+The problem here is that if you want to predict in a 5-gram language model that \emph{Bananas} is the first word in a sentence, it must take the role of the focus word. The context is then filled with markers\footnote{These tokens are usually called begin of sentence (BOS) markers, and end of sentence (EOS) markers when they signal the end of a sentence.} that denote they are not part of the sentence. Each sentence implicitly ends with an end of sentence marker. %This is useful to query the likelihood of the first $n-1$ words in an $n$-gram language model, but in practice the influence is negligible\footnote{is that so? I believe so.}. In the examples we will mention the markers if they add to the understanding.
+Punctuation is also considered a word, except when it is part of an abbreviation.\footnote{When using data that has been processed by others, this may vary, as it is dependent on choices such as how to tokenise the text.}
 
 The joint probability of $s$ with a bigram language model is thus:
-\[ p(s) = p(\mathit{Bananas}|\mathit{BOS})p(\mathit{are}|\mathit{Bananas})p(\mathit{my}|\mathit{are})p(\mathit{favourite}|\mathit{are})p(\mathit{fruit}|\mathit{favourite})\]
+\[ p(s) = p(\mathit{Bananas}|\mathit{BOS})p(\mathit{are}|\mathit{Bananas})p(\mathit{my}|\mathit{are})p(\mathit{favourite}|\mathit{are})p(\mathit{fruit}|\mathit{favourite})p(\mathit{EOS}|\mathit{fruit})\]
 
 Or in a more general and abstract sense:
-\[ p(s) = \prod_{i=1}^mp(w_i|w_1,\ldots,w_i-1 \]
+\[ p(s) = \prod_{i=1}^mp(w_i|w_1,\ldots,w_{i-1}) \]
 
 Henceforth we will use the abbreviation $w_{i-n+1}^{i-1} \equiv w_{i-n+1},\ldots,w_{i-1}$.
 
@@ -65,17 +69,57 @@ With the unigram approach, we have to store for each word its probability of occ
 
 
 
-Hier plaatjes van een corpus met 3,4,5-grammen en de upperbound
+%Hier plaatjes van een corpus met 3,4,5-grammen en de upperbound
+\begin{figure}
+\begin{scaletikzpicturetowidth}{\textwidth}
+\tikzsetnextfilename{hello}
+\begin{tikzpicture}[scale=\tikzscale]
+\begin{semilogyaxis}[
+%\begin{axis}[%domain=0:100,
+  title=Growth of the number of types throughout the corpus,
+  xlabel=relative position in document (tokens in \%),
+  ylabel=types,
+    width=11cm,
+    height=7cm]
+    %legend=none]
+    %legend cell align=left,
+    %legend pos=outer north east,
+    %legend style={draw=none}]
+\addplot table [y=c1, x=c]{ngramtypegrowth.dat};\label{fig:gp1}
+%\addlegendentry{1-grams}
+\addplot table [y=c2, x=c]{ngramtypegrowth.dat};\label{fig:gp2}
+%\addlegendentry{2-grams}
+\addplot table [y=c3, x=c]{ngramtypegrowth.dat};\label{fig:gp3}
+%\addlegendentry{3-grams}
+\addplot table [y=c4, x=c]{ngramtypegrowth.dat};\label{fig:gp4}
+%\addlegendentry{4-grams}
+\addplot table [y=c5, x=c]{ngramtypegrowth.dat};\label{fig:gp5}
+%\addlegendentry{5-grams}
+%\addplot (5*x);
+\end{semilogyaxis}
+%\end{axis}
+\end{tikzpicture}
+\end{scaletikzpicturetowidth}
+\caption{The number of unique $n$-grams (types) are plotted against their relative position in the document (the number of $n$-gram tokens encountered). Unigrams (\ref{fig:gp1}), bigrams (\ref{fig:gp2}), trigram (\ref{fig:gp3}), 4-grams (\ref{fig:gp4}), and 5-grams (\ref{fig:gp5}). The number of types is plotted on a log scale, since otherwise (\ref{fig:gp1}) would appear flat.}
+\end{figure}
 
 These graphs also show sparseness
 
 
-\subsection{Skipgrams}
-A problem of $n$-grams is that it can only model contiguous sequences of words; this rules out any form of long-distance relationship between words. A common example is the interjection of an adjective between a determiner and a noun: \emph{the delicious banana}, \emph{the yellow banana}. To model with, we introduce the skipgram language model, where we now allow $n$-grams to contain a abitrary number of skips, where each skip represents skipping one word. 
+\subsection{Skipgrams}\marginnote{With the surge of neural network-based language models, the meaning of the word skipgram has shifted from being an $n$-gram with a skipped word, to the skipgram paradigm in word2vec. In our case skipgrams are not in the output of the model, but rather on the input side, and do not have a fixed amount of left and right context.}
+A problem of $n$-grams is that it can only model contiguous sequences of words; this rules out any form of long-distance relationship\footnote{With long-distance we mean spanning over multiple words. Not necessarily the dependency-tree interpretation between words.} between words. A common example is the interjection of an adjective between a determiner and a noun: \emph{the delicious banana}, \emph{the yellow banana}. To give the model expressive power to such examples, we introduce the skipgram language model, where we now allow $n$-grams to contain a abitrary number of skips, where each skip represents skipping one word. 
 
-and flexgrams
+Let us first formally introduce the skipgrams as used in this thesis. Let $\{m\}$ be a skip of length $m$, then \emph{the $\{1\}$ banana} can match \emph{the delicious banana}, or \emph{the yellow banana}, etc. We do not allow skips to be at the beginning or end of the skipgram, so for $n>2$ skipgrams are a generalisation of $n$-grams \cite{goodman2001bit,shazeer2015sparse,Pickhardt2014GLM}.
 
-partially solve the sparseness of $n$-grams, by allowing skips.
+Now let $\sigma_{\rotatebox[origin=c]{180}{m}}$ be the operator that adds a skip to a pattern $\mathbf{u}$ on the $\rotatebox[origin=c]{180}{m}$th position if there is not already a skip. Then $\boldsymbol\sigma(\mathbf{u}) \left[\sigma_{\rotatebox[origin=c]{180}{m}}(\mathbf{u})\right]_{\rotatebox[origin=c]{180}{m}=2}^{|\mathbf{u}|-1}$ is the set of patterns with one skip more than the number of skips currently in $\mathbf{u}$. 
+
+For a 4-gram $\mathbf{u}w$ = \emph{ate the ripe banana}, $\sigma_2(\mathbf{u}w)$ = \emph{ate \{1\} ripe banana}, $\sigma_3(\mathbf{u}w)$ = \emph{ate the \{1\} banana}, and $\boldsymbol\sigma(\mathbf{uw}) = \left[\sigma_2(\mathbf{u}), \sigma_3(\mathbf{u})\right]$. To get to the 4-gram with two skips, we apply the operator on a skipgram that already contains a skip, e.g.~$\sigma_3(\sigma_2(\mathbf{u}w))$ = \emph{the \{1\} \{1\} banana}.\footnote{We can abbreviate this skipgram to \emph{ate \{2\} banana}.}
+
+This definition limits to one additional skip per application of the operator.\footnote{The main reason to limit only adding one skip per application is because in the backoff procedure skipgrams with more skips have a probability that is in a different range compared to skipgrams with less skips. When in a later stage this probabilities are interpolated, this undoes the expressive power, because one of the two completely overpowers the other. In the current implementation at least the number of content-bearing words is the same after the application of the skipgram operator.} However, the skipgram can be generalised further into a flexgram\cite{gompel2016efficient}, but this is computationally even more expensive than skipgrams, and preliminary results show no further improvements over just using skipgrams.
+
+Remember that we extend a language model to overcome the problem of poor generalisation, especially in scenarios where many OOVs are encountered, this hurts the performance. With skipgrams we can on one hand partially solve the sparseness of $n$-grams, without losing the information of word order, and on the other hand we now have a mechanism to jump over unknown words.
+
+But this is not the end of the story, since we also have to change the models to help in their own way.
 
 
 \section{Smoothing and Backoff Methods}

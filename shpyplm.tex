@@ -1,0 +1,154 @@
+\chapter{Chapter 3\newline Extending the hierarchical Pitman-Yor language models with skipgrams}\label{chap:shpyplm}\marginnote{This section is based on: \cite{onrust2016Improving}}
+
+%\section{Introduction}
+
+\newthought{Since the seminal paper} on hierarchical Bayesian language models based on Pitman-Yor processes\cite{teh2006hierarchical}, Bayesian language modelling has regained an interest. Although Bayesian language models are not new\cite{mackay1995hierarchical}, previously proposed models were reported to be inferior compared to other smoothing methods. Teh's work was the first to report on improvements over interpolated Kneser-Ney smoothing\cite{teh2006hierarchical}.
+    
+  To overcome the traditional problems of overestimating the probabilities of rare occurrences and underestimating the probabilities of unseen events, a range of smoothing algorithms have been proposed in the literature \cite{goodman2001bit}. Most methods take a heuristic-frequentist approach combining $n$-gram probabilities for various values of $n$, using back-off schemes or interpolation. 
+
+\textcite{teh2006hierarchical} showed that MacKay and Peto's \citep{mackay1995hierarchical} research on parametric Bayesian language models with a Dirichlet prior could be extended to give better results, but also that one of the best smoothing methods, interpolated Kneser-Ney \cite{kneser1995improved}, can be derived as an approximation of the Hierarchical Pitman-Yor process language model (HPYLM).
+  
+  % Eventueel eruit
+  The success of the Bayesian approach to language modelling is due to the use of statistical distributions such as the Dirichlet distribution, and distributions over distributions, such as the Dirichlet process and its two-parameter generalisation, the Pitman-Yor process. Both are widely studied in the statistics and probability theory communities. Interestingly, language modelling has acquired the status of a ``fruit fly'' problem in these communities, to benchmark the performance of statistical models. In this paper we approach language modelling from a computational linguistics point of view, and consider the statistical methods to be the tool with the future goal of improving language models for extrinsic tasks such as speech recognition.
+  
+  We derive our model from \textcite{teh2006hierarchical}, and propose an extension with skipgrams. A frequentist approach to language modelling with skipgrams is described by \textcite{pickhardt2014generalized}, who introduce an approach using skip-$n$-grams which are interpolated using modified Kneser-Ney smoothing. In this paper we show that a Bayesian skip-$n$-gram approach outperforms a frequentist skip-$n$-gram model.%, 
+
+\section{Method}
+
+Pitman-Yor Processes (PYP) belong to the family of non-parametric Bayesian models. Let $W$ be a fixed and finite vocabulary of $V$ words. For each word $w\in W$ let $G(w)$ be the probability of $w$, and $G = [G(w)]_{w\in W}$ be the vector of word probabilities. Since word frequencies generally follow a power-law distribution, we use a Pitman-Yor process, which is a distribution over partitions with power-law distributions. 
+In the context of a language model this means that for a space $P(\mathbf{u})$, with $c(\mathbf{u}\cdot)$ elements (tokens), we want to partition $P(\mathbf{u})$ in $V$ subsets such that the partition is a good approximation of the underlying data, in which $c(\mathbf{u}w)$ is the size of subset $w$ of $P(\mathbf{u})$. We assume that the training data is an sample of the underlying data, and for this reason we seek to find an approximation, rather than using the partitions precisely as found in the training data.
+
+Since we also assume that a power-law distribution on the words in the underlying data, we place a PYP prior on G:
+  \begin{equation*}
+  	G \sim \operatorname{PY}(d,\theta,G_0),
+  \end{equation*}
+with discount parameter $0\leq d<1$, a strength parameter $\theta > -d$ and a mean vector $G_0 = [G_0(w)]_{w\in W}$. $G_0(w)$ is the a-priori probability of word $w$, which we set uniformly: $G_0(w) = 1/V$ for all $w\in W$. In general, there is no known analytic form for the density of $\operatorname{PY}(d,\theta,G_0)$ when the vocabulary is finite. However, we are interested in the distribution over word sequences induced by the PYP, which has a tractable form, and is sufficient for the purpose of language modelling. 
+
+  Let $G$ and $G_0$ be distributions over $W$, and $x_1,x_2,\ldots$ be a sequence of words drawn i.i.d.\ from $G$. The PYP is then described in terms of a generative procedure that takes  $x_1,x_2,\ldots$ to produce a separate sequence of i.i.d.\ draws $y_1,y_2,\ldots$ from the mean distribution $G_0$ as follows. The first word $x_1$ is assigned the value of the first draw $y_1$ from $G_0$. Let $t$ be the current number of draws from $G_0$, $c_k$ the number of words assigned the value of draw $y_k$ and $c_\cdot = \sum^t_{k=1}c_k$ the number of draws from $G_0$. For each subsequent word $x_{c_\cdot+1}$, we either assign it the value of a previous draw $y_k$, with probability $\frac{c_k-d}{\theta+c_\cdot}$, or assign it the value of a new draw from $G_0$ with probability $\frac{\theta+dt}{\theta+c_\cdot}$.
+
+For an $n$-gram language model we use a hierarchical extension of the PYP. The hierarchical extension describes the probabilities over the current word given various contexts consisting of up to $n-1$ words. Given a context $\mathbf{u}$, let $G_\mathbf{u}(w)$ be the probability of the current word taking on value $w$. A PYP is used as the prior for $G_\mathbf{u}=[G_\mathbf{u}(w)]_{w\in W}$: 
+  \begin{equation*}
+  	G_\mathbf{u}\sim\operatorname{PY}(d_{|\mathbf{u}|}, \theta_{|\mathbf{u}|},G_{\pi(\mathbf{u})}),
+  \end{equation*}
+where $\pi(\mathbf{u})$ is the suffix of $\mathbf{u}$ consisting of all but the first word, and $|\mathbf{u}|$ being the length of $\mathbf{u}$. The priors are recursively placed with parameters $\theta_{|\pi(\mathbf{u})|}$, $d_{|\pi(\mathbf{u})|}$ and mean vector $G_{\pi(\pi(\mathbf{u}))}$, until we get to $G_\emptyset$: 		\begin{equation*}
+		G_\emptyset \sim\operatorname{PY}(d_0,\theta_0,G_0),
+    \end{equation*}\vspace{-0.05cm}
+with $G_0$ being the uniformly distributed global mean vector for the empty context $\emptyset$.
+
+\section{Backoff strategies}
+
+In this section we investigate three backoff strategies: {\sf ngram}, {\sf limited}, and {\sf full}. {\sf ngram} is the traditional $n$-gram backoff method as described by Teh (2006); {\sf limited} and {\sf full} are extensions that also incorporate skipgram probabilities. The {\sf full} backoff strategy is similar to {\sf ngram} in that it always backs off recursively to the word probabilities, while {\sf limited} halts as soon as a probability is known for a pattern. The backoff strategies can be formalised as follows.
+%
+For all strategies, we have that $p(w|\mathbf{u})=G_0(w)$ if $\mathbf{u} = \emptyset$. For {\sf ngram}, the other case is defined as:
+  \begin{equation*}\begin{split}
+  	p(w|\mathbf{u})= &
+\frac{c_{\mathbf{u}w\cdot}-d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} \\
+& +
+\frac{\theta_{|\mathbf{u}|}+d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}
+p(w|\pi(\mathbf{u}))
+  \end{split}\end{equation*}
+%with $c_{\mathbf{u}wk}$ being the count of $w$ having the value $k$ after context $\mathbf{u}$; 
+with $c_{\mathbf{u}w\cdot}$ being the number of $\mathbf{u}w$ tokens, and $c_{\mathbf{u}\cdot\cdot}$ the number of patterns starting with context $\mathbf{u}$. Similarly, $t_{\mathbf{u}wk}$ is 1 if draw the $k$th from $G_{\mathbf{u}}$ was $w$, 0 otherwise. $t_{\mathbf{u}w\cdot}$ then denotes if there is a pattern $\mathbf{u}w$, and $t_{\mathbf{u}\cdot\cdot}$ is the number of types following context $\mathbf{u}$.
+  
+Now let $\sigma_n$ be the operator that adds a skip to a pattern $\mathbf{u}$ on the $n$th position if there is not already a skip. Then $\boldsymbol\sigma(\mathbf{u}) = \left[\sigma_n(\mathbf{u})\right]_{n=2}^{|\mathbf{u}|}$ is the set of patterns with one skip more than the number of skips currently in $\mathbf{u}$. The number of generated patterns is $\boldsymbol\varsigma=|\boldsymbol\sigma(\mathbf{u})|$.
+We also introduce the indicator function $S$, which for the {\sf full} backoff strategy always returns its argument: $S_{\mathbf{u}w}(y) = y$.
+%
+%
+The {\sf full} backoff strategy is defined as follows, with $\mathbf{u}_x = \boldsymbol\sigma_x(\mathbf{u})$, and discount frequency $\delta_{\mathbf{u}} = 1$:
+ \begin{equation*}
+ \begin{split}
+p&(w|\mathbf{u}) = \\ 
+&\sum_{m=1}^{\boldsymbol\varsigma}\left\{ \frac{1}{\mathbf{\boldsymbol\varsigma}+1}\left[
+\frac{c_{\mathbf{u}_mw\cdot}-\delta_{\mathbf{u}_m}d_{|\mathbf{u}_m|}t_{\mathbf{u}_mw\cdot}}{\delta_{\mathbf{u}_m}\theta_{|\mathbf{u}_m|}+c_{\mathbf{u}_m\cdot\cdot}}\right.\right. + \\
+ & \left.\left.S_{\mathbf{u}_mw}\left(
+\frac{\theta_{|\mathbf{u}_m|}+d_{|\mathbf{u}_m|}t_{\mathbf{u}_m\cdot\cdot}}{\delta_{\mathbf{u}_m}\theta_{|\mathbf{u}_m|}+c_{\mathbf{u}_m\cdot\cdot}}
+p(w|\pi(\mathbf{u}_m))\right)\right] \right\} \\ 
++ 
+%%
+& \frac{1}{\mathbf{\boldsymbol\varsigma}+1}\left[
+\frac{c_{\mathbf{u}w\cdot}-\delta_{\mathbf{u}}d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}+\right. \\
+& \left.S_{\mathbf{u}w}\left(\frac{\theta_{|\mathbf{u}|}+d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}
+p(w|\pi(\mathbf{u}))\right)\right]
+  \end{split}\end{equation*}
+ 
+ The \BOL backoff strategy is an extension of the \BOF backoff strategy that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern. $S$ is the indicator function which tells if a pattern has been seen during training: $S_{\mathbf{u}w}(\cdot) = 0$ if $\mathrm{count}(\mathbf{u}w) > 0$, $1$ otherwise; and $\delta_{\mathbf{u}} = V-\sum_{w\in W} S_{\mathbf{u}w}(\cdot)$. Setting $S_{\mathbf{u}w}(\cdot) = 0$ stops the recursion.
+
+\begin{figure*}%
+    \centering
+    \subfloat[{\sf ngram}]{{\begin{forest} [abcd [bcd [cd [d] ] ] ] \end{forest} }}%
+    \qquad
+    \subfloat[{\sf limited}]{{\begin{forest} [abcd [bcd [bxd [d] ] [cd ] ] [axcd ] [abxd [axxd ] [bxd [d] ] ] ] \end{forest} }}%
+    \qquad
+    \subfloat[{\sf full}]{{\begin{forest} [abcd [bcd [bxd [d] ] [cd [d] ] ] [axcd [axxd [d] ] [cd [d] ] ] [abxd [axxd [d] ] [bxd [d] ] ] ] \end{forest} }}%
+    \caption{The three backoff strategies and their backoff steps. {\sf ngram} follows a linear backoff path, whereas {\sf full} recursively explores all subpatterns. For {\sf limited} we depicted the backoff graph in case a pattern aecd has been seen in the training data, in which case {\sf limited} uses the probability for a pattern that has been seen. }%
+    \label{fig:example}%
+\end{figure*}
+
+The backoff strategies \BON and \BOF always use the same number of backoff probabilities, 5 and 22 respectively. For \BOL this is dependent on the training material. If a top level pattern matches the training material, then only one probability is used. In the worst scenario, \BOL equals \BOF.
+
+\section{Interpolation factors}
+
+The use of interpolation factors in a language model is not new. In the literature we find lattice-based language models in
+\cite{dupont1997lattice} and a generalisation called factored language model with generalised parallel backoff \cite{bilmes2003factored}. 
+%However, the context sizes are small (2 and 3), % ik snap de relevantie van die laatste zin niet, maar misschien omdat ze niet af is ? (einigt in een komma)
+  Maximum entropy language models \cite{ROSENFELD1996187} and distant bigram language models \cite{bassiou2011long} are other related cases in point. In \cite{gao2004long} each backoff level has its own weight, fixed for all features. These works are all implicitly using skipgram features, with variable skip sizes, spanning patterns that are larger than $n$. 
+  
+%  In \cite{gao2004long} each backoff level has its own weight, fixed for all features.
+% [AB] this sentence moved and copied above
+
+  A more recent paper on using skipgram language models only uses uniform linear interpolation with a generalisation of modified Kneser-Ney \cite{pickhardt2014generalized}. Even more recently, in \cite{pelemans2016sparse} a sparse non-negative feature weight matrix is computed on the basis of an adjusted version of relative frequency.
+  
+Inspired by these studies, we use six interpolation strategies:\marginnote{Hier een plaatje dat voor een run de waarden geeft, en de gemiddelde proporties ofzo.}
+  
+  \begin{itemize}
+  \item \textsf{ngram}, where we ignore the skipgram probabilities (and prohibit the backoff step to skipgrams): \\
+	$I(\mathbf{u}) =
+  \begin{cases}
+    1 & \text{if } \mathbf{u} \text{ is }n\text{-gram} \\
+    0 & \text{if } \mathbf{u} \text{ is skipgram}
+  \end{cases}$
+\item \textsf{Uninformed uniform prior (uni)}, where all the weights are 1:\\ 
+	$ I(\mathbf{u}) = 1 $
+\item \textsf{Uninformed $n$-gram preference (npref)}, where we give the $n$-grams twice the importance of skipgrams: \\
+	$I(\mathbf{u}) =
+  \begin{cases}
+    2 & \text{if } \mathbf{u} \text{ is }n\text{-gram} \\
+    1 & \text{if } \mathbf{u} \text{ is skipgram}
+  \end{cases}$
+  \item \textsf{Maximum likelihood-based Linear Interpolation (mle)}, based on the maximum likelihood estimate of the context: \\[0.5ex]
+	$ I(\mathbf{u}) = \displaystyle \frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
+%    We also tried the unnormalised count, but this gave worse performance.
+\item \textsf{Entropy-based Linear Interpolation (ent)}, based on the entropy of the context: \\
+	$E(\mathbf{u}) = -\displaystyle \sum_{w,c(\mathbf{u}w)>0}^W\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)}\log\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
+    $ I(\mathbf{u}) = \displaystyle \frac{1}{1+E(\mathbf{u})}$ \\
+    where $c(\mathbf{u}w)$ are the counts as estimated by the model. We use the reciprocal because a higher entropy should yield a lower weight.
+    % although we did test also tested an increasing function, but this performed worse.
+\item \textsf{Perplexity-based Linear Interpolation (ppl)}, raising 2 to the power of the entropy of the context: \\ % shifted into the domain of the counts, by using the entropy: \\
+	$\textstyle I(\mathbf{u}) = \displaystyle 2^{-E(\mathbf{u})} $
+    \item \textsf{random}, where weights are uniformly distributed between 0 and 1 and assigned to the terms: \\
+    $ I(\mathbf{u}) = \text{rand}(0,1) $
+  \end{itemize} 
+
+The weights for the interpolation strategies \textsl{mle} and \textsl{ppl} are determined at test time, since precomputing and computing all these weights is expensive. To this end we have not ventured into learning the weights during training time, integrated into the Bayesian paradigm of the hierarchical Pitman-Yor process.
+
+\section{Experiments}
+We train 4-gram language model on the two training corpora, the Google 1 billion word benchmark and the Mediargus corpus.\footnote{See~\ref{sec:data} for a description of the corpora.} We do not perform any preprocessing on the data except tokenisation. 
+   %The models are trained with a HPYLM. We do not use sentence beginning and end markers. The results for the {\sf ngram} backoff strategy are obtained by training without skipgrams; for {\sf limited} and {\sf full} we added skipgram features during training.
+
+When setting up the experimental framework, we had to decide on the basis. Earlier work on hierarchical Pitman-Yor language models by Huang and Renals had accompanying software releases. An SRILM extension with HPYPLM was proposed in \cite{huang2007hierarchical}, and a frequentist approximation extension of the HPYPLM was described in \cite{huang2010power}. However, at the time I started this thesis, they were no longer accessible. With further inquiries we learned that also none of the source code has survived during the period. 
+
+We found an alternative in cpyp,\footnote{\url{https://github.com/redpony/cpyp}} which is an existing library for non-parametric Bayesian modelling with PY priors with histogram-based sampling \cite{blunsom2009note}. This library has an example application to showcase its performance with $n$-gram based language modelling. Limitations of the library, such as not natively supporting skipgrams, and the lack of other functionality such as thresholding and discarding of certain patterns, led us to extend the library with Colibri Core,\footnote{\url{http://proycon.github.io/colibri-core/}} a pattern modelling library. Colibri Core resolves the limitations, and together the libraries are a complete language model that handles skipgrams: cococpyp.\footnote{\url{https://github.com/naiaden/cococpyp}} This software in turn has been rewritten to allow also for reranking nbest lists, and being more in control of the underlying language model. We gave it the name SLM, for skipgram language model.\footnote{\url{https://github.com/naiaden/SLM}} Throughout the rest of the thesis the reported results were obtained with SLM.
+
+  Each model is run for 50 iterations (without an explicit burn-in phase), with the initial values for hyperparameters $\theta=1.0$ and $\gamma=0.8$. The hyperparameters are resampled every 30 iterations with slice sampling \cite{walker2007sampling}.
+  
+  \textbf{Plot van dalende ppl over iteraties, effect resampling?}
+  
+  We test each model on different test sets, and we collect their intrinsic performance by means of perplexity. We compute the perplexity on all 4-grams, rather than computing the perplexity for sentences. 
+  Words in the test set that were unseen in the training data are ignored in computing the perplexity on test data.\footnote{This is common for perplexity. }
+
+\subsection{PPL}
+\subsection{Learning curves}
+
+\section{Results}
+
+\section{Discussion}

@@ -1,0 +1,52 @@
+\section{Derivation}
+
+In the original paper by \citep{Teh2006AHierarchical}, the functions\marginnote{Eq.~10 and 11 in the paper by \citeauthor{Teh2006AHierarchical}.} that return the word probability are defined as:
+
+\begin{equation}
+\begin{split}
+p(w | 0, \mathcal{S}, \Theta) =& 1/V \\
+p(w | \mathbf{u}, \mathcal{S}, \Theta) =& \frac{c_{\mathbf{u}w\cdot} - d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)
+\end{split}
+\end{equation}
+
+Since these formulae will serve as the basis for our \textsl{limited} backoff strategy, we show its correctness. A step we also have to show for our derivation.
+
+We show its correctness by showing that the probability distribution sums up to one (and that it is not negative, and the elements are not bigger than 1).
+
+Assume there is a dictionary $W$ with $V$ words. Then we can sum over all customers in each restaurant, for all dishes with $\sum_{w\in W} c_{\mathbf{u}w} = c_{\mathbf{u}\cdot\cdot}$, and similarly for the tables: $\sum_{w\in W} t_{\mathbf{u}w\cdot} = t_{\mathbf{u}\cdot\cdot}$. 
+\begin{equation}
+\begin{split}
+	\sum_{w\in W} p(w | \mathbf{u}, \mathcal{S}, \Theta) = 1 \\
+    \sum_{w\in W}\frac{c_{\mathbf{u}w\cdot} - d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta) = 1 \\
+    \sum_{w\in W}\frac{c_{\mathbf{u}w\cdot} - d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in W} \frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta) =1 \\
+    \sum_{w\in W} \frac{c_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \sum_{w\in W} \frac{d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in W} \frac{\theta_{|\mathbf{u}|}p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in W} \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \theta_{|\mathbf{u}|}\sum_{w\in W} \frac{p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}\sum_{w\in W} \frac{ p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +\frac{ \theta_{|\mathbf{u}|}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{ d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}- d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = 1
+\end{split}
+\end{equation}
+
+For the limited backoff method we distinguish between the word probability, and the backoff probability and its weight. If a pattern $\mathbf{u}w$ occurs in the training data, we only use the word probability, and otherwise we use the word probability with its weighted backoff probability.
+
+Assume that we have a context pattern $\mathbf{u}$, and a vocabulary of $V$ words, of which $N$ words $w$ occur in the training data as $\mathbf{u}w$. $B$ of the $V$ words do not occur, hence $V = N + B$\marginnote{Read $B$ as backoff when this pattern occurs, and $N$ as no backoff}. 
+If we naively ignore the backoff probability in the $N$ cases, then the probability distribution does not sum up to one anymore.
+
+In the following example we show that our extension is a proper distribution. Let's call the words that we don't backoff for $\mathcal{N}$, and the other words $\mathcal{B}$. In the proof we will skip over the steps that are already in the previous example.
+
+Note that we can compute $\sum_{w\in\mathcal{B}} p(w|\pi(\mathbf{u}), \mathcal{S}, \Theta) = P$, and that this does not sum up to one. So we add a term $Q = 1 - P$.
+
+\begin{equation}
+\begin{split}
+	\sum_{w\in W} p(w | \mathbf{u}, \mathcal{S}, \Theta) = 1 \\
+    \sum_{w\in\mathcal{N}} p(w | \mathbf{u}, \mathcal{S}, \Theta) + \sum_{w\in\mathcal{B}} p(w | \mathbf{u}, \mathcal{S}, \Theta) = 1 \\
+    \sum_{w\in\mathcal{N}}\frac{c_{\mathbf{u}w\cdot} - d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} q + \sum_{w\in\mathcal{B}}\frac{c_{\mathbf{u}w\cdot} - d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta) = 1 \\
+	\frac{\sum_{w\in\mathcal{N}}c_{\mathbf{u}w\cdot} + \sum_{w\in\mathcal{B}}c_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{\sum_{w\in\mathcal{N}}d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot} + \sum_{w\in\mathcal{B}}d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in\mathcal{N}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} q + \sum_{w\in\mathcal{B}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)= 1\\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in\mathcal{N}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} q + \sum_{w\in\mathcal{B}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)= 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in\mathcal{N}}\frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} q + \sum_{w\in\mathcal{N}}\frac{\theta_{|\mathbf{u}|}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} q + \sum_{w\in\mathcal{B}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)= 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \sum_{w\in\mathcal{B}}\frac{\theta_{|\mathbf{u}|} + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)= 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \theta_{|\mathbf{u}|}\sum_{w\in\mathcal{B}}\frac{p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}\sum_{w\in\mathcal{B}}\frac{ p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}= 1 \\ 
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}P}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  + \frac{ d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}P}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}= 1 \\
+    \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{(-1+P+Q)d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{(P+Q)\theta_{|\mathbf{u}|}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = \frac{\theta_{|\mathbf{u}|} + c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  = 1
+\end{split}
+\end{equation}
+

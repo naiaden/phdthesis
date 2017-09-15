@@ -4,7 +4,8 @@
 
 %%
 % Book metadata
-\title{What's in the Bag for Latent Variable \\ \noindent Language Modelling?}
+%\title{What's in the Bag for Latent Variable \\ \noindent Language Modelling?}
+\title{To skip or not to skip: that's \{*\} question}
 \author{Louis Onrust}
 \publisher{Publisher of This Book}
 
@@ -20,6 +21,7 @@
 % For nicely typeset tabular material
 \usepackage{booktabs}
 
+\usepackage{makecell}
 %%
 %
 \usepackage{amsmath}
@@ -27,9 +29,26 @@
 
 \usepackage[inline]{enumitem}
 
+\usepackage{tikz}
+\usepackage{forest}
+\usepackage{subfig}
+
+\newcommand{\BON}{\textsf{ngram}\xspace}
+\newcommand{\BOL}{\textsf{limited}\xspace}
+\newcommand{\BOF}{\textsf{full}\xspace}
+
+\newcommand{\obw}{1bw\xspace}
+\renewcommand{\wp}{wp\xspace}
+\newcommand{\jrc}{jrc\xspace}
+\newcommand{\emea}{emea\xspace}\newcommand{\cgn}{cgn\xspace}
+\newcommand{\mediargus}{mediargus\xspace}
+
+%\newcommand{\invc}{\raisebox{\depth}{\rotatebox{180}{m}}}
+
 %%
 %
-\usepackage{cleveref}
+
+\usepackage{marginfix}
 
 %%
 % For graphics / images
@@ -46,6 +65,40 @@
 % Prints argument within hanging parentheses (i.e., parentheses that take
 % up no horizontal space).  Useful in tabular environments.
 \newcommand{\hangp}[1]{\makebox[0pt][r]{(}#1\makebox[0pt][l]{)}}
+
+\usepackage{pgfplotstable}
+\usepackage{pgfplots}
+\usepackage{environ}
+\makeatletter
+\newsavebox{\measure@tikzpicture}
+\NewEnviron{scaletikzpicturetowidth}[1]{%
+  \def\tikz@width{#1}%
+  \def\tikzscale{1}\begin{lrbox}{\measure@tikzpicture}%
+  \BODY
+  \end{lrbox}%
+  \pgfmathparse{#1/\wd\measure@tikzpicture}%
+  \edef\tikzscale{\pgfmathresult}%
+  \BODY
+}
+\makeatother
+
+\usetikzlibrary{external}
+% Enable the library !!!>>> MUST be in the preamble <<<!!!!
+\tikzexternalize
+
+\usetikzlibrary{positioning}
+
+\pgfmathsetmacro{\myinnersepp}{2}% inner sep in mm
+
+\tikzset{
+box/.style={%draw,%
+        inner sep=0,%\myinnersepp,%
+        outer sep=0,%
+    minimum width=5mm,%
+    minimum height=height("Cap")+2*\myinnersepp*1mm,%
+    %align=center
+    }
+}
 
 %%
 % Prints an asterisk that takes up no horizontal space.
@@ -157,74 +210,71 @@
 
 \newcommand{\textcite}[1]{\citet{#1}\cite{#1}}
 
+\usepackage{cleveref}
+
 \begin{document}
 
 % Front matter
-%\frontmatter
+\frontmatter
 
 % r.1 blank page
-%\blankpage
+\blankpage
 
 % v.2 epigraphs
-%\newpage\thispagestyle{empty}
+\newpage\thispagestyle{empty}
 %\openepigraph{%
 %Je kunt niet altijd alles willen wat je wilt.
 %}{Peggy Mays}
 
 
 
+
 % r.3 full title page
 %\maketitle
+%\input{titlepages}
 
-
-% v.4 copyright page
-%\newpage
-%\begin{fullwidth}
-%~\vfill
-%\thispagestyle{empty}
-%\setlength{\parindent}{0pt}
-%\setlength{\parskip}{\baselineskip}
-%Copyright \copyright\ \the\year\ \thanklessauthor
-%
-%\par\smallcaps{Published by \thanklesspublisher}
-%
-%
-%\par\textit{First printing, \monthyear}
-%\end{fullwidth}
+% v.5 copyright page
+%\input{copyright}
 
 % r.5 contents
-%\tableofcontents
+\tableofcontents
 
-%\listoffigures
-%
-%\listoftables
+\listoffigures
+
+\listoftables
 
 % r.7 dedication
-%\cleardoublepage
-%~\vfill
-%\begin{doublespace}
-%\noindent\fontsize{18}{22}\selectfont\itshape
-%\nohyphenation
-%Dedicated to
-%\end{doublespace}
-%\vfill
-%\vfill
+% \cleardoublepage
+\input{dedication}
 
 
 % r.9 introduction
-%\cleardoublepage
-%\chapter*{Introduction}
-%\input{introduction}
+\cleardoublepage
+
+
 
 
 %%
 % Start the main matter (normal chapters)
 \mainmatter
-
-%\input{influenceskipgrams}
-%\input{languagemodels}
+\input{introduction}
+\input{languagemodels}
 \input{bayesianstuff}
+\input{data}
 
+
+\part{Intrinsic evaluation}
+\input{shpyplm}
+%\chapter{Domain-adaptation with a double hierarchical Pitman-Yor skipgram language model}
+
+\part{Extrinsic evaluation}
+%\input{speech}
+%\chapter{Relating brain activity data to perplexities from skipgram models}
+%\chapter{Using skipgram language models in automatic speech recognition for under-resourced languages}
+
+\chapter{Conclusion}
+
+%\input{test}
 
 %%
 % The back matter contains appendices, bibliographies, indices, glossaries, etc.
@@ -233,6 +283,10 @@
 
 \bibliography{superpaper}
 \bibliographystyle{plainnat}
+
+\input{summaries}
+\input{cv}
+\input{siks}
 
 
 %\printindex

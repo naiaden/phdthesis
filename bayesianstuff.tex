@@ -1,7 +1,15 @@
 \chapter{Chapter 2\newline Introduction to Bayesian $n$-gram %and Domain-dependent 
-Language Modelling}
+Language Modelling}{chap:introblm}\marginnote{Strictly speaking the G-CRP is a stochastic process that generates exchangeable random partitions
+whereas the Pitman-Yor process (PYP) is usually taken to define a stochastic process that generates prob-
+ability distributions. However, the two are closely connected: every distribution sampled from the PYP is
+associated with a partition that assigns each observation to a cluster, and the partitions associated with
+a PYP-generated distribution follow a G-CRP. Given the slightly inconsistent way in which the PYP is
+defined, we have chosen to adopt the terminology from Ishwaran and James (2003) in which G-CRP is used
+to describe the process that generates partitions, and the PYP is defined more narrowly to refer to the
+closely related process that generates probability distributions.}
+\footnote{Table 1 van \url{http://www.psy.cmu.edu/~ckemp/papers/navarrok_noneoftheaboveabayesianaccountofthedetectionofnovelcategories.pdf} is ook handig}
 
-In the previous chapter we introduced language models in which the word probabilities are based on the underlying fixed, but unknown, (joint) distributions from which we assume that we sample our training examples in a frequentist manner. Those distributions are observed by simply counting $n$-grams. If the corpus is too small compared to the model complexity, this yields unreliable counts; smoothing is a technique to rectify these counts.  The downside of most smoothing techniques is that they do not rely on a statistical model, but merely rely on heuristics such as discounting, interpolation, and back-off schemes.
+\newthought{In the previous chapter we introduced language models} in which the word probabilities are based on the underlying fixed, but unknown, (joint) distributions from which we assume that we sample our training examples in a frequentist manner. Those distributions are observed by simply counting $n$-grams. If the corpus is too small compared to the model complexity, this yields unreliable counts; smoothing is a technique to rectify these counts.  The downside of most smoothing techniques is that they do not rely on a statistical model, but merely rely on heuristics such as discounting, interpolation, and back-off schemes.
 
 In this chapter we introduce the Bayesian counterpart to language modelling, where we use the posterior distribution to estimate the underlying distribution. We use an approach that allows the model complexity to grow with the corpus size, as to avoid unreliable counts often found by MLE, and to avoid statistical artefacts caused due to overfitting. 
 
@@ -9,7 +17,7 @@ The Bayesian language models have a basis which is firmly nested in probability 
 
 After reading this chapter, we assume you know about using the Chinese restaurant process, the Hoppe-P\'olya urn, and stick-breaking processes, and how they can be used as a prior in mixture models such as the Dirichlet process mixture model and the nested Pitman-Yor process mixture model, which is the Bayesian $n$-gram language model that we use throughout this thesis.
 
-\newpage
+%
 
 \marginnote{Central to this chapter is the theorem of Bayes, which is a powerful way to relate current belief to prior belief, e.g.~by using new evidence to update prior beliefs into current beliefs. In its simplest form, Bayes' theorem can be stated as:
 \begin{align}
@@ -20,10 +28,10 @@ Here $A$ is the proposition, and $B$ the evidence or belief. $p(A)$ is the the p
 In this chapter we look at the priors and processes underlying a Bayesian language model. In most studies on the topic it is either considered from a bottom-up approach, or from a top-down approach. The first approach is really useful given a strong probabilistic background, whereas the latter is more convenient if the reader already has (vaguely) heard about the priors and processes involved. The approach of this chapter is to make the priors and processes understandable for the reader who has neither.
 
 Recall that our goal is to devise a language model within a non-parametric Bayesian (BNP) framework. The BNP approach is an alternative to parametric modelling and model selection.\footnote[][1em]{Model selection is the task of selecting a model from a set of candidate models. Given a data set, the goal is to select the model with the best explanatory power, and favourably also the simplest model. Famous criteria are cross-validation \citep{Kohavi1995A} and the Akaike information criterion \citep{Bozdogan1987Model}. For a more general introduction see \citep{Burnham2002Model}.}
-In many statistical inference problems, we expect that structures or patterns continue to emerge as data accrue, perhaps even without limit. We want a modelling framework that supplies a growing, unbounded number of degrees of freedom to the data analysis. However, if we allow the degrees of freedom to accrue too quickly, we risk finding structures that are statistical artifacts; a typical example of such artifact is overfitting. Overfitting is a serious problem, and it motivates the Bayesian aspect of non-parametrics. In many parametric paradigms, a number of parameters needs to be set which optimises a certain value. However, more of different data might already require another number of parameters. 
+In many statistical inference problems, we expect that structures or patterns continue to emerge as data accrue, perhaps even without limit. We want a modelling framework that supplies a growing, unbounded number of degrees of freedom to the data analysis. However, if we allow the degrees of freedom to accrue too quickly, we risk finding structures that are statistical artifacts; a typical example of such artifact is overfitting. Overfitting is a serious problem,\footnote{Overfitting can also be used as a tool, for example in text generation where you may want to force certain language.} and it motivates the Bayesian aspect of non-parametrics. In many parametric paradigms, a number of parameters needs to be set which optimises a certain value. However, more of different data might already require another number of parameters. 
 Although Bayesian methods are by no means immune to overfitting, they provide a natural resilience to it. By using a model with an unbounded complexity, underfitting is migitated, while computing, or approximating, the full posterior over parameters migitates overfitting.
 
-A common misconception about non-parametrics is that it means that there are no parameters. Instead, it means that the model is not parametric, which in turn means that the number of parameters is not fixed once and for all. If the amount of training data is fixed, there is no difference between parametric and non-parametric models. The difference emerges when new training data is added. The non-parametric model can adapt to the influx of new data points, while the parametric model does not have the flexibility to add parameters. Thus, the non-parametric framework is not opposed to parameters, to the contrary: the framework can be viewed as allowing an infinite\footnote{With infinite we henceforth mean countably infinite, or more precise, a finite but unbounded number; unless stated otherwise.} number of parameters, or rather, as an finite but unbounded number of parameters.
+A common misconception about non-parametrics is that it means that there are no parameters. Instead, it means that the model is not parametric, which in turn means that the number of parameters is not fixed once and for all. If the amount of training data is fixed,\footnote{For example in the classic scenario where you only have one batch of training data.} there is no difference between parametric and non-parametric models. The difference emerges when new training data is added. The non-parametric model can adapt to the influx of new data points, while the parametric model does not have the flexibility to add parameters. Thus, the non-parametric framework is not opposed to parameters, to the contrary: the framework can be viewed as allowing an infinite\footnote{With infinite we henceforth mean countably infinite, or more precise, a finite but unbounded number; unless stated otherwise.} number of parameters, or rather, as an finite but unbounded number of parameters.
 
 The chapter is set up as a continuous explanation of how to build a language model within a Bayesian non-parametric framework along several subtopics. Many of the concepts are introduced at the side, but we tried to separate them into sections as well. If a concept is explained in more detail in another section, we have listed a reference. Although it is a custom in Bayesian literature to first specify a generative model, we start from an example, only to arrive at the generative model at the end.
 
@@ -52,9 +60,23 @@ What we have now is a partition\footnote{For a more rigorous and mathematical fo
 %
 For example, a restaurant that represents 4 word types and 12 word occurrences, might look like this: 
 \begin{equation}\label{eq:partitionexample}
-	\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
+	%\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
+    \pi_{[12]} = \{\tikz[baseline,remember picture]{\node[fill=blue!20,anchor=base] (t11) {$\{1,2,5,9\}$};},\tikz[baseline,remember picture]{\node[fill=red!20,anchor=base] (t12) {$\{3,4,8,10\}$};},\tikz[baseline,remember picture]{\node[fill=green!20,anchor=base] (t13) {$\{6\}$};},\tikz[baseline,remember picture]{\node[fill=magenta!20,anchor=base] (t14) {$\{7,11,12\}$};}\}.
 \end{equation}
-This restaurant might for instance represent the data set ``aabbacdbabdd''. 
+This restaurant might for instance represent the data set ``%
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta1) {a};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta2) {a};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (tb1) {b};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (tb2) {b};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta3) {a};}
+\tikz[baseline,remember picture]{\node[box,fill=green!20] (tc1) {c};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (td1) {d};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (tb3) {b};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta4) {a};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (tb4) {b};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (td2) {d};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (td3) {d};}
+''. 
 
 It is easy to see that for each $m$ we have a different seating arrangement $\pi_{[m]}$. Each $m$ describes a different restaurant, so we call the CRP a family of distributions.
 
@@ -454,7 +476,8 @@ Put together, we have the following relationships among the $c_{uw\cdot}$'s and 
 The first clause in \cref{eq:npyp1} states that if the there are no tables in restaurant $u$ serving dish $w$, that there are also no customers, hence the count is $0$. The second clause states that if there is at least $1$ table, that there must also be a positive number of customers, however, the number of tables cannot exceed the number of customers.
 \Cref{eq:npyp2} shows the marginalising step: the number of customers easting desert $w$ in restaurant $u$ is the sum of all people who may have had a different main course, but chose the same desert.
 
-
+\section{The Bayesian Approach to Skipgram Language Modelling}
+essentially the same, but backoff refer to later chapter
 
 % \section{The Bayesian Approach to Domain-dependent $n$-gram Language Modelling}
 

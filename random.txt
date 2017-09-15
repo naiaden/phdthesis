@@ -1,0 +1,46 @@
+% \begin{forest}
+% [abcd 
+%   [bcd 
+%   	[bxd [d] ] 
+%     [cd [d] ] 
+%   ] 
+%   [axcd 
+%   	[axxd [d] ] 
+%     [cd [d] ] 
+%   ]
+%   [abxd 
+%   	[axxd [d] ] 
+%     [bxd [d] ] 
+%   ]
+% ]
+% \end{forest}
+
+% \begin{forest}
+% [abcd 
+%   [bcd 
+%   	[bxd [d] ] 
+%     [cd ] 
+%   ] 
+%   [axcd ]
+%   [abxd 
+%   	[axxd ] 
+%     [bxd [d] ] 
+%   ]
+% ]
+% \end{forest}
+
+
+
+% \begin{forest}
+% [abcd 
+%  [bcd 
+%   [cd 
+%    [d] 
+%   ] 
+%  ] 
+% ]
+% \end{forest}
+
+\begin{forest} [abcd [bcd [cd [d] ] ] ] \end{forest}
+\begin{forest} [abcd [bcd [bxd [d] ] [cd ] ] [axcd ] [abxd [axxd ] [bxd [d] ] ] ] \end{forest}
+\begin{forest} [abcd [bcd [bxd [d] ] [cd [d] ] ] [axcd [axxd [d] ] [cd [d] ] ] [abxd [axxd [d] ] [bxd [d] ] ] ] \end{forest}

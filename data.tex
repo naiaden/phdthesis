@@ -1,0 +1,163 @@
+\chapter{Chapter 3\newline Introduction to the data}\label{chap:data}
+The results that we present later in this thesis are the outcome of many experiments that we ran, on different data sets, with different settings. We used multiple data sets to investigate the effect of performance in cross-domain settings, and did this for two languages: English and Flemish-Dutch.\footnote{Since the experiments on improving automatic speech recognition are being done at the KU Leuven, we use their acoustic models. These acoustic models are trained on the Flemish-Dutch part of the Dutch spoken corpus (introduced later in this section), and are part of an automatic speech recogniser for Flemish-Dutch speech (see~\cref{ch:speech}).} 
+
+In this section we introduce these data sets individually, and throughout the thesis we will refer back to this section for the details of the data sets.
+
+\section{English data}
+For the experiments on English we use four corpora: two large generic mixed-domain corpora and two smaller domain-specific corpora. Although the two generic corpora comprise encyclopedic and news texts, we consider them less domain-specific.\footnote{waarom vinden we dit?}
+  
+  \subsection{\obw}
+  
+  The first generic corpus is the Google 1 billion word benchmark for measuring progress in statistical language modelling (henceforth \obw). It comprises shuffled web corpus of 769 million tokens \cite{chelba2013one}. For training we use sets 1 through 100, out of the 101 available training sets; for testing we use all available 50 test sets (8 million tokens).
+  
+  The corpus is based on the corpora provided for the sixth workshop on machine translation (WMT11). They only used the English part, as other languages were also available to use for training machine translation systems. For postprocessing duplicate sentences were removed, sentences were shuffled into a random order\footnote{Whilst maintaining the order within the sentences}, and a word type threshold of 3 was used. The word types that did not make the threshold were mapped to an UNK-token.
+  
+  This resulted in a corpus of 800 million tokens with sentences markers\footnote{1 begin of sentence and 1 end of sentence marker}, and around 793 thousand word types.
+  
+ \subsection{\wp}
+  The second generic corpus, is a Wikipedia snapshot (henceforth \wp) of November 2013 as used and provided by \textcite{pickhardt2014generalized}. 
+  
+  The data consists of Wikipedia articles which are not postprocessed, except for cleaning of the markup, and tokenisation\footnote{``We filtered the word tokens by removing all character sequences which did not contain any letter, digit or common punctuation marks.''}.
+  
+  However, we find that some of the tokenisation is too rigorous, as this has introduced errors such as separating abbreviations:
+  
+  \begin{quote}The vacuum state is defined as the state with no particle or antiparticle , i . e . , and . </s>\footnote{This example also lacks the formulae before and after `and': ``$a_k |0\rangle=0$ and $b_k |0\rangle=0$''.}\end{quote}
+  
+  \begin{quote}All of Solzhenitsyn's sons became U . S . citizens . </s>\footnote{Especially when the final dot of U . S . is also the sentence final punctuation, this is misleading.}\end{quote}
+  Other frequently occurring errors are runons such as 
+  
+  \begin{quote}Stephen C Kleene defined as his nowfamousThesis Iknown as the ChurchTuring thesis . </s>\end{quote}
+  where dashes and quotation marks have been stripped, as well as whitespace; and boxed content is not always separated from the main text, which causes a lot of tables and other marked-up context to be in the data.
+  
+  In total the data comprises 1.4 billion words for training and 367 million words for testing.
+
+   \subsection{\jrc}
+  The first domain-specific corpus is from JRC-Acquis v3.0\cite{steinberger2006jrc}, which contains legislative text of the European Union. It is part of the joint research centre collection of the Acquis Communautaire\footnote{The Acquis Communautaire (AC) is the total body of European Union (EU) law applicable in the the EU Member States.} in 22 of the official languages of the European Union. The collection comprises selected texts written between the 1950s and 2007.
+  
+  We only use the English part of this parallel-aligned multilingual corpus. We shuffle the sentences and create a train (31 million words) and test split (8 million words). 
+    
+   
+  \subsection{\emea}
+  The second domain-specific corpus consists of converted\footnote{The composers of the corpus note that there are known problems with tables and multi-column layouts, as the documents are converted with \texttt{pdftotext}.} PDF documents from the European Medicines Agency, EMEA\cite{tiedemann2009news}. Similar to \jrc, \emea is the English part of the multilingual aligned parallel corpus.
+  
+  We shuffled all sentences, and selected 20\% of them as the test set (3 million tokens), and the remaining 80\% was reserved for training (12 million tokens).
+  
+  
+  \subsection{Data handling}
+	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model. We used a high occurrence threshold of 100 on the unigrams, yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Although more recent work such as \ref{shareghi2017compressed} do not report on the number of types,  }
+    
+% hit rates: 
+% determine: colibri-patternmodeller -i /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.patternmodel -f /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.dat -c /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.cls -l 4 -m 4 -u -P | cut -f 1 > /scratch/lonrust/train-1bw.4gram 
+% and colibri-extract
+%
+%rate: for train in emea jrc 1bw; do for test in emea jrc 1bw; do for i in 2 3 4; do TOTAL=$(wc -l ./test-${test}.${i}gram | cut -d' ' -f1); PART=$(fgrep -o -x -f ./test-${test}.${i}gram ./train-${train}.${i}gram | wc -l); echo $train $test $TOTAL $PART; done; done; done
+%
+% see: https://docs.google.com/spreadsheets/d/1425o5GMjbUaCoK_XKvpinRzgkT8YGcqU4ucHzJJVghE/edit#gid=462900132
+\begin{table}%
+    \centering
+    \subfloat[Unigrams]{{\begin{tabular}{lllll}
+     & \obw  & \emea & \jrc  & \wp   \\
+\obw  & 1.5  & 10.9 & 6.2  & 6.6  \\
+\emea & 18.3 & 0.1  & 10.1 & 22.4 \\
+\jrc  & 12.3 & 14.9 & 0.4  & 9.9  \\
+\end{tabular}\label{tab:ex1ample1} }}%
+    \qquad
+    \subfloat[Bigrams]{{\begin{tabular}{llll}
+ \obw   & \emea & \jrc  & \wp \\
+ 17.82 & 4.13 & 5.34 &    \\
+ 1.28  & 8.37 & 1.19 &    \\
+ 3.51  & 2.46 & 9.81 &    \\
+\end{tabular}\label{tab:ex1ample2} }}%
+    \qquad
+    \subfloat[Trigrams]{{\begin{tabular}{lllll}
+\obw  & 35.58 & 5.53  & 8.70  &    \\
+\emea & 1.21  & 18.43 & 1.24  &    \\
+\jrc  & 4.16  & 2.64  & 21.87 &    \\
+\end{tabular}\label{tab:ex1ample3} }}%
+	\qquad
+    \subfloat[4-grams]{{\begin{tabular}{llll}
+   32.06 & 3.56  & 5.50  &    \\
+   0.57  & 25.48 & 0.69  &    \\
+   2.06  & 1.56  & 29.25 &    \\
+\end{tabular}\label{tab:ex1ample4} }}%
+    \caption{Out-of-vocabulary rates (in \%) for the unigrams; hit rates (in \%) for bi-, tri- and 4-grams. A test pattern 'hits', when it is also in the training data. The training corpora on the rows, and test sets in the columns.}%
+    \label{tab:ex1ample}%
+\end{table}
+    
+    \section{Analysis of cross-corpora OOV and hit rates}
+Most corpora comprise a coherent set of texts, that share certain properties. This can be because of phenomena that you want to investigate, such as the usage of constructs of language, or in diachronic corpora where you can track changes in meaning of words. With the inherent differences in usage for the corpora, the most obvious differences are the words.
+
+The problem with out-of-vocabulary words is not only that you don't learn specific probabilities per OOV word\footnote{Unlike all the other words that are in the vocabulary.}, but have to resort to other means such as a specific OOV probability, or using a hierarchical structure with a character language model.
+
+The second problem is that perplexity is the default evaluation criterion for language models, and OOV words are not considered when computing perplexity. This has many implications, especially since the evaluation can hardly be used for downstream tasks where OOV words are a real issue.
+
+In \cref{tab:ex1ample1} we list the OOV rates per train corpus, and for each test corpus. For each word in the test data, we checked whether it occurred in the train data.\footnote{After thresholding in the cases of \obw and \wp.}
+Here we see that on the diagonal the OOV rates are the lowest, this being the within-corpus cases. If we stray from the diagonal, the OOV are higher, up to 22.2\%. This means that more than 1 out of 5 words in \wp does not occur in \emea. Although this is not necessarily a problem\footnote{Since \emea is a small corpus with 3 million words, and no one would use it as a general-purpose corpus.}, we have to take this into consideration when we look at the perplexity scores later in this thesis.
+For \obw the cross-corpus OOV rates are lower, which strengthens our idea that it is a general-domain text corpus.
+
+Similarly, it is also interesting to look at the hit rates for the higher order $n$-grams. In \cref{tab:ex1ample2,tab:ex1ample3,tab:ex1ample4} we listed the rate of patterns that are also present in the training data. The effects are generally much stronger than just the OOV rate. For example, in \cref{tab:ex1ample3}, we see that about 36\% of the trigrams in the test data of \obw literally also occur in the training data of \obw. For the other test corpora this number is obviously much lower. In the same table it also shows that the coverage with \emea as training corpus is much lower compared than \obw.
+    
+\section{Flemish-Dutch data}
+\subsection{\mediargus}
+For the experiments on Flemish-Dutch data, we use the Mediargus corpus as training material. It contains 5 years of newspaper texts from 12 Flemish newspapers and magazines, totaling 1.4 billion words.
+
+Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT, the department of Electrotechnical Engineering at the KU Leuven obtained the texts from Mediargus, the supplier for Southern Dutch news paper texts for language model training. The corpus is also not publicly available.} we briefly introduce it here.
+
+\begin{table}
+	\begin{tabular}{ll}
+    	Source & \thead{Tokens \\ ($\times 10^6$)} \\
+    	De Morgen & 135 \\
+        De Standaard & 118 \\
+        De Tijd & 98 \\
+        Gazet van Antwerpen & 240 \\
+        Het Belang van Limburg & 106 \\
+        Het Laatste Nieuws & 284 \\
+        Het Nieuwsblad & 322 \\
+        Het Volk & 133
+    \end{tabular}
+    \caption{The sources of the \mediargus corpus. The numbers are millions of tokens.}
+\end{table}
+
+	Similarly to the \obw models, we used a threshold on the word types, such that we have a similar size of vocabulary (100 thousand types), which we produced with a threshold of 250. We used the same occurrence threshold of 2 on the $n$- and skipgrams.
+ 
+    
+    \subsection{\cgn}
+    For testing we use the Flemish part of the Spoken Dutch Corpus (CGN, and henceforth denoted as \cgn) \citep{oostdijk2000spoken} (3 million words), divided over 15 components (see~\cref{tab:cgn}), ranging from spontaneous speech to books read aloud. The corpus aimed to be a plausible sample of contemporary standard Dutch as spoken in Flanders and the Netherlands. One third of the data were to be collected in Flanders, the other two thirds were to originate from the Netherlands.
+
+    \begin{table}
+    	\begin{tabular}{llllllll}
+                  & \obw & \emea & \jrc & \wp & \mediargus & \cgn & nbest \\ \cline{2-8}
+        	train & 769m & 12m & 31m & 1.4b & 1.3b &    & \\
+            test  & 8m   & 3m  & 8m  & 367m &      & 3m & 0.5m
+        \end{tabular}
+        \caption{Summary of the number of words for each training and test set. m denote millions of words, and b denotes billions of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
+    \end{table}
+    
+    \begin{table}
+    	\begin{tabular}{llll}
+              & Component description & \thead{Tokens \\ ($\times 10^3$)} \\ \hline
+        	a & Spontaneous conversations ('face-to-face') & 955 & \\
+            b & Interviews with teachers of Dutch & 350 & \\
+            c & Spontaneous telephone dialogues (recorded via a switchboard) & 559 & \\ 
+            d & Spontaneous telephone dialogues (recorded on MD via a local interface) & 390 & \\
+            e & Simulated business negotiations & 0 & \\
+            f & Interviews, discussions, and debates (broadcast) & 282 & \\
+            g & (Political) discussions, debates, and meetings (non-broadcast) & 161 & \\
+            h & Lessons recorded in the classroom & 119 & \\
+            i & Live commentaries (broadcast) & 89 & \\
+            j & Newsreports and reportages (broadcast) & 108 & \\
+            k & News (broadcast) & 93 & \\
+            l & Commentaries, columns, and reviews (broadcast) & 75 & \\
+            m & Ceremonious speeches and sermons & 14 & \\ 
+            n & Lectures and seminars & 88 & \\
+            o & Read speech & 407 & 
+        \end{tabular}
+        \caption{Components in the Spoken Dutch Corpus. The reported number of tokens is for the Flemish part of the corpus. }
+        \label{tab:cgn}
+    \end{table}
+    
+    The second series of test sets are the Flemish parts of the NBest benchmark \cite{kessens2007n} (475k words; the train, development and test sets). 
+    
+    mediargus in nbest, parts of cgn, (f, i, j, k, l, c, d)
+    
+
