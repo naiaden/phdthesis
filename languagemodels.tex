@@ -11,6 +11,8 @@ But this method has also some downsides. First, since most languages have an unb
 
 For the rest of this thesis, we assume that we learn the language by reading a lot. This ignores other valuable resources such as grammar, speech, and cultural influences. But we have a dictionary, so we can at least get an idea of what's in the text. Again, we focus on two things. First we want to recognise the words, and second, we want to recognise patterns that precede a word. This will be our approximation of the language. This approximation of patterns and their words can be modelled in many ways. In the next section we introduce the models that are the foundation of this thesis.
 
+
+
 %\begin{itemize}
 %	\item What is SLM?
 %    \item Why do we do it?
@@ -44,11 +46,13 @@ $n$-gram language models generalise unigram language models, by implicitly takin
 
 \begin{enumerate}
 	\item Bananas, are, my, favourite, fruit
-    \item \emph{Bananas} are, \emph{are} my, \emph{my} favourite, \emph{favourite} fruit
-    \item \emph{Bananas are} my, \emph{are my} favourite, \emph{my favourite} fruit
-    \item \emph{Bananas are my} favourite, \emph{are my favourite} fruit
-    \item \emph{Bananas are my favourite} fruit
+	\item \emph{Bananas} are, \emph{are} my, \emph{my} favourite, \emph{favourite} fruit
+	\item \emph{Bananas are} my, \emph{are my} favourite, \emph{my favourite} fruit
+	\item \emph{Bananas are my} favourite, \emph{are my favourite} fruit
+	\item \emph{Bananas are my favourite} fruit
 \end{enumerate}
+
+
 
 The problem here is that if you want to predict in a 5-gram language model that \emph{Bananas} is the first word in a sentence, it must take the role of the focus word. The context is then filled with markers\footnote{These tokens are usually called begin of sentence (BOS) markers, and end of sentence (EOS) markers when they signal the end of a sentence.} that denote they are not part of the sentence. Each sentence implicitly ends with an end of sentence marker. %This is useful to query the likelihood of the first $n-1$ words in an $n$-gram language model, but in practice the influence is negligible\footnote{is that so? I believe so.}. In the examples we will mention the markers if they add to the understanding.
 Punctuation is also considered a word, except when it is part of an abbreviation.\footnote{When using data that has been processed by others, this may vary, as it is dependent on choices such as how to tokenise the text.}
@@ -70,38 +74,40 @@ With the unigram approach, we have to store for each word its probability of occ
 
 
 
+
+
 %Hier plaatjes van een corpus met 3,4,5-grammen en de upperbound
 \begin{figure}
-\begin{scaletikzpicturetowidth}{\textwidth}
-\tikzsetnextfilename{hello}
-\begin{tikzpicture}[scale=\tikzscale]
-\begin{semilogyaxis}[
-%\begin{axis}[%domain=0:100,
-  title=Growth of the number of types throughout the corpus,
-  xlabel=relative position in document (tokens in \%),
-  ylabel=types,
-    width=11cm,
-    height=7cm]
-    %legend=none]
-    %legend cell align=left,
-    %legend pos=outer north east,
-    %legend style={draw=none}]
-\addplot table [y=c1, x=c]{ngramtypegrowth.dat};\label{fig:gp1}
-%\addlegendentry{1-grams}
-\addplot table [y=c2, x=c]{ngramtypegrowth.dat};\label{fig:gp2}
-%\addlegendentry{2-grams}
-\addplot table [y=c3, x=c]{ngramtypegrowth.dat};\label{fig:gp3}
-%\addlegendentry{3-grams}
-\addplot table [y=c4, x=c]{ngramtypegrowth.dat};\label{fig:gp4}
-%\addlegendentry{4-grams}
-\addplot table [y=c5, x=c]{ngramtypegrowth.dat};\label{fig:gp5}
-%\addlegendentry{5-grams}
-%\addplot (5*x);
-\end{semilogyaxis}
-%\end{axis}
-\end{tikzpicture}
-\end{scaletikzpicturetowidth}
-\caption{The number of unique $n$-grams (types) are plotted against their relative position in the document (the number of $n$-gram tokens encountered). Unigrams (\ref{fig:gp1}), bigrams (\ref{fig:gp2}), trigram (\ref{fig:gp3}), 4-grams (\ref{fig:gp4}), and 5-grams (\ref{fig:gp5}). The number of types is plotted on a log scale, since otherwise (\ref{fig:gp1}) would appear flat.}
+	\begin{scaletikzpicturetowidth}{\textwidth}
+		\tikzsetnextfilename{hello}
+		\begin{tikzpicture}[scale=\tikzscale]
+		\begin{semilogyaxis}[
+		%\begin{axis}[%domain=0:100,
+		title=Growth of the number of types throughout the corpus,
+		xlabel=relative position in document (tokens in \%),
+		ylabel=types,
+		width=11cm,
+		height=7cm]
+		%legend=none]
+		%legend cell align=left,
+		%legend pos=outer north east,
+		%legend style={draw=none}]
+		\addplot table [y=c1, x=c]{ngramtypegrowth.dat};\label{fig:gp1}
+		%\addlegendentry{1-grams}
+		\addplot table [y=c2, x=c]{ngramtypegrowth.dat};\label{fig:gp2}
+		%\addlegendentry{2-grams}
+		\addplot table [y=c3, x=c]{ngramtypegrowth.dat};\label{fig:gp3}
+		%\addlegendentry{3-grams}
+		\addplot table [y=c4, x=c]{ngramtypegrowth.dat};\label{fig:gp4}
+		%\addlegendentry{4-grams}
+		\addplot table [y=c5, x=c]{ngramtypegrowth.dat};\label{fig:gp5}
+		%\addlegendentry{5-grams}
+		%\addplot (5*x);
+		\end{semilogyaxis}
+		%\end{axis}
+		\end{tikzpicture}
+	\end{scaletikzpicturetowidth}
+	\caption{The number of unique $n$-grams (types) are plotted against their relative position in the document (the number of $n$-gram tokens encountered). Unigrams (\ref{fig:gp1}), bigrams (\ref{fig:gp2}), trigram (\ref{fig:gp3}), 4-grams (\ref{fig:gp4}), and 5-grams (\ref{fig:gp5}). The number of types is plotted on a log scale, since otherwise (\ref{fig:gp1}) would appear flat.}
 \end{figure}
 
 These graphs also show sparseness
@@ -113,6 +119,8 @@ A problem of $n$-grams is that it can only model contiguous sequences of words; 
 Let us first formally introduce the skipgrams as used in this thesis. Let $\{m\}$ be a skip of length $m$, then \emph{the $\{1\}$ banana} can match \emph{the delicious banana}, or \emph{the yellow banana}, etc. We do not allow skips to be at the beginning or end of the skipgram, so for $n>2$ skipgrams are a generalisation of $n$-grams \cite{goodman2001bit,shazeer2015sparse,Pickhardt2014GLM}.
 
 Now let $\sigma_{\rotatebox[origin=c]{180}{m}}$ be the operator that adds a skip to a pattern $\mathbf{u}$ on the $\rotatebox[origin=c]{180}{m}$th position if there is not already a skip. Then $\boldsymbol\sigma(\mathbf{u}) \left[\sigma_{\rotatebox[origin=c]{180}{m}}(\mathbf{u})\right]_{\rotatebox[origin=c]{180}{m}=2}^{|\mathbf{u}|-1}$ is the set of patterns with one skip more than the number of skips currently in $\mathbf{u}$. 
+
+
 
 For a 4-gram $\mathbf{u}w$ = \emph{ate the ripe banana}, $\sigma_2(\mathbf{u}w)$ = \emph{ate \{1\} ripe banana}, $\sigma_3(\mathbf{u}w)$ = \emph{ate the \{1\} banana}, and $\boldsymbol\sigma(\mathbf{uw}) = \left[\sigma_2(\mathbf{u}), \sigma_3(\mathbf{u})\right]$. To get to the 4-gram with two skips, we apply the operator on a skipgram that already contains a skip, e.g.~$\sigma_3(\sigma_2(\mathbf{u}w))$ = \emph{the \{1\} \{1\} banana}.\footnote{We can abbreviate this skipgram to \emph{ate \{2\} banana}.}
 
@@ -128,11 +136,27 @@ Earlier we saw that even for a small vocabulary of $50000$ words and a trigram l
 
 One of the first ways to overcome assigning a zero probability to an $n$-gram, is to smooth the probability distribution, and adjust the empirical counts to expected counts.
 
-The simplest method is \emph{add-one smoothing}, which prevents having zero-probabilities by modifying the count method for the MLE.\footnote{The MLE will generally underestimate the probability of unseen words $w$ after a known context $\mathbf{u}$.}
-	
+The simplest method is \emph{additive smoothing}, or in particular \emph{add-one smoothing}, which prevents having zero-probabilities by modifying the count method for the MLE.\footnote{The MLE will generally underestimate the probability of unseen words $w$ after a known context $\mathbf{u}$.}
+
+
+
 \begin{equation} p_{\operatorname{MLE_{+1}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+1}{c\left(w_{i-n+1}^{i-1}\right)+W}\label{eq:paddone}
 \end{equation}\footnote{The more general \emph{add-$\alpha$ smoothing} with $\alpha < 1$ limits the strength in non-observed counts: \[ p_{\operatorname{MLE_{+\alpha}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+\alpha}{c\left(w_{i-n+1}^{i-1}\right)+\alpha W}.\]}
-	
-\subsection{Kneser-Ney}
-With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{grey} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{earl}\footnote{For the Earl Grey tea blend.}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{grey} than its raw could suggests, taking into account the diversity of history.
 
+
+In some cases you have bigrams with the same frequency count, but with different counts for the focus words. In estimating the probability you want to capture this behaviour by interpolating the bigram model with a unigram model. E.g.~
+\[p_{\mathrm{interp}}\left(w_i|w_{i-3}w_{i-2}w_{i-1}\right) = 
+\lambda_1 p_{\operatorname{MLE}}\left(w_i|w_{i-3}w_{i-2}w_{i-1}\right) + 
+\lambda_2 p_{\operatorname{MLE}}\left(w_i|w_{i-2}w_{i-1}\right) + 
+\lambda_3 p_{\operatorname{MLE}}\left(w_i|w_{i-1}\right) + 
+\lambda_4 p_{\operatorname{MLE}}\left(w_i\right)\]
+\footnote{If you extend the formula with $+ \lambda_5 \frac{1}{W}$ then the probability will never be zero.} 
+This type of interpolated models is described by \cite{jelinek1980interpolated}. The $n$th-order smoothed model is defined recursively as a linear interpolation between the $n$th-order MLE and the $(n-1)$th-order smoothed model.
+\footnote{Notice that the optimal $\lambda$ will be different for different histories. For example, for a context that occurs often, and high $\lambda$ is more suitable, since the distribution will be very reliable. See the following papers on binning techniques for estimation of the value of $\lambda$: \cite{bahl1983maximum}	}
+
+
+\subsection{Kneser-Ney}
+With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{bulb} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{light}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{bulb} than its raw could suggests, taking into account the diversity of history.
+
+For example, \emph{bulb} occurs 1624 times in a corpus, in 262 different contexts, of which 626 occurrences of \emph{light bulb}. If we take a more general word that occurs 1626 times, such as \emph{pies}, then we see that it occurs after 402 contexts. 
+With Kneser-Ney smoothing
