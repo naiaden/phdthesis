@@ -13,7 +13,7 @@
   
   We derive our model from \textcite{teh2006hierarchical}, and propose an extension with skipgrams. A frequentist approach to language modelling with skipgrams is described by \textcite{pickhardt2014generalized}, who introduce an approach using skip-$n$-grams which are interpolated using modified Kneser-Ney smoothing. In this paper we show that a Bayesian skip-$n$-gram approach outperforms a frequentist skip-$n$-gram model.%, 
 
-\section{Method}
+\section{Method}\marginnote{This section is a recap of \cref{chap:intoblm}, and in particular the Bayesian $n$-gram language model.}
 
 Pitman-Yor Processes (PYP) belong to the family of non-parametric Bayesian models. Let $W$ be a fixed and finite vocabulary of $V$ words. For each word $w\in W$ let $G(w)$ be the probability of $w$, and $G = [G(w)]_{w\in W}$ be the vector of word probabilities. Since word frequencies generally follow a power-law distribution, we use a Pitman-Yor process, which is a distribution over partitions with power-law distributions. 
 In the context of a language model this means that for a space $P(\mathbf{u})$, with $c(\mathbf{u}\cdot)$ elements (tokens), we want to partition $P(\mathbf{u})$ in $V$ subsets such that the partition is a good approximation of the underlying data, in which $c(\mathbf{u}w)$ is the size of subset $w$ of $P(\mathbf{u})$. We assume that the training data is an sample of the underlying data, and for this reason we seek to find an approximation, rather than using the partitions precisely as found in the training data.
