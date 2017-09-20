@@ -62,7 +62,8 @@ Or in a more general and abstract sense:
 Henceforth we will use the abbreviation $w_{i-n+1}^{i-1} \equiv w_{i-n+1},\ldots,w_{i-1}$.
 
 An $n$-gram probability $p(w_i|w_{i-n+1}^{i-1})$ is computed by means of its maximum likelihood estimate (MLE), which is a natural procedure to count how often the token $w_i$ follows the context $w_{i-n+1}^{i-1}$, and to divide by the total number of times the history occurs:
-\[ p_{\operatorname{MLE}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)}{c\left(w_{i-n+1}^{i-1}\right)} = \frac{c\left(w_{i-n+1}^{i}\right)}{\sum_{w_i}^{V}c\left(w_{i-n+1}^{i}\right)}\]
+\begin{equation} p_{\operatorname{MLE}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)}{c\left(w_{i-n+1}^{i-1}\right)} = \frac{c\left(w_{i-n+1}^{i}\right)}{\sum_{w_i}^{V}c\left(w_{i-n+1}^{i}\right)}\label{eq:pmle}
+\end{equation}
 where $c(\mathbf{u}w)$ is the count function that denotes how often an $n$-gram $\mathbf{u}w$ occurs in the train data.
 
 With the unigram approach, we have to store for each word its probability of occuring. With $W$ the number of words in the vocabulary $V$, we have to store $W$ probabilities. With $n$-grams, there are exponentially many possibilities: $W^n$. A typical vocabulary size is $W\approx 200,000$, hence storing all possibilities for a trigram is already quite a feat. Fortunately, most of these trigrams never occur:\footnote{Although mentioning a $n$-gram that never occurs, is a paradox.} \emph{elephant vaccuum cola}
@@ -122,7 +123,16 @@ Remember that we extend a language model to overcome the problem of poor general
 But this is not the end of the story, since we also have to change the models to help in their own way.
 
 
-\section{Smoothing and Backoff Methods}
-Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation.
+\section{Smoothing, Interpolation, and Backoff Methods}
+Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation. On the other hand we observe that many of these trigrams have count zero\footnote{Combine the large feature space with relatively few observations, of which the elements mostly occur in standard patterns, and it is clear that we are dealing with a very sparse feature space.}, which causes divisions by zero in \cref{eq:pmle}.
+
+One of the first ways to overcome assigning a zero probability to an $n$-gram, is to smooth the probability distribution, and adjust the empirical counts to expected counts.
+
+The simplest method is \emph{add-one smoothing}, which prevents having zero-probabilities by modifying the count method for the MLE.\footnote{The MLE will generally underestimate the probability of unseen words $w$ after a known context $\mathbf{u}$.}
+	
+\begin{equation} p_{\operatorname{MLE_{+1}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+1}{c\left(w_{i-n+1}^{i-1}\right)+W}\label{eq:paddone}
+\end{equation}\footnote{The more general \emph{add-$\alpha$ smoothing} with $\alpha < 1$ limits the strength in non-observed counts: \[ p_{\operatorname{MLE_{+\alpha}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+\alpha}{c\left(w_{i-n+1}^{i-1}\right)+\alpha W}.\]}
+	
 \subsection{Kneser-Ney}
+With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{grey} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{earl}\footnote{For the Earl Grey tea blend.}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{grey} than its raw could suggests, taking into account the diversity of history.
 

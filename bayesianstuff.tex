@@ -1,5 +1,5 @@
 \chapter{Chapter 2\newline Introduction to Bayesian $n$-gram %and Domain-dependent 
-Language Modelling}{chap:introblm}\marginnote{Strictly speaking the G-CRP is a stochastic process that generates exchangeable random partitions
+Language Modelling}\label{chap:introblm}\marginnote{Strictly speaking the G-CRP is a stochastic process that generates exchangeable random partitions
 whereas the Pitman-Yor process (PYP) is usually taken to define a stochastic process that generates prob-
 ability distributions. However, the two are closely connected: every distribution sampled from the PYP is
 associated with a partition that assigns each observation to a cluster, and the partitions associated with
@@ -63,7 +63,9 @@ For example, a restaurant that represents 4 word types and 12 word occurrences, 
 	%\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
     \pi_{[12]} = \{\tikz[baseline,remember picture]{\node[fill=blue!20,anchor=base] (t11) {$\{1,2,5,9\}$};},\tikz[baseline,remember picture]{\node[fill=red!20,anchor=base] (t12) {$\{3,4,8,10\}$};},\tikz[baseline,remember picture]{\node[fill=green!20,anchor=base] (t13) {$\{6\}$};},\tikz[baseline,remember picture]{\node[fill=magenta!20,anchor=base] (t14) {$\{7,11,12\}$};}\}.
 \end{equation}
-This restaurant might for instance represent the data set ``%
+This restaurant might for instance represent the data set 
+
+\noindent \begin{center}%
 \tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta1) {a};}
 \tikz[baseline,remember picture]{\node[box,fill=blue!20] (ta2) {a};}
 \tikz[baseline,remember picture]{\node[box,fill=red!20] (tb1) {b};}
@@ -76,7 +78,7 @@ This restaurant might for instance represent the data set ``%
 \tikz[baseline,remember picture]{\node[box,fill=red!20] (tb4) {b};}
 \tikz[baseline,remember picture]{\node[box,fill=magenta!20] (td2) {d};}
 \tikz[baseline,remember picture]{\node[box,fill=magenta!20] (td3) {d};}
-''. 
+.\end{center} 
 
 It is easy to see that for each $m$ we have a different seating arrangement $\pi_{[m]}$. Each $m$ describes a different restaurant, so we call the CRP a family of distributions.
 
