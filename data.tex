@@ -8,7 +8,7 @@ For the experiments on English we use four corpora: two large generic mixed-doma
   
   \subsection{\obw}
   
-  The first generic corpus is the Google 1 billion word benchmark for measuring progress in statistical language modelling (henceforth \obw). It comprises shuffled web corpus of 769 million tokens \cite{chelba2013one}. For training we use sets 1 through 100, out of the 101 available training sets; for testing we use all available 50 test sets (8 million tokens).
+  The first generic corpus is the Google 1 billion word benchmark for measuring progress in statistical language modelling (henceforth \obw). It comprises shuffled web corpus of 769 million tokens.\cite{chelba2013one} For training we use sets 1 through 100, out of the 101 available training sets; for testing we use all available 50 test sets (8 million tokens).
   
   The corpus is based on the corpora provided for the sixth workshop on machine translation (WMT11). They only used the English part, as other languages were also available to use for training machine translation systems. For postprocessing duplicate sentences were removed, sentences were shuffled into a random order\footnote{Whilst maintaining the order within the sentences}, and a word type threshold of 3 was used. The word types that did not make the threshold were mapped to an UNK-token.
   
@@ -44,7 +44,7 @@ For the experiments on English we use four corpora: two large generic mixed-doma
   
   
   \subsection{Data handling}
-	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model. We used a high occurrence threshold of 100 on the unigrams, yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Although more recent work such as \ref{shareghi2017compressed} do not report on the number of types,  }
+	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model.\footnote[][-3em]{This area is still under investigation, as this topic of memory expensiveness is addressed in recent papers such as: \cite{shareghi2017compressed}} We used a high occurrence threshold of 100 on the unigrams,\footnote{Compared the original threshold of 3 used in the corpus.} yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs\footnote{\label{fn:shareghi}We map their UNK type to ours \emph{\{?\}}.} occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Although more recent work such as mentioned in \cref{fn:shareghi} do not report on the number of types, making it hard to compare our memory usage to theirs.}
     
 % hit rates: 
 % determine: colibri-patternmodeller -i /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.patternmodel -f /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.dat -c /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.cls -l 4 -m 4 -u -P | cut -f 1 > /scratch/lonrust/train-1bw.4gram 
@@ -53,36 +53,131 @@ For the experiments on English we use four corpora: two large generic mixed-doma
 %rate: for train in emea jrc 1bw; do for test in emea jrc 1bw; do for i in 2 3 4; do TOTAL=$(wc -l ./test-${test}.${i}gram | cut -d' ' -f1); PART=$(fgrep -o -x -f ./test-${test}.${i}gram ./train-${train}.${i}gram | wc -l); echo $train $test $TOTAL $PART; done; done; done
 %
 % see: https://docs.google.com/spreadsheets/d/1425o5GMjbUaCoK_XKvpinRzgkT8YGcqU4ucHzJJVghE/edit#gid=462900132
+% NO SEE: https://docs.google.com/spreadsheets/d/1-dAbMnq1vHzRA4i-d_4gj2vTvFjEEK-KO7Y8Y8k54uA/edit#gid=0
+% AND /vol/tensusers/lonrust/overlapcount
 \begin{table}%
     \centering
-    \subfloat[Unigrams]{{\begin{tabular}{lllll}
-     & \obw  & \emea & \jrc  & \wp   \\
-\obw  & 1.5  & 10.9 & 6.2  & 6.6  \\
-\emea & 18.3 & 0.1  & 10.1 & 22.4 \\
-\jrc  & 12.3 & 14.9 & 0.4  & 9.9  \\
+    \subfloat[Unigrams]{{\begin{tabular}{llll}
+     & \obw  & \emea & \jrc    \\
+\obw  & 1.5  & 10.9 & 6.2    \\
+\emea & 18.3 & 0.1  & 10.1  \\
+\jrc  & 12.3 & 14.9 & 0.4    \\
 \end{tabular}\label{tab:ex1ample1} }}%
     \qquad
-    \subfloat[Bigrams]{{\begin{tabular}{llll}
- \obw   & \emea & \jrc  & \wp \\
- 17.82 & 4.13 & 5.34 &    \\
- 1.28  & 8.37 & 1.19 &    \\
- 3.51  & 2.46 & 9.81 &    \\
+    \subfloat[Bigrams]{{\begin{tabular}{lll}
+ \obw   & \emea & \jrc   \\
+ 98.5 & 92.5 & 93.5     \\
+ 46.2  & 98.3 & 59.9    \\
+ 59.7  & 60.5 & 95.5   \\
 \end{tabular}\label{tab:ex1ample2} }}%
     \qquad
     \subfloat[Trigrams]{{\begin{tabular}{lllll}
-\obw  & 35.58 & 5.53  & 8.70  &    \\
-\emea & 1.21  & 18.43 & 1.24  &    \\
-\jrc  & 4.16  & 2.64  & 21.87 &    \\
+\obw  & 85.6 & 69.8  & 66.0  &    \\
+\emea & 17.0  & 94.8 & 26.6  &    \\
+\jrc  & 26.8  & 32.1  & 88.3 &    \\
 \end{tabular}\label{tab:ex1ample3} }}%
 	\qquad
     \subfloat[4-grams]{{\begin{tabular}{llll}
-   32.06 & 3.56  & 5.50  &    \\
-   0.57  & 25.48 & 0.69  &    \\
-   2.06  & 1.56  & 29.25 &    \\
+   62.5 & 42.2  & 33.3  &    \\
+   5.8  & 91.2 & 10.0  &    \\
+   9.2  & 14.1  & 78.3 &    \\
 \end{tabular}\label{tab:ex1ample4} }}%
     \caption{Out-of-vocabulary rates (in \%) for the unigrams; hit rates (in \%) for bi-, tri- and 4-grams. A test pattern 'hits', when it is also in the training data. The training corpora on the rows, and test sets in the columns.}%
     \label{tab:ex1ample}%
+    \setfloatalignment{b}
 \end{table}
+    
+    
+  
+  
+  
+  
+  
+  
+  
+  
+ 
+  
+  
+  
+  \begin{figure*}
+  %	\centering
+  	\subfloat[\obw]{%\hspace*{-4em}
+  		\begin{scaletikzpicturetowidth}{0.3*\textwidth}
+  			\tikzsetnextfilename{wf1}
+  			\begin{tikzpicture}
+  			\begin{axis}[
+  			xmode=log,
+  			ymode=log,
+  			title=Comparable word frequency,
+  			xlabel=rank of word type in 1bw,
+  			ylabel=frequency,
+  			width=5cm, %0.5\textwidth,
+  			legend cell align=left,
+  			legend pos=outer north east,
+  			legend style={draw=none}]
+  			\addplot table [y=tr1val, x=tr1pos]{data/tr1.dat};
+  			\addplot table [y=te1val, x=tr1pos]{data/tr1.dat};
+  			%\addlegendentry{1-grams}
+  			\addplot table [y=tejval, x=tr1pos]{data/tr1.dat};
+  			%\addlegendentry{2-grams}
+  			\addplot table [y=teeval, x=tr1pos]{data/tr1.dat};
+  			\end{axis}
+  			\end{tikzpicture}
+  	\end{scaletikzpicturetowidth}}%\qquad
+  	\subfloat[\jrc]{ \begin{scaletikzpicturetowidth}{0.3*\textwidth}
+  			\tikzsetnextfilename{wf2}
+  			\begin{tikzpicture}
+  			\begin{axis}[
+  			xmode=log,
+  			ymode=log,
+  			%title=lol,
+  			%xlabel=relative position in document,
+  			%  ylabel=types,
+  			width=5cm,%0.5\textwidth,
+  			legend cell align=left,
+  			legend pos=outer north east,
+  			legend style={draw=none}]
+  			\addplot table [y=trjval, x=trjpos]{data/trj.dat};
+  			\addplot table [y=te1val, x=trjpos]{data/trj.dat};
+  			%\addlegendentry{1-grams}
+  			\addplot table [y=tejval, x=trjpos]{data/trj.dat};
+  			%\addlegendentry{2-grams}
+  			\addplot table [y=teeval, x=trjpos]{data/trj.dat};
+  			\end{axis}
+  			\end{tikzpicture}
+  	\end{scaletikzpicturetowidth}}%\qquad
+  	\subfloat[\emea]{\begin{scaletikzpicturetowidth}{0.3*\textwidth}
+  			\tikzsetnextfilename{wf3}
+  			\begin{tikzpicture}
+  			\begin{axis}[
+  			xmode=log,
+  			ymode=log,
+  			%title=lol,
+  			% xlabel=relative position in document,
+  			% ylabel=types,
+  			width=5cm, %0.5\textwidth,
+  			legend cell align=left,
+  			legend pos=outer north east,
+  			legend style={draw=none}]
+  			\addplot table [y=treval, x=trepos]{data/tre.dat};
+  			\addplot table [y=te1val, x=trepos]{data/tre.dat};
+  			%\addlegendentry{1-grams}
+  			\addplot table [y=tejval, x=trepos]{data/tre.dat};
+  			%\addlegendentry{2-grams}
+  			\addplot table [y=teeval, x=trepos]{data/tre.dat};
+  			\end{axis}
+  			\end{tikzpicture}
+  	\end{scaletikzpicturetowidth}}
+  	
+  	\caption[][2em]{The plots show the word ranks and their frequency. The blue line represents the training data, the red line the test data. For all three corpora they show similar behaviour. The other lines represent the test data for the mentioned corpora.}
+  \end{figure*}
+  
+  
+  
+    
+    
+    
     
     \section{Analysis of cross-corpora OOV and hit rates}
 Most corpora comprise a coherent set of texts, that share certain properties. This can be because of phenomena that you want to investigate, such as the usage of constructs of language, or in diachronic corpora where you can track changes in meaning of words. With the inherent differences in usage for the corpora, the most obvious differences are the words.
@@ -116,9 +211,10 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
         Het Volk & 133
     \end{tabular}
     \caption{The sources of the \mediargus corpus. The numbers are millions of tokens.}
+     \setfloatalignment{b}
 \end{table}
 
-	Similarly to the \obw models, we used a threshold on the word types, such that we have a similar size of vocabulary (100 thousand types), which we produced with a threshold of 250. We used the same occurrence threshold of 2 on the $n$- and skipgrams.
+	Similarly to the \obw models, we used a threshold on the word types, such that we have a similar size of vocabulary (100 thousand types), which we produced with a threshold of 250. We used the same\footnote{Same as for \obw on the English data.} occurrence threshold of 2 on the $n$- and skipgrams.
  
     
     \subsection{\cgn}
@@ -131,6 +227,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
             test  & 8m   & 3m  & 8m  & 367m &      & 3m & 0.5m
         \end{tabular}
         \caption{Summary of the number of words for each training and test set. m denote millions of words, and b denotes billions of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
+        \setfloatalignment{b}
     \end{table}
     
     \begin{table}
@@ -138,8 +235,8 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
               & Component description & \thead{Tokens \\ ($\times 10^3$)} \\ \hline
         	a & Spontaneous conversations ('face-to-face') & 955 & \\
             b & Interviews with teachers of Dutch & 350 & \\
-            c & Spontaneous telephone dialogues (recorded via a switchboard) & 559 & \\ 
-            d & Spontaneous telephone dialogues (recorded on MD via a local interface) & 390 & \\
+            c & Spontaneous telephone dialogues (switchboard) & 559 & \\ %(recorded via a switchboard)
+            d & Spontaneous telephone dialogues (local interface) & 390 & \\ %(recorded on MD via a local interface)
             e & Simulated business negotiations & 0 & \\
             f & Interviews, discussions, and debates (broadcast) & 282 & \\
             g & (Political) discussions, debates, and meetings (non-broadcast) & 161 & \\
@@ -154,6 +251,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
         \end{tabular}
         \caption{Components in the Spoken Dutch Corpus. The reported number of tokens is for the Flemish part of the corpus. }
         \label{tab:cgn}
+        \setfloatalignment{b}
     \end{table}
     
     The second series of test sets are the Flemish parts of the NBest benchmark \cite{kessens2007n} (475k words; the train, development and test sets). 
