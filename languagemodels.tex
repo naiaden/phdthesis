@@ -190,4 +190,5 @@ c_{\mathbf{u'}w} = t_{\cdot\mathbf{u'}w} = \sum_{w'}t_{w'\mathbf{u'}w}
 
 The value of $d_x$ is used for each length $x$, and can be estimated using formulas or by using cross-validation.
 
-Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. 
+Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. In \cite{} they found that the optimal amount of discount changes slowly as a function of the counts $c_{\mathbf{u}w}$. In the same study they also noticed that the optimal discounts for low values of $c_{\mathbf{u}w}$ differ substantially from those with higher values. The formed the basis for MKN, which uses different values of discounts for different counts, one for each $c_{\mathbf{u}w} = 1, 2, \ldots, c^{(\textnormal{max})}-1$ and another for $c_{\mathbf{u}w} \geq c^{(\textnormal{max})}$. MKN reduces to IKN when $c^{(\textnormal{max})} = 1$, while \cite{} use $c^{(\textnormal{max})} = 3$ as a compromise between diminishing improvements and increasing implementational complexity.
+
