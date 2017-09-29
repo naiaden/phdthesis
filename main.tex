@@ -2,6 +2,17 @@
 
 \hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
 
+\usepackage{etoolbox}
+\usepackage{pgfplotstable}
+\usepackage{pgfplots}
+
+% patch pgfplots so that \label does the original job
+% tufte-book saves the original meaning of \label in
+% \@tufte@orig@label
+\makeatletter
+\patchcmd{\pgfplots@environment@opt}{\label}{\@tufte@orig@label}{}{}
+\makeatother
+
 %%
 % Book metadata
 %\title{What's in the Bag for Latent Variable \\ \noindent Language Modelling?}
@@ -68,8 +79,11 @@
 % up no horizontal space).  Useful in tabular environments.
 \newcommand{\hangp}[1]{\makebox[0pt][r]{(}#1\makebox[0pt][l]{)}}
 
-\usepackage{pgfplotstable}
-\usepackage{pgfplots}
+%% use emph in math mode for textnormal
+\newcommand{\mathemph}[1]{\textnormal{\emph{#1}}}
+
+% \usepackage{pgfplotstable}
+% \usepackage{pgfplots}
 \usepackage{environ}
 \makeatletter
 \newsavebox{\measure@tikzpicture}
@@ -84,9 +98,14 @@
 }
 \makeatother
 
-\usetikzlibrary{external}
+% \usetikzlibrary{external}
+\pgfplotsset{compat=1.13}
+\usepgfplotslibrary{external}
 % Enable the library !!!>>> MUST be in the preamble <<<!!!!
 \tikzexternalize
+
+\DeclareRobustCommand{\tikzcaption}[1]{\tikzset{external/export next=false}#1}
+\DeclareRobustCommand{\tikzref}[1]{\tikzcaption{\ref{#1}}}
 
 \usetikzlibrary{positioning}
 
@@ -213,6 +232,9 @@ box/.style={%draw,%
 \newcommand{\textcite}[1]{\citet{#1}\cite{#1}}
 
 \usepackage{cleveref}
+%\usepackage{backref} 
+
+
 
 \begin{document}
 

@@ -1,4 +1,5 @@
 \chapter{Chapter 1\newline Introduction to $n$-gram language modelling}\label{chap:introlm}
+
 \newthought{Statistical language modelling is a technique} that attempts to measure how likely any given piece of text is by building a probabilistic model and assigning a probability value to the text. These models are generally very large and are generated from a very large collection of documents.
 
 A statistical language model is a probability distribution $P(s)$ over possible sentences $S$.\footnote{In this thesis sentences represent linguistic units, such as spoken utterances, or in some case even documents.} Its task can be shown with an example from automated speech recognition (ASR)\footnote{ASR is the process of converting a speech signal to a sequence of words, by means of an algorithm implemented as a computer program.}. Imagine that one day you walk on the beach, and you find a bottle. Although that in itself is not really surprising, you also find that the bottle contains a note. You can make out the script; the language is unknown to you, but in the address you recognise the sender's country. Eager as you are, you want to decipher the message. With sophisticated translation services as Google Translate you could at least get an idea of what the note says in an instant. These translation services work bidirectionally, but you decide to learn the language, as to write your reply.
@@ -21,7 +22,7 @@ For the rest of this thesis, we assume that we learn the language by reading a l
 
 \section{Patterns in Language}
 The goal of a statistical language model to assign a probability to a sequence of words. Say we have a sentence $s$ of $m=5$ words: \emph{Bananas are his favourite fruit.} If we want to compute the query likelihood of $s$, $p(s)$, we have to start 
-at the first word: \emph{Bananas}. For now assume that we know every word that we might encounter. What is the chance that the first word was \emph{Bananas}? $p(\mathit{Bananas})$. The same goes for the second word: the chance of the second word being \emph{are} is $p(\mathit{are})$. We can do this for every word $m_i$ in $s$. This results in\footnote{$p(s)=\prod_{i=1}^m p(w_i)$}
+at the first word: \emph{Bananas}. For now assume that we know every word that we might encounter. What is the chance that the first word was \emph{Bananas}? $p(\mathit{Bananas})$. The same goes for the second word: the chance of the second word being \emph{are} is $p(\mathit{are})$. We can do this for every word $m_i$ in $s$. This results in the chainrule\footnote{$p(s)=\prod_{i=1}^m p(w_i)$}
 \begin{equation}
 p(s) = p(\mathit{Bananas})p(\mathit{are})p(\mathit{his})p(\mathit{favourite})p(\mathit{fruit})\label{eq:unigramexample}
 \end{equation}
@@ -58,14 +59,12 @@ The problem here is that if you want to predict in a 5-gram language model that 
 Punctuation is also considered a word, except when it is part of an abbreviation.\footnote{When using data that has been processed by others, this may vary, as it is dependent on choices such as how to tokenise the text.}
 
 The joint probability of $s$ with a bigram language model is thus:
-\[ p(s) = p(\mathit{Bananas}|\mathit{BOS})p(\mathit{are}|\mathit{Bananas})p(\mathit{my}|\mathit{are})p(\mathit{favourite}|\mathit{are})p(\mathit{fruit}|\mathit{favourite})p(\mathit{EOS}|\mathit{fruit})\]
-
+\[ p(s) = p(\mathemph{Bananas}|\mathemph{BOS})p(\mathemph{are}|\mathemph{Bananas})p(\mathemph{my}|\mathemph{are})p(\mathemph{favourite}|\mathemph{are})p(\mathemph{fruit}|\mathemph{favourite})p(\mathemph{EOS}|\mathemph{fruit})\]
 Or in a more general and abstract sense:
 \[ p(s) = \prod_{i=1}^mp(w_i|w_1,\ldots,w_{i-1}) \]
-
 Henceforth we will use the abbreviation $w_{i-n+1}^{i-1} \equiv w_{i-n+1},\ldots,w_{i-1}$.
 
-An $n$-gram probability $p(w_i|w_{i-n+1}^{i-1})$ is computed by means of its maximum likelihood estimate (MLE), which is a natural procedure to count how often the token $w_i$ follows the context $w_{i-n+1}^{i-1}$, and to divide by the total number of times the history occurs:
+An $n$-gram probability $p(w_i|w_{i-n+1}^{i-1})$ is\footnote{Naively\ldots} computed by means of its maximum likelihood estimate (MLE), which is a natural procedure to count how often the token $w_i$ follows the context $w_{i-n+1}^{i-1}$, and to divide by the total number of times the history occurs:
 \begin{equation} p_{\operatorname{MLE}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)}{c\left(w_{i-n+1}^{i-1}\right)} = \frac{c\left(w_{i-n+1}^{i}\right)}{\sum_{w_i}^{V}c\left(w_{i-n+1}^{i}\right)}\label{eq:pmle}
 \end{equation}
 where $c(\mathbf{u}w)$ is the count function that denotes how often an $n$-gram $\mathbf{u}w$ occurs in the train data.
@@ -107,10 +106,52 @@ With the unigram approach, we have to store for each word its probability of occ
 		%\end{axis}
 		\end{tikzpicture}
 	\end{scaletikzpicturetowidth}
-	\caption{The number of unique $n$-grams (types) are plotted against their relative position in the document (the number of $n$-gram tokens encountered). Unigrams (\ref{fig:gp1}), bigrams (\ref{fig:gp2}), trigram (\ref{fig:gp3}), 4-grams (\ref{fig:gp4}), and 5-grams (\ref{fig:gp5}). The number of types is plotted on a log scale, since otherwise (\ref{fig:gp1}) would appear flat.}
+	\caption{The number of unique $n$-grams (types) (from the \obw corpus, which will be introduced in the next chapter) are plotted against their relative position in the document (the number of $n$-gram tokens encountered). Unigrams (\ref{fig:gp1}), bigrams (\ref{fig:gp2}), trigram (\ref{fig:gp3}), 4-grams (\ref{fig:gp4}), and 5-grams (\ref{fig:gp5}). The number of types is plotted on a log scale, since otherwise (\ref{fig:gp1}) would appear flat.}\label{fig:ngramgrowth}
 \end{figure}
 
-These graphs also show sparseness
+\begin{figure}
+	\begin{scaletikzpicturetowidth}{\textwidth}
+		\tikzsetnextfilename{byeb}
+		\begin{tikzpicture}[scale=\tikzscale]
+		\begin{semilogyaxis}[
+		%\begin{axis}[%domain=0:100,
+		title=Maximum growth of the number of types throughout the corpus,
+		xlabel=relative position in document (tokens in \%),
+		ylabel=types,
+		width=11cm,
+		height=7cm]
+		%legend=none]
+		%legend cell align=left,
+		%legend pos=outer north east,
+		%legend style={draw=none}]
+		\addplot table [y=c1, x=c]{ngrammaxgrowth.dat};\label{fig:gp1-1}
+		%\addlegendentry{1-grams}
+		\addplot table [y=c2, x=c]{ngrammaxgrowth.dat};\label{fig:gp1-2}
+		%\addlegendentry{2-grams}
+		\addplot table [y=c3, x=c]{ngrammaxgrowth.dat};\label{fig:gp1-3}
+		%\addlegendentry{3-grams}
+		\addplot table [y=c4, x=c]{ngrammaxgrowth.dat};\label{fig:gp1-4}
+		%\addlegendentry{4-grams}
+		\addplot table [y=c5, x=c]{ngrammaxgrowth.dat};\label{fig:gp1-5}
+        		\addplot table [y=c1, x=c]{ngramtypegrowth.dat};\label{fig:gp1}
+		%\addlegendentry{1-grams}
+		\addplot table [y=c2, x=c]{ngramtypegrowth.dat};\label{fig:gp2}
+		%\addlegendentry{2-grams}
+		\addplot table [y=c3, x=c]{ngramtypegrowth.dat};\label{fig:gp3}
+		%\addlegendentry{3-grams}
+		\addplot table [y=c4, x=c]{ngramtypegrowth.dat};\label{fig:gp4}
+		%\addlegendentry{4-grams}
+		\addplot table [y=c5, x=c]{ngramtypegrowth.dat};\label{fig:gp5}
+		%\addlegendentry{5-grams}
+		%\addplot (5*x);
+		\end{semilogyaxis}
+		%\end{axis}
+		\end{tikzpicture}
+	\end{scaletikzpicturetowidth}
+	\caption{The maximum number of $n$-grams, given the same corpus as \cref{fig:ngramgrowth}. The indistinguishable lines in the bottom are the lines from the previous plot. This shows how sparse the possible $n$-gram feature space is, with up to $10^{44}$ possible $5$-grams, and an observed amount of $10^8$.}\label{fig:maxgrowth}
+\end{figure}
+
+In \cref{fig:maxgrowth} we added the maximum number of possible $n$-grams to the number of observed $n$-grams. The graph shows that this feature space can be really sparse, and that the observed number of $n$-grams, and more notably the $5$-grams, are even below the maximum number of unigrams. Hence the chance of running into an observed $n$-gram is very likely, and that is why further in this chapter we show some countermeasures to improve MLE to deal with this issue.
 
 
 \subsection{Skipgrams}\marginnote{With the surge of neural network-based language models, the meaning of the word skipgram has shifted from being an $n$-gram with a skipped word, to the skipgram paradigm in word2vec. In our case skipgrams are not in the output of the model, but rather on the input side, and do not have a fixed amount of left and right context.}
@@ -122,7 +163,7 @@ Now let $\sigma_{\rotatebox[origin=c]{180}{m}}$ be the operator that adds a skip
 
 
 
-For a 4-gram $\mathbf{u}w$ = \emph{ate the ripe banana}, $\sigma_2(\mathbf{u}w)$ = \emph{ate \{1\} ripe banana}, $\sigma_3(\mathbf{u}w)$ = \emph{ate the \{1\} banana}, and $\boldsymbol\sigma(\mathbf{uw}) = \left[\sigma_2(\mathbf{u}), \sigma_3(\mathbf{u})\right]$. To get to the 4-gram with two skips, we apply the operator on a skipgram that already contains a skip, e.g.~$\sigma_3(\sigma_2(\mathbf{u}w))$ = \emph{the \{1\} \{1\} banana}.\footnote{We can abbreviate this skipgram to \emph{ate \{2\} banana}.}
+For a 4-gram $\mathbf{u}w$ = \emph{ate the ripe banana}, $\sigma_2(\mathbf{u}w)$ = \emph{ate \{1\} ripe banana}, $\sigma_3(\mathbf{u}w)$ = \emph{ate the \{1\} banana}, and $\boldsymbol\sigma(\mathbf{u}w) = \left[\sigma_2(\mathbf{u}), \sigma_3(\mathbf{u})\right]$. To get to the 4-gram with two skips, we apply the operator on a skipgram that already contains a skip, e.g.~$\sigma_3(\sigma_2(\mathbf{u}w))$ = \emph{the \{1\} \{1\} banana}.\footnote{We can abbreviate this skipgram to \emph{ate \{2\} banana}.}
 
 This definition limits to one additional skip per application of the operator.\footnote{The main reason to limit only adding one skip per application is because in the backoff procedure skipgrams with more skips have a probability that is in a different range compared to skipgrams with less skips. When in a later stage this probabilities are interpolated, this undoes the expressive power, because one of the two completely overpowers the other. In the current implementation at least the number of content-bearing words is the same after the application of the skipgram operator.} However, the skipgram can be generalised further into a flexgram\cite{gompel2016efficient}, but this is computationally even more expensive than skipgrams, and preliminary results show no further improvements over just using skipgrams.
 
@@ -132,36 +173,57 @@ But this is not the end of the story, since we also have to change the models to
 
 
 \section{Smoothing, Interpolation, and Backoff Methods}
-Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation. On the other hand we observe that many of these trigrams have count zero\footnote{Combine the large feature space with relatively few observations, of which the elements mostly occur in standard patterns, and it is clear that we are dealing with a very sparse feature space.}, which causes divisions by zero in \cref{eq:pmle}.
+Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation. On the other hand we observe that many of these trigrams have count zero\footnote{Combine the large feature space with relatively few observations, of which the elements mostly occur in standard patterns, and it is clear that we are dealing with a very sparse feature space.}, which causes divisions by zero in \cref{eq:pmle}. For many language modelling applications such as automatic speech recognition, having zero $n$-gram probabilities implies that such word sequence can never be hypothesised. Generally, we want to assign non-zero probabilities to all $n$-grams.\cite{jevtic2005estimation}
 
 One of the first ways to overcome assigning a zero probability to an $n$-gram, is to smooth the probability distribution, and adjust the empirical counts to expected counts.
 
-The simplest method is \emph{additive smoothing}, or in particular \emph{add-one smoothing}, which prevents having zero-probabilities by modifying the count method for the MLE.\footnote{The MLE will generally underestimate the probability of unseen words $w$ after a known context $\mathbf{u}$.}
+The simplest method is \emph{additive smoothing}, or in particular \emph{add-one smoothing}, which prevents having zero-probabilities by modifying the count method for the MLE.\footnote{The MLE will generally underestimate the probability of unseen words $w$ after a known context $\mathbf{u}$.}\footnote{The more general \emph{add-$\alpha$ smoothing} with $\alpha < 1$ limits the strength in non-observed counts: \[ p_{\operatorname{MLE_{+\alpha}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+\alpha}{c\left(w_{i-n+1}^{i-1}\right)+\alpha W}.\]}
 
 
 
 \begin{equation} p_{\operatorname{MLE_{+1}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+1}{c\left(w_{i-n+1}^{i-1}\right)+W}\label{eq:paddone}
-\end{equation}\footnote{The more general \emph{add-$\alpha$ smoothing} with $\alpha < 1$ limits the strength in non-observed counts: \[ p_{\operatorname{MLE_{+\alpha}}}\left(w_i|w_{i-n+1}^{i-1}\right) = \frac{c\left(w_{i-n+1}^i\right)+\alpha}{c\left(w_{i-n+1}^{i-1}\right)+\alpha W}.\]}
+\end{equation}
 
 
-In some cases you have bigrams with the same frequency count, but with different counts for the focus words. In estimating the probability you want to capture this behaviour by interpolating the bigram model with a unigram model. E.g.~
-\[p_{\mathrm{interp}}\left(w_i|w_{i-3}w_{i-2}w_{i-1}\right) = 
-\lambda_1 p_{\operatorname{MLE}}\left(w_i|w_{i-3}w_{i-2}w_{i-1}\right) + 
-\lambda_2 p_{\operatorname{MLE}}\left(w_i|w_{i-2}w_{i-1}\right) + 
-\lambda_3 p_{\operatorname{MLE}}\left(w_i|w_{i-1}\right) + 
-\lambda_4 p_{\operatorname{MLE}}\left(w_i\right)\]
-\footnote{If you extend the formula with $+ \lambda_5 \frac{1}{W}$ then the probability will never be zero.} 
-This type of interpolated models is described by \cite{jelinek1980interpolated}. The $n$th-order smoothed model is defined recursively as a linear interpolation between the $n$th-order MLE and the $(n-1)$th-order smoothed model.
-\footnote{Notice that the optimal $\lambda$ will be different for different histories. For example, for a context that occurs often, and high $\lambda$ is more suitable, since the distribution will be very reliable. See the following papers on binning techniques for estimation of the value of $\lambda$: \cite{bahl1983maximum}	}
+Another tool is backoff. One of the basic techniques involves subtracting a small constant discount $D < 1$ from the count of each observed $n$-gram, and distribute the withheld counts uniformly to unseen $n$-grams:
+\begin{equation}
+	p_{\operatorname{uni}}(w|\mathbf{u})=\left.
+    \begin{cases}
+    	\frac{c(\mathbf{u}w)-D}{\sum_{w'}c(\mathbf{u}w')}, & c(\mathbf{u}w) > 0\textnormal{ (observed)} \\
+        \alpha_{\operatorname{uni}}(\mathbf{u}), & c(\mathbf{u}w) = 0\textnormal{ unseen}
+    \end{cases}\right.
+\end{equation}
+which describes uniform backoff. To ensure that $\sum_wp(w|\mathbf{u})=1$, \cite{chen1996empirical} define $N_{1+}(\mathbf{u}\cdot) = |\{w:c(\mathbf{u}w) > 0\}|$ and
+\begin{equation}
+\alpha_{\operatorname{uni}}(\mathbf{u}) = \frac{D}{\sum_{w'}c(\mathbf{u}w')}\frac{N_{1+}(\mathbf{u}\cdot)}{W - N_{1+}(\mathbf{u}\cdot)}.
+\end{equation}
 
+However, distributing the withheld counts uniformly implies that unseen bigrams are assigned the same probability.
+In some cases you have bigrams with the same frequency count, but with different counts for the focus words. In estimating the probability you want to capture this behaviour by interpolating the bigram model with a unigram model. E.g. proportional backoff:~
+\begin{equation}\begin{split}
+	p_{\operatorname{prop}}(w|\mathbf{u})=&\left.
+    \begin{cases}
+    	\frac{c(\mathbf{u}w)-D}{\sum_{w'}c(\mathbf{u}w')}, & c(\mathbf{u}w) > 0\textnormal{ (observed)} \\
+        \alpha_{\operatorname{prop}}(\mathbf{u})p_{\operatorname{prop}}(w|\pi(\mathbf{u})), & c(\mathbf{u}w) = 0\textnormal{ unseen}
+    \end{cases}\right. \\
+    \alpha_{\operatorname{prop}}(\mathbf{u}) =& \frac{1 - \sum_{N_{1+}}p_{\operatorname{prop}}(w|\mathbf{u})}{1 - \sum_{N_{1+}}p_{\operatorname{prop}}(w|\pi(\mathbf{u}))}
+\end{split}\end{equation}
+
+Now we have the issue that with proportional backoff smoothing, equally observed $n$-grams with the same history have the same probability. We want to create a bias towards a more frequently occurring focus word. One approach would be to interpolate all $n$-gram probabilities with the lower-order backoff model, independent of whether the $n$-grams are observed. This method is known as absolute discounting\cite{ney1994structuring}:
+\begin{equation}\begin{split}
+p_{\operatorname{abs}}(w|\mathbf{u})=&\frac{\max(c(\mathbf{u}w)-D,0)}{\sum_{w'}c(\mathbf{u}w')} + \alpha_{\operatorname{abs}}(\mathbf{u})p_{\operatorname{abs}}(w|\pi(\mathbf{u})) \\
+\alpha_{\operatorname{abs}}(\mathbf{u})=&\frac{D\cdot N_{1+}(\mathbf{u}\cdot)}{\sum_{w'}c(\mathbf{u}w')}
+\end{split}\end{equation}
+Although the discount parameter $D$ can be tuned to optimise the performance on a held-out set, it is generally estimated using the $n$-gram count statistics as:
+\begin{equation}
+D = \frac{N_{1}(\cdot)}{N_{1}(\cdot)+2N_{2}(\cdot)},
+\end{equation}
+where $N_{1}(\cdot)$ and $N_{1}(\cdot)$ are the number of $n$-grams that appear exactly once and twice in the training corpus.
 
 \subsection{Kneser-Ney}
 With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{bulb} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{light}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{bulb} than its raw could suggests, taking into account the diversity of history.
 
-For example, \emph{bulb} occurs 1624 times in a corpus, in 262 different contexts, of which 626 occurrences of \emph{light bulb}. If we take a more general word that occurs 1626 times, such as \emph{pies}, then we see that it occurs after 402 contexts. 
-With Kneser-Ney smoothing a higher probability is assigned to \emph{pies}.
-
-In its simplest form Kneser-Ney smoothing replaces the raw word count $c(w)$ from MLE with the count of histories for a word. For example,  
+In its simplest form\cite{kneser1995improved} Kneser-Ney smoothing replaces the raw word count $c(w)$ from MLE with the count of histories for a word. For example,  
 \begin{equation}
 p_{\operatorname{KN}}(w) = \frac{N_{1+} (\cdot w)}{\sum_{w_i}N_{1+} (w_iw)},
 \end{equation}
@@ -192,3 +254,30 @@ The value of $d_x$ is used for each length $x$, and can be estimated using formu
 
 Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. In \cite{} they found that the optimal amount of discount changes slowly as a function of the counts $c_{\mathbf{u}w}$. In the same study they also noticed that the optimal discounts for low values of $c_{\mathbf{u}w}$ differ substantially from those with higher values. The formed the basis for MKN, which uses different values of discounts for different counts, one for each $c_{\mathbf{u}w} = 1, 2, \ldots, c^{(\textnormal{max})}-1$ and another for $c_{\mathbf{u}w} \geq c^{(\textnormal{max})}$. MKN reduces to IKN when $c^{(\textnormal{max})} = 1$, while \cite{} use $c^{(\textnormal{max})} = 3$ as a compromise between diminishing improvements and increasing implementational complexity.
 
+In summary, MKN is defined as follows:
+\begin{equation}\begin{split}
+p_{\operatorname{MKN}}(w|\mathbf{u}) =& \frac{\max(0, c_{\mathbf{u}w} - d(c(\mathbf{u})))}{c_{\mathbf{u}\cdot}} + \frac{d_1N_1(\mathbf{u}\cdot) + d_2N_2(\mathbf{u}\cdot) + d_{3+}N_{3+}(\mathbf{u}\cdot)}{c_{\mathbf{u}\cdot}}p_{\operatorname{MKN}}(w|\pi(\mathbf{u})) \\
+d(c) =& \left.
+\begin{cases}
+0, & \textnormal{if }c = 0; \\
+d_1, & \textnormal{if } c = 1; \\
+d_2, & \textnormal{if } c = 2; \\
+d_3, & \textnormal{if } c \geq 3,
+\end{cases}\right. \\
+d_1 =& 1- \frac{2n_1n_2}{n_1(n_1+2n_2)} \\
+d_2 =& 2 - \frac{3n_1n_3}{n_2(n_1+2n_2)} \\
+d_{3+} =& 3 - \frac{4n_1n_4}{n_3(n_1+2n_2)}
+\end{split}\end{equation}
+
+\section{Other $n$-gram-based language models}
+An informed reader might notice that we have not mentioned other language models based on the $n$-gram paradigm. Although some of them are mentioned in the course of this thesis, we will give an inherently limit overview of some of the other language models that are out there. 
+
+$n$-grams are a natural generalisation of words, and an intermediate step is bag-of-words, which are $n$-grams without the constraint on word order. 
+
+Because of the computational costs inherent to skipgram language modelling for example with IKN, until recently researchers only experimented up to trigrams. To circumvent this burden, other long-distance-based language models have been introduced, such as the trigger-based\cite{lau1993trigger}, cache-based\cite{clarkson1997language}, and association pattern-based\cite{chien2006association} language models. To overcome the sparseness other models have been implemented such as class-based $n$-grams\cite{brown1992class}. The implementation varied between classes such as the co-occurrence count, part-of-speech (POS) tags, or even semantic relatedness based on WordNet.
+
+Collocations\cite{tomokiyo2003language} and multi-word expressions (MWE)\cite{blei2009visualizing} in particular were often combined with topic modelling\footnote{A topic model is a type of statistical model for discovering the abstract \emph{topics} that occur in a collection of documents. A technique first mentioned in the 80s with PLSA, with a widespread renewed interest in 2003 with LDA.} techniques such as latent Dirichlet allocation (LDA).
+
+More recently the neural language models have seen a huge revival. Also in the field on language modelling huge advances have been shown. Currently, the state-of-the-art on the One billion word benchmark (see \cref{chap:data}) is an LSTM\cite{kuchaiev2017factorization}. Simpler and computationally less intensive methods and tools such as word2vec\cite{mikolov2013distributed} are now replacing the reigning language model MKN.
+
+A notable mention goes out to sparse non-negative language models\cite{shazeer2015sparse}. The researchers show that these language models are competitive in nature, but also capture different behaviour from count-based $n$-gram methods such as MKN, and neural language models such as recurrent neural networks (RNNs)\footnote{Even though word2vec can be seen as implicit matrix factorisation:\cite{levy2015improving}.} and LSTMs. This means that with an optimal interpolation strategy, by improving either of these methods, even better results can be obtained by the combination.
