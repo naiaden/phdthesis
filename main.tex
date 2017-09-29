@@ -214,79 +214,79 @@ box/.style={%draw,%
 
 \begin{document}
 
-% Front matter
-\frontmatter
+%% Front matter
+%\frontmatter
 
-% r.1 blank page
-\blankpage
+%% r.1 blank page
+%\blankpage
 
-% v.2 epigraphs
-\newpage\thispagestyle{empty}
-%\openepigraph{%
-%Je kunt niet altijd alles willen wat je wilt.
-%}{Peggy Mays}
-
-
-
-
-% r.3 full title page
-%\maketitle
-%\input{titlepages}
-
-% v.5 copyright page
-%\input{copyright}
-
-% r.5 contents
-\tableofcontents
-
-\listoffigures
-
-\listoftables
-
-% r.7 dedication
-% \cleardoublepage
-\input{dedication}
-
-
-% r.9 introduction
-\cleardoublepage
+%% v.2 epigraphs
+%\newpage\thispagestyle{empty}
+%%\openepigraph{%
+%%Je kunt niet altijd alles willen wat je wilt.
+%%}{Peggy Mays}
 
 
 
 
-%%
-% Start the main matter (normal chapters)
+%% r.3 full title page
+%%\maketitle
+%%\input{titlepages}
+
+%% v.5 copyright page
+%%\input{copyright}
+
+%% r.5 contents
+%\tableofcontents
+
+%\listoffigures
+
+%\listoftables
+
+%% r.7 dedication
+%% \cleardoublepage
+%\input{dedication}
+
+
+%% r.9 introduction
+%\cleardoublepage
+
+
+
+
+%%%
+%% Start the main matter (normal chapters)
 \mainmatter
-\input{introduction}
-\input{languagemodels}
-\input{bayesianstuff}
+%\input{introduction}
+%\input{languagemodels}
+%\input{bayesianstuff}
 \input{data}
 
 
-%\part{Intrinsic evaluation}
-\input{shpyplm}
-%\chapter{Domain-adaptation with a double hierarchical Pitman-Yor skipgram language model}
+%%\part{Intrinsic evaluation}
+%\input{shpyplm}
+%%\chapter{Domain-adaptation with a double hierarchical Pitman-Yor skipgram language model}
 
-%\part{Extrinsic evaluation}
-%\input{speech}
-%\chapter{Relating brain activity data to perplexities from skipgram models}
-%\chapter{Using skipgram language models in automatic speech recognition for under-resourced languages}
+%%\part{Extrinsic evaluation}
+%%\input{speech}
+%%\chapter{Relating brain activity data to perplexities from skipgram models}
+%%\chapter{Using skipgram language models in automatic speech recognition for under-resourced languages}
 
-\chapter{Conclusion}
+%\chapter{Conclusion}
 
-%\input{test}
+%%\input{test}
 
-%%
-% The back matter contains appendices, bibliographies, indices, glossaries, etc.
+%%%
+%% The back matter contains appendices, bibliographies, indices, glossaries, etc.
 
 \backmatter
 
 \bibliography{superpaper}
 \bibliographystyle{plainnat}
 
-\input{summaries}
-\input{cv}
-\input{siks}
+%\input{summaries}
+%\input{cv}
+%\input{siks}
 
 
 %\printindex

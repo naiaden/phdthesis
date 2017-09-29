@@ -4,7 +4,7 @@ The results that we present later in this thesis are the outcome of many experim
 In this section we introduce these data sets individually, and throughout the thesis we will refer back to this section for the details of the data sets.
 
 \section{English data}
-For the experiments on English we use four corpora: two large generic mixed-domain corpora and two smaller domain-specific corpora. Although the two generic corpora comprise encyclopedic and news texts, we consider them less domain-specific.\footnote{waarom vinden we dit?}
+For the experiments on English we use four corpora: one large generic mixed-domain news corpus and two smaller domain-specific corpora. %Although the two generic corpora comprise encyclopedic and news texts, we consider them less domain-specific.\footnote{waarom vinden we dit?}
   
   \subsection{\obw}
   
@@ -14,37 +14,37 @@ For the experiments on English we use four corpora: two large generic mixed-doma
   
   This resulted in a corpus of 800 million tokens with sentences markers\footnote{1 begin of sentence and 1 end of sentence marker}, and around 793 thousand word types.
   
- \subsection{\wp}
-  The second generic corpus, is a Wikipedia snapshot (henceforth \wp) of November 2013 as used and provided by \textcite{pickhardt2014generalized}. 
-  
-  The data consists of Wikipedia articles which are not postprocessed, except for cleaning of the markup, and tokenisation\footnote{``We filtered the word tokens by removing all character sequences which did not contain any letter, digit or common punctuation marks.''}.
-  
-  However, we find that some of the tokenisation is too rigorous, as this has introduced errors such as separating abbreviations:
-  
-  \begin{quote}The vacuum state is defined as the state with no particle or antiparticle , i . e . , and . </s>\footnote{This example also lacks the formulae before and after `and': ``$a_k |0\rangle=0$ and $b_k |0\rangle=0$''.}\end{quote}
-  
-  \begin{quote}All of Solzhenitsyn's sons became U . S . citizens . </s>\footnote{Especially when the final dot of U . S . is also the sentence final punctuation, this is misleading.}\end{quote}
-  Other frequently occurring errors are runons such as 
-  
-  \begin{quote}Stephen C Kleene defined as his nowfamousThesis Iknown as the ChurchTuring thesis . </s>\end{quote}
-  where dashes and quotation marks have been stripped, as well as whitespace; and boxed content is not always separated from the main text, which causes a lot of tables and other marked-up context to be in the data.
-  
-  In total the data comprises 1.4 billion words for training and 367 million words for testing.
+% \subsection{\wp}
+%  The second generic corpus, is a Wikipedia snapshot (henceforth \wp) of November 2013 as used and provided by \textcite{pickhardt2014generalized}. 
+%  
+%  The data consists of Wikipedia articles which are not postprocessed, except for cleaning of the markup, and tokenisation\footnote{``We filtered the word tokens by removing all character sequences which did not contain any letter, digit or common punctuation marks.''}.
+%  
+%  However, we find that some of the tokenisation is too rigorous, as this has introduced errors such as separating abbreviations:
+%  
+%  \begin{quote}The vacuum state is defined as the state with no particle or antiparticle , i . e . , and . </s>\footnote{This example also lacks the formulae before and after `and': ``$a_k |0\rangle=0$ and $b_k |0\rangle=0$''.}\end{quote}
+%  
+%  \begin{quote}All of Solzhenitsyn's sons became U . S . citizens . </s>\footnote{Especially when the final dot of U . S . is also the sentence final punctuation, this is misleading.}\end{quote}
+%  Other frequently occurring errors are runons such as 
+%  
+%  \begin{quote}Stephen C Kleene defined as his nowfamousThesis Iknown as the ChurchTuring thesis . </s>\end{quote}
+%  where dashes and quotation marks have been stripped, as well as whitespace; and boxed content is not always separated from the main text, which causes a lot of tables and other marked-up context to be in the data.
+%  
+%  In total the data comprises 1.4 billion words for training and 367 million words for testing.
 
    \subsection{\jrc}
   The first domain-specific corpus is from JRC-Acquis v3.0\cite{steinberger2006jrc}, which contains legislative text of the European Union. It is part of the joint research centre collection of the Acquis Communautaire\footnote{The Acquis Communautaire (AC) is the total body of European Union (EU) law applicable in the the EU Member States.} in 22 of the official languages of the European Union. The collection comprises selected texts written between the 1950s and 2007.
   
-  We only use the English part of this parallel-aligned multilingual corpus. We shuffle the sentences and create a train (31 million words) and test split (8 million words). 
+  We only use the English part of this parallel-aligned multilingual corpus. We shuffle the sentences and create a train (31 million words, 288 thousand types) and test split (8 million words).
     
    
   \subsection{\emea}
   The second domain-specific corpus consists of converted\footnote{The composers of the corpus note that there are known problems with tables and multi-column layouts, as the documents are converted with \texttt{pdftotext}.} PDF documents from the European Medicines Agency, EMEA\cite{tiedemann2009news}. Similar to \jrc, \emea is the English part of the multilingual aligned parallel corpus.
   
-  We shuffled all sentences, and selected 20\% of them as the test set (3 million tokens), and the remaining 80\% was reserved for training (12 million tokens).
+  We shuffled all sentences, and selected 20\% of them as the test set (3 million tokens), and the remaining 80\% was reserved for training (12 million tokens, 61 thousand types).
   
   
   \subsection{Data handling}
-	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model.\footnote[][-3em]{This area is still under investigation, as this topic of memory expensiveness is addressed in recent papers such as: \cite{shareghi2017compressed}} We used a high occurrence threshold of 100 on the unigrams,\footnote{Compared the original threshold of 3 used in the corpus.} yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs\footnote{\label{fn:shareghi}We map their UNK type to ours \emph{\{?\}}.} occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Although more recent work such as mentioned in \cref{fn:shareghi} do not report on the number of types, making it hard to compare our memory usage to theirs.}
+	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model.\footnote[][-3em]{\label{fn:shareghi}This area is still under investigation, as this topic of memory expensiveness is addressed in recent papers such as: \cite{shareghi2017compressed}} We used a high occurrence threshold of 100 on the unigrams,\footnote{Compared the original threshold of 3 used in the corpus.} yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs\footnote{We map their UNK type to our \emph{\{?\}}.} occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Recent work such as mentioned in \cref{fn:shareghi} do not report on the number of types, making it hard to compare our memory usage to theirs.}
     
 % hit rates: 
 % determine: colibri-patternmodeller -i /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.patternmodel -f /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.dat -c /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.cls -l 4 -m 4 -u -P | cut -f 1 > /scratch/lonrust/train-1bw.4gram 
@@ -59,7 +59,7 @@ For the experiments on English we use four corpora: two large generic mixed-doma
     \centering
     \subfloat[Unigrams]{{\begin{tabular}{llll}
      & \obw  & \emea & \jrc    \\
-\obw  & 1.5  & 10.9 & 6.2    \\
+\obw  & 1.5  & 9.9 & 5.9    \\
 \emea & 18.3 & 0.1  & 10.1  \\
 \jrc  & 12.3 & 14.9 & 0.4    \\
 \end{tabular}\label{tab:ex1ample1} }}%
@@ -88,109 +88,93 @@ For the experiments on English we use four corpora: two large generic mixed-doma
 \end{table}
     
     
-  
-  
-  
-  
-  
-  
-  
-  
- 
-  
-  
-  
-  \begin{figure*}
-  %	\centering
-  	\subfloat[\obw]{%\hspace*{-4em}
-  		\begin{scaletikzpicturetowidth}{0.3*\textwidth}
-  			\tikzsetnextfilename{wf1}
-  			\begin{tikzpicture}
-  			\begin{axis}[
-  			xmode=log,
-  			ymode=log,
-  			title=Comparable word frequency,
-  			xlabel=rank of word type in 1bw,
-  			ylabel=frequency,
-  			width=5cm, %0.5\textwidth,
-  			legend cell align=left,
-  			legend pos=outer north east,
-  			legend style={draw=none}]
-  			\addplot table [y=tr1val, x=tr1pos]{data/tr1.dat};
-  			\addplot table [y=te1val, x=tr1pos]{data/tr1.dat};
-  			%\addlegendentry{1-grams}
-  			\addplot table [y=tejval, x=tr1pos]{data/tr1.dat};
-  			%\addlegendentry{2-grams}
-  			\addplot table [y=teeval, x=tr1pos]{data/tr1.dat};
-  			\end{axis}
-  			\end{tikzpicture}
-  	\end{scaletikzpicturetowidth}}%\qquad
-  	\subfloat[\jrc]{ \begin{scaletikzpicturetowidth}{0.3*\textwidth}
-  			\tikzsetnextfilename{wf2}
-  			\begin{tikzpicture}
-  			\begin{axis}[
-  			xmode=log,
-  			ymode=log,
-  			%title=lol,
-  			%xlabel=relative position in document,
-  			%  ylabel=types,
-  			width=5cm,%0.5\textwidth,
-  			legend cell align=left,
-  			legend pos=outer north east,
-  			legend style={draw=none}]
-  			\addplot table [y=trjval, x=trjpos]{data/trj.dat};
-  			\addplot table [y=te1val, x=trjpos]{data/trj.dat};
-  			%\addlegendentry{1-grams}
-  			\addplot table [y=tejval, x=trjpos]{data/trj.dat};
-  			%\addlegendentry{2-grams}
-  			\addplot table [y=teeval, x=trjpos]{data/trj.dat};
-  			\end{axis}
-  			\end{tikzpicture}
-  	\end{scaletikzpicturetowidth}}%\qquad
-  	\subfloat[\emea]{\begin{scaletikzpicturetowidth}{0.3*\textwidth}
-  			\tikzsetnextfilename{wf3}
-  			\begin{tikzpicture}
-  			\begin{axis}[
-  			xmode=log,
-  			ymode=log,
-  			%title=lol,
-  			% xlabel=relative position in document,
-  			% ylabel=types,
-  			width=5cm, %0.5\textwidth,
-  			legend cell align=left,
-  			legend pos=outer north east,
-  			legend style={draw=none}]
-  			\addplot table [y=treval, x=trepos]{data/tre.dat};
-  			\addplot table [y=te1val, x=trepos]{data/tre.dat};
-  			%\addlegendentry{1-grams}
-  			\addplot table [y=tejval, x=trepos]{data/tre.dat};
-  			%\addlegendentry{2-grams}
-  			\addplot table [y=teeval, x=trepos]{data/tre.dat};
-  			\end{axis}
-  			\end{tikzpicture}
-  	\end{scaletikzpicturetowidth}}
-  	
-  	\caption[][2em]{The plots show the word ranks and their frequency. The blue line represents the training data, the red line the test data. For all three corpora they show similar behaviour. The other lines represent the test data for the mentioned corpora.}
-  \end{figure*}
-  
-  
-  
-    
-    
-    
-    
     \section{Analysis of cross-corpora OOV and hit rates}
 Most corpora comprise a coherent set of texts, that share certain properties. This can be because of phenomena that you want to investigate, such as the usage of constructs of language, or in diachronic corpora where you can track changes in meaning of words. With the inherent differences in usage for the corpora, the most obvious differences are the words.
+
+\begin{figure*}
+	%	\centering
+	\subfloat[\obw]{%\hspace*{-4em}
+		\begin{scaletikzpicturetowidth}{0.3*\textwidth}
+			\tikzsetnextfilename{wf1}
+			\begin{tikzpicture}
+			\begin{axis}[
+			xmode=log,
+			ymode=log,
+			title=Comparable word frequency,
+			xlabel=rank,
+			ylabel=frequency,
+			width=5cm, %0.5\textwidth,
+			legend cell align=left,
+			legend pos=outer north east,
+			legend style={draw=none}]
+			\addplot +[mark=none] table [y=tr1val, x=tr1pos]{data/tr1.dat};
+			\addplot +[mark=none] table [y=te1val, x=tr1pos]{data/tr1.dat};
+			%\addlegendentry{1-grams}
+			\addplot +[mark=none] table [y=tejval, x=tr1pos]{data/tr1.dat};
+			%\addlegendentry{2-grams}
+			\addplot +[mark=none] table [y=teeval, x=tr1pos]{data/tr1.dat};
+			\end{axis}
+			\end{tikzpicture}
+	\end{scaletikzpicturetowidth}}%\qquad
+	\subfloat[\jrc]{ \begin{scaletikzpicturetowidth}{0.3*\textwidth}
+			\tikzsetnextfilename{wf2}
+			\begin{tikzpicture}
+			\begin{axis}[
+			xmode=log,
+			ymode=log,
+			%title=lol,
+			xlabel=rank,
+			%  ylabel=types,
+			width=5cm,%0.5\textwidth,
+			legend cell align=left,
+			legend pos=outer north east,
+			legend style={draw=none}]
+			\addplot +[mark=none]table [y=trjval, x=trjpos]{data/trj.dat};
+			\addplot +[mark=none]table [y=te1val, x=trjpos]{data/trj.dat};
+			%\addlegendentry{1-grams}
+			\addplot +[mark=none]table [y=tejval, x=trjpos]{data/trj.dat};
+			%\addlegendentry{2-grams}
+			\addplot +[mark=none]table [y=teeval, x=trjpos]{data/trj.dat};
+			\end{axis}
+			\end{tikzpicture}
+	\end{scaletikzpicturetowidth}}%\qquad
+	\subfloat[\emea]{\begin{scaletikzpicturetowidth}{0.3*\textwidth}
+			\tikzsetnextfilename{wf3}
+			\begin{tikzpicture}
+			\begin{axis}[
+			xmode=log,
+			ymode=log,
+			%title=lol,
+			xlabel=rank,
+			% ylabel=types,
+			width=5cm, %0.5\textwidth,
+			legend cell align=left,
+			legend pos=outer north east,
+			legend style={draw=none}]
+			\addplot +[mark=none]table [y=treval, x=trepos]{data/tre.dat};
+			\addplot +[mark=none]table [y=te1val, x=trepos]{data/tre.dat};
+			%\addlegendentry{1-grams}
+			\addplot +[mark=none]table [y=tejval, x=trepos]{data/tre.dat};
+			%\addlegendentry{2-grams}
+			\addplot +[mark=none]table [y=teeval, x=trepos]{data/tre.dat};
+			\end{axis}
+			\end{tikzpicture}
+	\end{scaletikzpicturetowidth}}
+	
+	\caption[][2em]{The plots show the difference in word use, by means of their word ranks and frequency. The blue line represents the training data, the red line the test data. These lines are comparable, modulo the difference in size. The other two lines are the other two corpora. Not only do they differ in size, but compared to the training corpus they do not follow it's Zipf's law.}
+\end{figure*}
 
 The problem with out-of-vocabulary words is not only that you don't learn specific probabilities per OOV word\footnote{Unlike all the other words that are in the vocabulary.}, but have to resort to other means such as a specific OOV probability, or using a hierarchical structure with a character language model.
 
 The second problem is that perplexity is the default evaluation criterion for language models, and OOV words are not considered when computing perplexity. This has many implications, especially since the evaluation can hardly be used for downstream tasks where OOV words are a real issue.
 
-In \cref{tab:ex1ample1} we list the OOV rates per train corpus, and for each test corpus. For each word in the test data, we checked whether it occurred in the train data.\footnote{After thresholding in the cases of \obw and \wp.}
+In \cref{tab:ex1ample1} we list the OOV rates per train corpus, and for each test corpus. For each word in the test data, we checked whether it occurred in the train data.\footnote{After thresholding in the cases of \obw.}
 Here we see that on the diagonal the OOV rates are the lowest, this being the within-corpus cases. If we stray from the diagonal, the OOV are higher, up to 22.2\%. This means that more than 1 out of 5 words in \wp does not occur in \emea. Although this is not necessarily a problem\footnote{Since \emea is a small corpus with 3 million words, and no one would use it as a general-purpose corpus.}, we have to take this into consideration when we look at the perplexity scores later in this thesis.
 For \obw the cross-corpus OOV rates are lower, which strengthens our idea that it is a general-domain text corpus.
 
-Similarly, it is also interesting to look at the hit rates for the higher order $n$-grams. In \cref{tab:ex1ample2,tab:ex1ample3,tab:ex1ample4} we listed the rate of patterns that are also present in the training data. The effects are generally much stronger than just the OOV rate. For example, in \cref{tab:ex1ample3}, we see that about 36\% of the trigrams in the test data of \obw literally also occur in the training data of \obw. For the other test corpora this number is obviously much lower. In the same table it also shows that the coverage with \emea as training corpus is much lower compared than \obw.
+Similarly, it is also interesting to look at the hit rates for the higher order $n$-grams. In \cref{tab:ex1ample2,tab:ex1ample3,tab:ex1ample4} we listed the rate of patterns that are also present in the training data. The effects are generally much stronger than just the OOV rate. For example, in \cref{tab:ex1ample3}, we see that about 86\% of the trigrams in the test data of \obw literally also occur in the training data of \obw.
+% For the other test corpora this number is obviously much lower. 
+In the same table it also shows that the coverage with \emea as training corpus is much lower compared than \obw.
     
 \section{Flemish-Dutch data}
 \subsection{\mediargus}
@@ -200,7 +184,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
 
 \begin{table}
 	\begin{tabular}{ll}
-    	Source & \thead{Tokens \\ ($\times 10^6$)} \\
+    	Source & \thead{Tokens \\ ($\times 10^6$)} \\ \hline
     	De Morgen & 135 \\
         De Standaard & 118 \\
         De Tijd & 98 \\
@@ -214,7 +198,9 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
      \setfloatalignment{b}
 \end{table}
 
-	Similarly to the \obw models, we used a threshold on the word types, such that we have a similar size of vocabulary (100 thousand types), which we produced with a threshold of 250. We used the same\footnote{Same as for \obw on the English data.} occurrence threshold of 2 on the $n$- and skipgrams.
+	Similarly to the \obw models, we used a threshold on the word types, such that we have a similar size of vocabulary (100 thousand types), which we produced with a threshold of 250. We used the same
+	%\footnote{Same as for \obw on the English data.} 
+	occurrence threshold of 2 on the $n$- and skipgrams.
  
     
     \subsection{\cgn}
@@ -226,7 +212,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
         	train & 769m & 12m & 31m & 1.4b & 1.3b &    & \\
             test  & 8m   & 3m  & 8m  & 367m &      & 3m & 0.5m
         \end{tabular}
-        \caption{Summary of the number of words for each training and test set. m denote millions of words, and b denotes billions of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
+        \caption[][-2em]{Summary of the number of words for each training and test set. m denote millions of words, and b denotes billions of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
         \setfloatalignment{b}
     \end{table}
     
@@ -254,8 +240,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
         \setfloatalignment{b}
     \end{table}
     
-    The second series of test sets are the Flemish parts of the NBest benchmark \cite{kessens2007n} (475k words; the train, development and test sets). 
-    
-    mediargus in nbest, parts of cgn, (f, i, j, k, l, c, d)
+    The second series of test sets are the Flemish parts of the NBest benchmark \cite{kessens2007n} (475 thousand words; the train, development and test sets). The benchmark was introduced to stimulate further development on Dutch ASR systems, and contain a wide variety of texts, among \mediargus and \cgn in the language models, and \cgn\footnote{Components f, i, j, k, l, c, and d.}  in the acoustic models.
+ 
     
 
