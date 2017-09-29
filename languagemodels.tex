@@ -159,4 +159,35 @@ This type of interpolated models is described by \cite{jelinek1980interpolated}.
 With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{bulb} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{light}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{bulb} than its raw could suggests, taking into account the diversity of history.
 
 For example, \emph{bulb} occurs 1624 times in a corpus, in 262 different contexts, of which 626 occurrences of \emph{light bulb}. If we take a more general word that occurs 1626 times, such as \emph{pies}, then we see that it occurs after 402 contexts. 
-With Kneser-Ney smoothing
+With Kneser-Ney smoothing a higher probability is assigned to \emph{pies}.
+
+In its simplest form Kneser-Ney smoothing replaces the raw word count $c(w)$ from MLE with the count of histories for a word. For example,  
+\begin{equation}
+p_{\operatorname{KN}}(w) = \frac{N_{1+} (\cdot w)}{\sum_{w_i}N_{1+} (w_iw)},
+\end{equation}
+where $N_{1+}(\cdot w^i_{i-n+1}) = |\{w_{i-n} : c(w^i_{i-n} )> 0\}|$, meaning the number of different words that precede the sequence $w^i_{w_{i-n+1}}$.
+
+With interpolated Kneser-Ney (IKN) the probability of a word $w$ following a context $\mathbf{u}$ is estimated by discounting the true count $c_{\mathbf{u}w}$ by a fixed amount $d_{|\mathbf{u}|}$ depending on the length of the $n$-gram ($|\mathbf{u}w|$). Furthermore, the probability of word $w$ is estimated with lower order $n$-gram probabilities, such that:
+\begin{equation}
+p_{\operatorname{IKN}}(w|\mathbf{u}) = \frac{\max(0, c_{\mathbf{u}w} - d_{|\mathbf{u}|})}{c_{\mathbf{u}\cdot}} + \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot}}{c_{\mathbf{u}\cdot}}p_{\operatorname{IKN}}(w|\pi(\mathbf{u}))
+\end{equation}
+where $t_{\mathbf{u}\cdot} = |\{ w' : c_{\mathbf{u}w'} > 0 \}|$ is the number of distinct words $w'$ following context $\mathbf{u}$ and $\pi(\mathbf{u})$ is the context consisting of all words in $\mathbf{u}$ except the first. $p_{\operatorname{IKN}}(w|\pi(\mathbf{u}))$ then holds the lower order ($n-1$) $n$-gram probabilities. 
+
+Since IKN forms the basis of the Bayesian language models that we will introduce later, and form a specialisation of modified Kneser-Ney, which is a common baseline, we will elaborate a bit on this family of language models.
+
+First let $w'\mathbf{u'}$ be the context formed by concatenating $w'$ and $\mathbf{u'}$. Then for a context $\mathbf{u'}$ of length $m<n-1$, and words $w'$ and $w$,
+\begin{equation}
+\begin{split}
+t_{w'\mathbf{u'}w} = \left.
+\begin{cases}
+1, & \textnormal{if } c_{w'\mathbf{u'}w} > 0; \\
+0, & \textnormal{if } c_{w'\mathbf{u'}w} = 0;
+\end{cases}
+\right. \\
+c_{\mathbf{u'}w} = t_{\cdot\mathbf{u'}w} = \sum_{w'}t_{w'\mathbf{u'}w}
+\end{split}
+\end{equation}\footnote{In the next chapter $c$ and $t$ are given the names \emph{customers} and \emph{tables} respectively, after the metaphorical Chinese restaurant process which is introduced there. We use the same notation here, and throughout this thesis, for sake of clarity.}
+
+The value of $d_x$ is used for each length $x$, and can be estimated using formulas or by using cross-validation.
+
+Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. 
