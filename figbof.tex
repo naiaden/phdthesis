@@ -1,0 +1,92 @@
+\begin{figure*}
+    \begin{tikzpicture}[every node/.style={node distance=10pt, rectangle, minimum size=1cm}]
+	\node[rectangle, minimum size=1cm](abcde) {abcde};
+%     % I [above right=0.7cm and 4cm of A]
+    \node[above left=0cm and 1cm of abcde](abcxe) {abc\{1\}e};
+    \node[above=of abcxe](axcxe1) {a\{1\}c\{1\}e};
+    \node[left=of axcxe1](bcxe1) {bc\{1\}e};
+    \node[right=of axcxe1](abxxe1) {ab\{2\}e};
+    \node[above=of bcxe1](cxe1) {c\{1\} e};
+    \node[above=of axcxe1](bxxe1) {b\{2\}e};
+    \node[above=of abxxe1](axxxe1) {a\{3\}e};
+    \node[above=of bxxe1](e1) {e};
+   %\draw (abxde) -> (bxde1);
+    \draw (abcxe) -> (abxxe1);
+    \draw (abcxe) -> (axcxe1);
+    \draw (abcxe) -> (bcxe1);
+    \draw (abxxe1) -> (axxxe1);
+    \draw (axcxe1) -> (axxxe1);
+    \draw (abxxe1) -> (bxxe1);
+    \draw (bcxe1) -> (bxxe1);
+    \draw (axcxe1) -> (cxe1);
+    \draw (bcxe1) -> (cxe1);
+    \draw (axxxe1) -> (e1);
+    \draw (bxxe1) -> (e1);
+    \draw (cxe1) -> (e1);
+%     % II
+    \node[above right=0cm and 1cm of abcde](axcde) {a\{1\}cde};
+    \node[above=of axcde](axxde1) {a\{2\}de};
+    \node[left=of axxde1](cde1) {cde};
+    \node[right=of axxde1](axcxe2) {a\{1\}c\{1\}e};   
+    \node[above=of axxde1](cxe2) {c\{1\}e};
+    \node[left=of cxe2](de1) {de};
+    \node[right=of cxe2](axxxe2) {a\{3\}e}; %
+    \node[above=of cxe2](e2) {e};
+    \draw (abxde) -> (bxde1);
+    \draw (axcde) -> (axcxe2);
+    \draw (axcde) -> (axxde1);
+    \draw (axcde) -> (cde1);
+    \draw (axcxe2) -> (axxxe2);
+    \draw (axxde1) -> (axxxe2);
+    \draw (axxde1) -> (de1);
+    \draw (cde1) -> (de1);
+    \draw (cde1) -> (cxe2);
+    \draw (cxe2) -> (e2);
+    \draw (de1) -> (e2);
+    \draw (axxxe2) -> (e2);
+    \draw (axcxe2) -> (cxe2);
+    % III %% below
+    \node[above left=0cm and 5.5cm of abcde](abxde) {ab\{1\}de};
+    \node[above=of abxde](axxde2) {a\{2\}de};
+    \node[left=of axxde2](bxde1) {b\{1\}de};
+    \node[right=of axxde2](abxxe2) {ab\{2\}e};
+    \node[above = of $(bxde1)!0.5!(axxde2)$](de2) {de};
+    \node[above = of $(axxde2)!0.5!(abxxe2)$](bxxe2) {b\{2\}e};
+    \node[above = of $(de2)!0.5!(bxxe2)$](e3) {e};
+    \draw (abxde) -> (bxde1);
+    \draw (abxde) -> (axxde2);
+    \draw (abxde) -> (abxxe2);
+    \draw (bxde1) -> (de2);
+    \draw (axxde2) -> (de2);
+    \draw (abxxe2) -> (bxxe2);
+    \draw (de2) -> (e3);
+    \draw (bxxe2) -> (e3);
+    % IV %% below
+    \node[above right=0cm and 5.5cm of abcde](bcde) {bcde};
+    \node[above=of bcde](bcxe2) {bc\{1\}e};
+    \node[left=of bcxe2](bxde2) {b\{1\}de};
+    \node[right=of bcxe2](cde2) {cde};
+    \node[above=of bcxe2](de3) {de};
+    \node[left=of de3](bxxe3) {b\{2\}e};
+    \node[right=of de3](cxe3) {c\{1\}e};
+    \node[above=of de3](e4) {e};
+    \draw (bcde) -> (bxde2);
+    \draw (bcde) -> (bcxe2);
+    \draw (bcde) -> (cde2);
+    \draw (bxde2) -> (bxxe3);
+    \draw (bcxe2) -> (bxxe3);
+    \draw (bcxe2) -> (cxe3);
+    \draw (bxde2) -> (de3);
+    \draw (cde2) -> (de3);
+    \draw (cde2) -> (cxe3);
+    \draw (bxxe3) -> (e4);
+    \draw (de3) -> (e4);
+    \draw (cxe3) -> (e4);
+    %
+    \draw (abcde) -> (abcxe);
+    \draw (abcde) -> (bcde);
+    \draw (abcde) -> (axcde);
+    \draw (abcde) -> (abxde);
+	\end{tikzpicture}
+    \caption{Following the same example as \cref{fig:bon}, we now illustrate all backoff paths for \BOF. Some steps such as de, c\{1\}e (inter alia), occur more than one time. However, depicting them only once would render the graph illegible. }\label{fig:bof}
+    \end{figure*}

@@ -37,7 +37,49 @@ with $G_0$ being the uniformly distributed global mean vector for the empty cont
 
 \section{Backoff strategies}
 
-In this section we investigate three backoff strategies: {\sf ngram}, {\sf limited}, and {\sf full}. {\sf ngram} is the traditional $n$-gram backoff method as described by Teh (2006); {\sf limited} and {\sf full} are extensions that also incorporate skipgram probabilities. The {\sf full} backoff strategy is similar to {\sf ngram} in that it always backs off recursively to the word probabilities, while {\sf limited} halts as soon as a probability is known for a pattern. The backoff strategies can be formalised as follows.
+Although numerous backoff strategies for $n$-grams have been proposed\cite{chen1996empirical}, due to their nature, skipgrams allow for even a greater number of backoff strategies. In this section we limit ourselves to three backoff strategies that we will investigate: \BON, \BOL, and \BOF. First we will introduce a graphical representation, followed by a formal definition.
+
+The \BON backoff method uses the backoff structure as prescribed by the HPYPLM. Even when trained on skipgrams, \BON only backs off to $n$-grams. \Cref{fig:bon} illustrates the \BON hierarchy.
+
+\input{figbon}
+
+\BOF is similar to \BON, in that it always performs full recursive backoff to the a-priori unigram probabilities. But instead of ignoring the skipgrams, \BOF uses both pattern types. In contrast to the straight hierarchical backoff structure of \BON, \BOF yields a graph-like structure, starting with the root, $\mathbf{u}w$, and all steps ending in $\emptyset$. The structure is depicted in \cref{fig:bof}.
+
+\input{figbof}
+
+Each step we only allow one skip to be introduced, where the first and last\footnote{The focus word $w$.} cannot be a skip. \textbf{HIER een STUKJE over RATIOS}.
+
+The \BOL backoff strategy is an extension of the \BOF backoff strategy, in that it also uses both $n$-grams and skipgrams and follows the same backoff rules, that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern.
+
+Suppose we have a collected the frequencies of patterns from \obw:\footnote{With the HPYPLM you would in fact look at the frequencies after sampling, since they might not be same as those in the original corpus. Especially in those cases where the sampled frequencies are now zero, or vice versa.}
+\begin{multicols}{2}\begin{enumerate}
+	\item[0] bananas are my favourite fruit
+	\item[1] are my favourite fruit
+	\item[2] my favourite fruit 
+	\item[7] favourite fruit
+	\item[15391] fruit
+	\item[1] are \{1\} favourite fruit
+	\item[1] are my \{1\} fruit
+	\item[90] are \{2\} fruit
+	\item[13] my \{1\} fruit
+	\item[0] bananas \{1\} my \{1\} fruit
+	\item[0] bananas \{1\} my favourite fruit
+	\item[0] bananas \{2\} favourite fruit
+	\item[4] bananas \{3\} fruit
+	\item[0] bananas are \{1\} favourite fruit
+	\item[0] bananas are \{2\} fruit
+	\item[0] bananas are my \{1\} fruit
+\end{enumerate}\label{enum:minicorpus}\end{multicols}
+
+
+Then for all patterns in \cref{fig:bol} that occur in this corpus, we remove their backoff steps.
+
+\input{figbol}
+
+In a setup with only $n$-gram features, \BON and \BOF are functionally the same in terms of backoff strategy. The nuance lies in the way they do the backoff. \BOF tries to backoff to skipgrams,\footnote{It tries, does not find the skipgram, since it is not trained on skipgrams, and continues with the backoff procedure.} independent of whether it was trained with skipgrams. The \BON strategy has only one way to get to the a-priori word probability. 
+For \BOF it can get to the word probabilities for each skipgram that is generated, hence it puts more emphasis on the word probabilities.\footnote{Compare the number of paths to e in \cref{fig:bon} and \cref{fig:bof}.}
+
+{\sf ngram} is the traditional $n$-gram backoff method as described by Teh (2006); {\sf limited} and {\sf full} are extensions that also incorporate skipgram probabilities. The {\sf full} backoff strategy is similar to {\sf ngram} in that it always backs off recursively to the word probabilities, while {\sf limited} halts as soon as a probability is known for a pattern. The backoff strategies can be formalised as follows.
 %
 For all strategies, we have that $p(w|\mathbf{u})=G_0(w)$ if $\mathbf{u} = \emptyset$. For {\sf ngram}, the other case is defined as:
   \begin{equation*}\begin{split}
