@@ -1,0 +1,67 @@
+
+\section{Interpolation factors}
+
+The use of interpolation factors in a language model is not new. In the literature we find lattice-based language models in
+\cite{dupont1997lattice} and a generalisation called factored language model with generalised parallel backoff \cite{bilmes2003factored}. 
+%However, the context sizes are small (2 and 3), % ik snap de relevantie van die laatste zin niet, maar misschien omdat ze niet af is ? (einigt in een komma)
+  Maximum entropy language models \cite{ROSENFELD1996187} and distant bigram language models \cite{bassiou2011long} are other related cases in point. In \cite{gao2004long} each backoff level has its own weight, fixed for all features. These works are all implicitly using skipgram features, with variable skip sizes, spanning patterns that are larger than $n$. 
+  
+%  In \cite{gao2004long} each backoff level has its own weight, fixed for all features.
+% [AB] this sentence moved and copied above
+
+  A more recent paper on using skipgram language models only uses uniform linear interpolation with a generalisation of modified Kneser-Ney \cite{pickhardt2014generalized}. Even more recently, in \cite{pelemans2016sparse} a sparse non-negative feature weight matrix is computed on the basis of an adjusted version of relative frequency.
+  
+Inspired by these studies, we use six interpolation strategies:\marginnote{Hier een plaatje dat voor een run de waarden geeft, en de gemiddelde proporties ofzo.}
+  
+  \begin{itemize}
+  \item \textsf{ngram}, where we ignore the skipgram probabilities (and prohibit the backoff step to skipgrams): \\
+	$I(\mathbf{u}) =
+  \begin{cases}
+    1 & \text{if } \mathbf{u} \text{ is }n\text{-gram} \\
+    0 & \text{if } \mathbf{u} \text{ is skipgram}
+  \end{cases}$
+\item \textsf{Uninformed uniform prior (uni)}, where all the weights are 1:\\ 
+	$ I(\mathbf{u}) = 1 $
+\item \textsf{Uninformed $n$-gram preference (npref)}, where we give the $n$-grams twice the importance of skipgrams: \\
+	$I(\mathbf{u}) =
+  \begin{cases}
+    2 & \text{if } \mathbf{u} \text{ is }n\text{-gram} \\
+    1 & \text{if } \mathbf{u} \text{ is skipgram}
+  \end{cases}$
+  \item \textsf{Maximum likelihood-based Linear Interpolation (mle)}, based on the maximum likelihood estimate of the context: \\[0.5ex]
+	$ I(\mathbf{u}) = \displaystyle \frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
+%    We also tried the unnormalised count, but this gave worse performance.
+\item \textsf{Entropy-based Linear Interpolation (ent)}, based on the entropy of the context: \\
+	$E(\mathbf{u}) = -\displaystyle \sum_{w,c(\mathbf{u}w)>0}^W\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)}\log\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
+    $ I(\mathbf{u}) = \displaystyle \frac{1}{1+E(\mathbf{u})}$ \\
+    where $c(\mathbf{u}w)$ are the counts as estimated by the model. We use the reciprocal because a higher entropy should yield a lower weight.
+    % although we did test also tested an increasing function, but this performed worse.
+\item \textsf{Perplexity-based Linear Interpolation (ppl)}, raising 2 to the power of the entropy of the context: \\ % shifted into the domain of the counts, by using the entropy: \\
+	$\textstyle I(\mathbf{u}) = \displaystyle 2^{-E(\mathbf{u})} $
+    \item \textsf{random}, where weights are uniformly distributed between 0 and 1 and assigned to the terms: \\
+    $ I(\mathbf{u}) = \text{rand}(0,1) $
+  \end{itemize} 
+
+The weights for the interpolation strategies \textsl{mle} and \textsl{ppl} are determined at test time, since precomputing and computing all these weights is expensive. To this end we have not ventured into learning the weights during training time, integrated into the Bayesian paradigm of the hierarchical Pitman-Yor process.
+
+\section{Experiments}
+We train 4-gram language model on the two training corpora, the Google 1 billion word benchmark and the Mediargus corpus.\footnote{See~\ref{sec:data} for a description of the corpora.} We do not perform any preprocessing on the data except tokenisation. 
+   %The models are trained with a HPYLM. We do not use sentence beginning and end markers. The results for the {\sf ngram} backoff strategy are obtained by training without skipgrams; for {\sf limited} and {\sf full} we added skipgram features during training.
+
+When setting up the experimental framework, we had to decide on the basis. Earlier work on hierarchical Pitman-Yor language models by Huang and Renals had accompanying software releases. An SRILM extension with HPYPLM was proposed in \cite{huang2007hierarchical}, and a frequentist approximation extension of the HPYPLM was described in \cite{huang2010power}. However, at the time I started this thesis, they were no longer accessible. With further inquiries we learned that also none of the source code has survived during the period. 
+
+We found an alternative in cpyp,\footnote{\url{https://github.com/redpony/cpyp}} which is an existing library for non-parametric Bayesian modelling with PY priors with histogram-based sampling \cite{blunsom2009note}. This library has an example application to showcase its performance with $n$-gram based language modelling. Limitations of the library, such as not natively supporting skipgrams, and the lack of other functionality such as thresholding and discarding of certain patterns, led us to extend the library with Colibri Core,\footnote{\url{http://proycon.github.io/colibri-core/}} a pattern modelling library. Colibri Core resolves the limitations, and together the libraries are a complete language model that handles skipgrams: cococpyp.\footnote{\url{https://github.com/naiaden/cococpyp}} This software in turn has been rewritten to allow also for reranking nbest lists, and being more in control of the underlying language model. We gave it the name SLM, for skipgram language model.\footnote{\url{https://github.com/naiaden/SLM}} Throughout the rest of the thesis the reported results were obtained with SLM.
+
+  Each model is run for 50 iterations (without an explicit burn-in phase), with the initial values for hyperparameters $\theta=1.0$ and $\gamma=0.8$. The hyperparameters are resampled every 30 iterations with slice sampling \cite{walker2007sampling}.
+  
+  \textbf{Plot van dalende ppl over iteraties, effect resampling?}
+  
+  We test each model on different test sets, and we collect their intrinsic performance by means of perplexity. We compute the perplexity on all 4-grams, rather than computing the perplexity for sentences. 
+  Words in the test set that were unseen in the training data are ignored in computing the perplexity on test data.\footnote{This is common for perplexity. } 
+
+\subsection{PPL}
+\subsection{Learning curves}
+
+\section{Results}
+
+\section{Discussion}
