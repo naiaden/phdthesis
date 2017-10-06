@@ -1,9 +1,17 @@
-\documentclass{tufte-book}
+\documentclass[nobib]{tufte-book}
 \usepackage[maxfloats=255]{morefloats}
 
-\hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
+%\hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
 
-\usepackage{etoolbox}
+\usepackage{hyphenat}
+\usepackage[style=verbose,autocite=footnote,backend=biber]{biblatex}
+\addbibresource{superpaper.bib}
+\AtEveryCiteKey{%
+	\clearfield{note}%
+	\clearfield{isbn}%	
+}
+
+%\usepackage{etoolbox}
 \usepackage{pgfplotstable}
 \usepackage{pgfplots}
 
@@ -230,7 +238,7 @@ box/.style={%draw,%
 \usepackage{makeidx}
 \makeindex
 
-\newcommand{\textcite}[1]{\citet{#1}\cite{#1}}
+%\newcommand{\textcite}[1]{\citet{#1}\cite{#1}}
 
 \usepackage[noabbrev,capitalize]{cleveref}
 %\usepackage{backref} 
@@ -307,8 +315,10 @@ box/.style={%draw,%
 
 \backmatter
 
-\bibliography{superpaper}
-\bibliographystyle{plainnat}
+%\bibliography{superpaper}
+%\bibliographystyle{plainnat}
+
+\printbibliography
 
 %\input{summaries}
 %\input{cv}
