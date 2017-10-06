@@ -7,15 +7,14 @@
 \usepackage[%bibstyle=mybibstyle,
 style=verbose,autocite=footnote,backend=biber,maxbibnames=99]{biblatex}
 \addbibresource{superpaper.bib}
-\AtEveryCitekey{%
-	\clearfield{booktitle}%
-	\clearfield{pages}%	
-	\clearfield{author}%
-	\clearfield{url}%
-	\clearfield{publisher}%
-	\clearfield{address}%
-	\clearfield{month}%	
-}
+\AtEveryCitekey{\clearfield{booktitle}}
+\AtEveryCitekey{\clearfield{pages}}	
+\AtEveryCitekey{\clearfield{author}}
+\AtEveryCitekey{\clearfield{url}}
+\AtEveryCitekey{\clearlist{publisher}}
+\AtEveryCitekey{\clearfield{address}}
+\AtEveryCitekey{\clearfield{month}}
+
 
 \renewbibmacro{in:}{}
 
