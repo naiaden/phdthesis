@@ -180,3 +180,249 @@ The \BOF backoff strategy is effective especially in cross-domain situations, wh
 
 For a within-domain experiment on \obw, we notice that throughout the learning curve until 30M words, \BOF is slightly outperforming \BOL. But with more training data, \BOL has seen enough $n$-grams to overtake \BOF.
 
+\subsection{Observations from \obw learning curves}
+
+The learning curves for \obw are shown in \cref{fig:1bwlc}. The pure $n$-gram models are outperformed by the skipgram models, for all four test sets. We are mostly interested in comparing \BON with the best performing skipgram backoff method.
+
+The first observation is that the skipgrams are especially useful in the beginning, when the perplexity is very low. However, we have to `discard' these values, since at this point there are still too many OOV words and therefore it models only few words. Only after the learning curve drops, we consider the values to be of use. Here the perplexity of the skipgram models is consistently lower than those of \BON. Since the \BON models have a higher peak in the learning curve, it is also easier to gain a reduction in perplexity with an increasing number of training words. But with the amount of training data we have the models do not converge for cross-domain testing. For none of the eight models plotted in \cref{fig:1bwlc} we see any plateauing behaviour, indicating that all eight models gain from having (yet even) more train data.
+
+In the same plot we can also see that there is a clear distinction between the test sets. The behaviour of testing on \obw, is different compared to testing on \jrc, \emea, or \wp. They share the same progression, with \wp's course shifted downwards\footnote{Since it shares the same property of being more generic than \jrc and \emea.}, unlike the domain-specific sets. \BON and \BOF of these models also seem to have a gap, whereas \BON and \BOL of \obw are converging at the end. This seems to confirm that skipgrams are especially useful in cross-domain settings, where with order of magnitude more data, the lines do not seem to converge.\footnote{Although we do not have in fact more data, we extrapolated this bevahiour on the basis of the plots.}
+
+For within-domain we have reached a point where we have seen enough $n$-grams to estimate the probabilities, and the patterns modelled by skipgrams are also covered sufficiently by $n$-grams. We verified this by checking to which level the models backoff, and find that with an increasing amount of training material, the average backoff depth is smaller, and that for out-of-domain experiments the average backoff depth is larger.
+
+\begin{figure*}
+	\begin{tikzpicture}
+	\begin{axis}[
+	height=6cm, width=8cm, legend cell align=left, legend style={legend pos=north west, fill=none, font=\small},
+	title=Testing on general texts,
+	xmode = log,
+	xmin=800,xmax=2048576000,
+	%ymin=-100,ymax=40,
+	xlabel=Train corpus size (\obw; in words),
+	ylabel=Perplexity]
+	\addplot[brown,thick] table [x=1bw, y=ngram]{data/1bw-1bw.dat};
+	\addlegendentry{\obw \BON}
+	\addplot[brown,thick,dotted] table [x=1bw, y=limited]{data/1bw-1bw.dat};
+	\addlegendentry{\obw \BOL}
+	%\addplot[brown,thick,dashed] table [x=1bw, y=full]{1bw-1bw.dat};
+	%\addlegendentry{1bw full}
+	\addplot[black,thick] table [x=wp, y=ngram]{data/1bw-wp.dat};
+	\addlegendentry{\wp \BON}
+	\addplot[black,thick,dashed] table [x=wp, y=full,mark=*]{data/1bw-wp.dat};
+	\addlegendentry{\wp \BOF}
+	\end{axis}
+	\begin{axis}[
+	height=6cm, width=8cm, legend cell align=left, legend style={legend pos=north west, fill=none, font=\small},
+	title=Testing on domain-specific texts,
+	xmode = log,
+	xmin=800,xmax=2048576000,
+	%ymin=-100,ymax=40,
+	xlabel=Train corpus size (\obw; in words),
+	xshift=8cm]
+	\addplot[blue,thick] table [x=jrc, y=ngram]{data/1bw-jrc.dat};
+	\addlegendentry{\jrc \BON}
+	\addplot[blue,thick,dashed] table [x=jrc, y=full]{data/1bw-jrc.dat};
+	\addlegendentry{\jrc \BOF}
+	\addplot[red,thick] table [x=emea, y=ngram]{data/1bw-emea.dat};
+	\addlegendentry{\emea \BON}
+	\addplot[red,thick, dashed] table [x=emea, y=full,mark=*]{data/1bw-emea.dat};
+	\addlegendentry{\emea \BOF}
+	\end{axis}
+	\end{tikzpicture}
+	\caption{Learning curve for training on \obw, and testing on \obw and \wp on the left, and \jrc and \emea on the right. The solid lines indicate the perplexity of the \BON model, the dotted line \BOL for testing on \obw, and the dashed lines \BOF for \jrc,\ emea, and \wp.}\label{fig:1bwlc}
+\end{figure*}
+
+ \section{Behaviour of the Language Models}
+Aside from a quantitative analysis in terms of perplexity, we are also interested in the qualitative differences between the compared approaches. In this section we analyse the skipgrams that contribute the most, and which are most prominent. We finish the section with a look at the models from a Zipfian point of view, and compare the frequentist and Bayesian rank-ordered frequencies.
+
+\subsection{When do skipgrams work?}
+Earlier we stated that skipgrams can be part of the solution for modelling long-range dependencies and shorter-range non-contiguous patterns. In the experiments described in this paper we have limited ourselves to modelling each skip with one token, where skips must be surrounded by word tokens. This limits the skipgrams of length $4$ as used in this paper to at most two position skips.
+
+To understand which patterns can be modelled with these skipgrams, and in particular, which of these patterns contribute positively to a better score, we analysed all $4$-grams in the test data which have a higher posterior probability with skipgram features added to the training model. 
+%
+To this end, we analysed the results of one run in which we trained on 1bw and tested on the 2.2M $4$-grams in emea. Of those $4$-grams 473 thousand showed a lower perplexity when adding skipgram features, as compared to the standard $n$-gram model. 
+
+In this section we approach the question from three different angles. First we consider the skipgrams patterns boost probability of test patterns. Second, we look at the most-frequent skipgram patterns that cause a lower perplexity for the skipgram model. Third, we are interested in the patterns with high-frequent words that skip over low-frequent words, because they are not only frequent themselves, but also invariant to domains. 
+
+
+\begin{table*}
+	\small
+	\begin{tabular}{lllllll}
+		most helpful  & & most-frequently helpful & & skip on second & & skip on third \\ \cline{1-1}\cline{3-3}\cline{5-5}\cline{7-7}
+		if the \{1\} blood & & , \{2\} , & & the \{1\} of the &  & in the \{1\} of\\
+		: in \{1\} with & & ( \{2\} ) & & the \{1\} of a   & & to the \{1\} of\\
+		treatment \{1\} cervical cancer   & & see \{2\} ) & & , \{1\} , and    & & on the \{1\} of\\
+		product \{1\} due to & & see section \{1\} ) & & The \{1\} of the & & of the \{1\} of\\
+		result \{1\} due to & & of \{2\} and & & and \{1\} of the & & of the \{1\} . \\
+	\end{tabular}
+	\caption{First column contains the 5 most-helpful patterns; the second column the 5 most-frequently helpful patterns. The third and fourth column contain the top-5 most-frequent skipgrams with their frequency, with the skip on the second (left) and third (right) position, when the skipped word is 20 or more times less frequent than the least frequent word in the skipgram.}\label{ta:examples}
+\end{table*}
+
+
+%(': {1} accordance with', 0.15049816926667361),
+% (': in {1} with', 0.15049816926667361),
+% ('treatment {1} cervical cancer', 0.10562404017518799),
+% ('product {1} due to', 0.09975897235968394),
+% ('result {1} due to', 0.07797193841653396),
+
+
+Patterns with the largest difference in probability are typically domain-specific patterns of which the words occur in the training data, but where there is no direct $n$-gram match. See \cref{ta:examples} for 5 examples. 
+%The pattern \emph{such as myocardial infarction} is a very domain-specific pattern, and as such does not occur in 1bw. However, since parts of it occurs in multiple forms (\emph{bowel infarction}, \emph{celebral infarction}, etc.), having a skipgram \emph{such as \{1\} infarction} is beneficial.
+%The pattern \emph{intestines ( ulcerative colitis} is a very domain-specific pattern, and as such does not occur in 1bw. However the trigram \emph{( ulcerative colitis} occurs once, and its bi-, and unigram \emph{ulcerative colitis} and \emph{colitis} occur 189 and 337 times. We showed earlier that adding skipgrams add causes the subpatterns in the skipgrams to be added: e.g. each bigram is added twice. Additionally \emph{full} places an emphasis in the backoff procedure on the unigrams, which helps improving the probability of this pattern a lot.
+The pattern \emph{if the systolic blood} is a very domain-specific pattern in \emea, and is not covered by \obw. However, the pattern \emph{if the \{1\} blood} occurs in multiple forms (e.g.\ \emph{bad blood}, \emph{maternal blood}, \emph{' blood}). Although there is match for \emph{the systolic blood} in \obw, the skipgrams help to boost the probability with over $0.15$. 
+%An example is \emph{: in accordance with}, whose high-frequency is also domain-specific for biomedical texts (326 times in emea). The improvement of the probability is not caused by emphasising the unigrams, but because of the skipgram patterns added. As a whole it occurs once in 1bw. The skipgram \emph{: \{2\} with} occurs 3969 times, \emph{: \{1\} accordance with} and \emph{: in \{1\} with} 6 and 22 times respectively. Leaving out the first marker gives an even better clue: 1bw contains 143909 occurrences of \emph{in \{1\} with} .
+
+On the other hand, the patterns with the largest difference in probability only occur very sparsely. To explain the gain in perplexity when adding skipgrams, we have to look at patterns with a lower probability that occur often. Here we see that these patterns are less domain-specific.
+%
+%The first example \emph{e . g .} seems odd, but in the training data only \emph{e , g .} occurs, hence the skipgram is able to give a better estimation. Since this example occurs 1346 times, this has the potential to make a huge difference in the final perplexity.
+
+The texts in \emea contain many subordinate clauses and parenthesised phrases, for clarification. Since \obw is a different domain, we do not find these clauses and phrases verbatim in the train data. However, we do find patterns such as \emph{, \{2\} ,} and \emph{( \{2\} )} a lot. Knowing that a lot of clauses and phrases are of length 2, these skipgrams contribute a little each time an opening parenthesis occurs, when the focus word is a closing parenthesis. The improvement is subtle, but accumulated over all test patterns, this amounts for a noticeable change in the perplexity.
+
+%The patterns above are mostly composed out of content words. For the last analysis we look at patterns composed of function words. 
+From the 473 thousand patterns that obtained a lower perplexity we first discarded specific patterns through imposing an occurrence ratio threshold of 20 on the words in the skips. This means that if the skip is $\{1\}$, that word must occur at most 20 times less often than the least frequent of the three other words, and in case of $\{2\}$ the two words must occur at most 20 times less than the least frequent of the other two words. This ratio models the suspicion that skipgrams are particularly useful in situations where the skip models a low-frequent content word. 
+
+We hardly observe any other patterns than these function-word patterns. 
+This may be caused by the fact that \emea is very domain-specific, and that matches on content words are unlikely to occur often. It may be precisely because of this feature of \emea that the skipgrams, extracted from \obw, are providing the kind of effective modelling of non-contiguous patterns to be able to skip unknown words and continue matching with (function) words further to the left.
+
+As an illustration we list in the last two columns of \cref{ta:examples} the five most frequent skipgrams types with the skip on position 2 and with occurrence ratio 20, and with a skip on position 3.
+
+%	If we look at which patterns are predicted better, and if we drop the concept of frequency ratio in skipgrams, then different patterns do emerge. For example, in the training data there is only one mention of `Merck Sharp \& Dohme'. Being a pharmaceutical company, there are many mentions in the test data (emea), but in more variations, such as: `Merck Sharp \& Dohme', `Merck Sharp and Dohme', `Merck Sharp E Dohme'. The pattern that attains a lower perplexity skips the third word. This is a case where skipgrams help with patterns that are not composed of function words.
+
+Another type of effective pattern is one that skips over a numerical value. Medical prescriptions often contain mentions of quantities or concentrations, for example expressed by ``with consideration for the haemoglobin target range of 10 g / dL ( 6.2 mmol / l )''. Skipgrams are particularly useful in skipping over the number positions, as the patterns surrounding them are fixed and frequent. This step is often implicit in language modelling, when all numbers are mapped to a special token, i.e.\ \{\#\#\#\}. With skipgrams, the numerical value can be preserved.
+
+
+\begin{figure*}
+	\centering
+	\begin{tikzpicture}
+	\begin{loglogaxis} [
+	width=5cm,
+	height=3cm,
+	scale only axis,
+	enlargelimits=false,
+	axis on top,
+	xlabel=Rank,
+	ylabel=Frequency,
+	title=$n$-grams,
+	ylabel shift=-0.1cm, legend cell align=left, legend style={only marks, legend pos=north east
+		, font=\small}
+	]
+	\addplot+ graphics [ 
+	xmin=1,
+	xmax=4746593,
+	ymin=1,
+	ymax=369489,
+	] {figures/n1.png};
+	
+	\end{loglogaxis}
+	\begin{loglogaxis} [
+	width=5cm,
+	height=3cm,
+	scale only axis,     
+	enlargelimits=false,   
+	axis on top,        
+	xlabel=Rank,
+	title=$n$-grams and skipgrams,
+	xshift=7cm, legend cell align=left, legend style={at={(8cm,3cm)}
+		, only marks
+		, font=\small}
+	]
+	\addplot+ graphics [
+	xmin=1,
+	xmax=7370640,
+	ymin=1,
+	ymax=4014991,
+	] {figures/s1.png};
+	\addlegendimage{only marks, black, mark=*}
+	\addlegendentry{\obw train}
+	\addlegendentry{\obw HPYPLM}
+	\addlegendentry{\jrc test}
+	\addlegendentry{\obw test}
+	\addlegendimage{only marks, red, mark=*} % or mark=none?
+	\addlegendimage{only marks, brown, mark=*}
+	\addlegendimage{only marks, blue, mark=*}
+	
+	\end{loglogaxis}
+	\end{tikzpicture}
+	\caption{Log-log frequency-rank curves 
+		and scatter plots for three sets, the complete \obw (train and test), and the deviating estimated frequencies of the HPYPLM (black). The ranks are determined on the heldout data.
+		}\label{fig:freqs}
+\end{figure*}
+
+\subsection{An analysis of the $n$-gram distribution}
+Because the HPYPLM is a Bayesian generalisation of the IKN language model, and in some circumstances also to MKN, we are interested in the differences between the two methods. 
+%     %In this subsection we analyze the word distributions, for the complete corpus, the trainings data, and the posterior trigram distribution for the HPYLM.
+
+We know that words and word $n$-grams in a language manifest themselves typically in power-law distributions. Few patterns occur very often, whereas the majority of patterns are only observed very sparsely. For this reason we chose the HPYPLM, as the Pitman-Yor prior can model this power-law behaviour. The power-law growth of patterns in language has been popularized by the early work of George Zipf \cite{Zipf35,Zipf49}. Recently, \cite{piantadosi2014Zipfs} has asserted that most Zipfian analyses have been done under false premises, namely that the frequency of the words is determined on the same data set as which is used to determine the rank of the words. In this subsection we analyse the rank of the patterns on the heldout set of \obw, and determine the frequency on the training sets. The trigrams in the remainder of this section are context trigrams, the part of fourgrams before the focus word.
+
+In \cref{fig:freqs} we plot the frequency for each trigram in the heldout set of \obw. The brown dots
+follow a typical Zipfian curve since the rank is determined on the same set. The blue dots are the frequencies of the trigrams in the complete \obw, ordered by the rank as found on the heldout data. Invisible in the scatter plot, there are patterns that occur in the training data but not in the heldout data (since the heldout data was unseen data).
+The blue dots also represent the frequencies as used by MKN, which does not manipulate the data by changing the word counts. The black dots are the frequencies as estimated by the HPYPLM. 
+
+In general we observe that most deviating frequency estimations are in the tail, where we can find many patterns that do not occur in the heldout data, but have a positive frequency in the training data. Trigram tokens are mostly re-distributed by HPYPLM among those patterns.\footnote{A sum of all frequencies confirms that tokens are not lost in the process.}
+
+If we train with only $n$-grams, HPYPLM follows the counted frequencies, but as the rank increases, the effect of sampling and re-estimating frequencies by the HPYPLM is quite apparent (the black points not shadowed by the blue cloud). For the high frequency data the frequencies are estimated lower, whereas the remainder of the counts is used to boost the patterns that have a lower rank. If we add skipgram features, than HPYPLM's cloud is more spread-out, and its power-law behaviour is less explicit. Here also we see that the counts of higher-ranked patterns are diminished to boost lower-ranked patterns.
+
+Another observation we make is that if we train on \obw, yielding the distributions as shown in \cref{fig:freqs}, and we test on a specific domain such as \jrc (the red dots in the figure), we see that if we only train on $n$-grams, the dots are quite dispersed into a cloud, and that this distribution over frequencies differs substantially from the distributions from \obw. For the skipgram-trained model we see that the red dots are less dispersed, somewhat more closely following a Zipfian distribution, with a decay similar to the training points for the HPYPLM estimated frequencies of \obw.
+
+\subsection{Variation in HYPLMs}
+In this subsection we briefly show an analysis of the variability of the perplexity of the HPYLM approach, both in terms of iterations used for sampling, and in terms of stability over multiple runs. These analyses support the idea that the reductions in perplexity mentioned earlier in this paper are not due to some random effect, by choosing a favourable `best' run, or halting at an specific or large number of iterations.
+
+
+%     One of the major concerns of Bayesian models are their intractability. To avoid these complications, clever inference schemes have been proposed. In our methods we use Gibbs sampling for the seating arrangement, and slice sampling for the hyperparameters. Still, each new run leads to a different outcome. 
+
+\begin{figure*}
+	\begin{tikzpicture}
+	\begin{axis} [
+	%width=0.25\textwidth,
+	height=4cm,
+	scale only axis,        % Plot size does not include axes.
+	enlargelimits=false,    % Shrink wrap the PNG.
+	axis on top,            % Axes placed over PNG to avoid obscuring the lines.
+	xlabel=Iterations,
+	ylabel=Perplexity,
+	]
+	\addplot graphics [
+	xmin=1,
+	xmax=150,
+	ymin=1181.23,
+	ymax=1192.63,
+	] {figures/jrc1bwglm.pdf};
+	\end{axis}
+	%     \begin{axis} [
+	%     	width=0.25\textwidth,
+	%         scale only axis,        % Plot size does not include axes.
+	%         enlargelimits=false,    % Shrink wrap the PNG.
+	%         axis on top,            % Axes placed over PNG to avoid obscuring the lines.
+	%         xlabel=Iterations,
+	%         xshift=0.33\textwidth
+	%     ]
+	%         \addplot graphics [
+	%             xmin=1,
+	%             xmax=150,
+	%             ymin=61.6039,
+	%             ymax=66.3028,
+	%         ] {jrcjrcglm.pdf};
+	%     \end{axis}
+	\begin{axis} [
+	%width=0.25\textwidth,
+	height=4cm,
+	scale only axis,        % Plot size does not include axes.
+	enlargelimits=false,    % Shrink wrap the PNG.
+	axis on top,            % Axes placed over PNG to avoid obscuring the lines.
+	xlabel=Iterations,
+	xshift=8cm
+	]
+	\addplot graphics [
+	xmin=1,
+	xmax=150,
+	ymin=13.2062,
+	ymax=13.3504,
+	] {figures/jrcjrcngram.pdf};
+	\end{axis}
+\end{tikzpicture}
+\caption{Variation over 10 runs. On the left is \jrc-\obw-\BOF, on the right is \jrc-\jrc-\BON. The red lines show the perplexity values for one of the 10 runs, and the blue lines show the min and max values per iteration over the 10 runs.}\label{fig:iterplots}
+\end{figure*}
+
+
+We evaluate on the test sets jrc and 1bw, trained on $n$-grams and skipgrams, with backoff strategies \emph{ngram} and \emph{full}, in ten individual runs with up to 150 iterations each, with the same training data. We measure perplexity on the respective test sets at every iteration. We find that there are only minor differences in perplexities between runs (maximal and minimal values denoted by the blue lines) with respect to the average over the 10 runs (the red line). This is the case in high-perplexity scenarios such as jrc-1bw-\emph{full}, with perplexities around 1184, and low-perplexity scenarios such as jrc-jrc-\emph{full} with perplexities around 13.2. The perplexities also converge quickly, within 50 iterations.
+%(although we do not take burn-in and autocorrelation between iterations into consideration).
