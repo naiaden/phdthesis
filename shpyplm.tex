@@ -284,6 +284,24 @@ From the 473 thousand patterns that obtained a lower perplexity we first discard
 We hardly observe any other patterns than these function-word patterns. 
 This may be caused by the fact that \emea is very domain-specific, and that matches on content words are unlikely to occur often. It may be precisely because of this feature of \emea that the skipgrams, extracted from \obw, are providing the kind of effective modelling of non-contiguous patterns to be able to skip unknown words and continue matching with (function) words further to the left.
 
+In the analysis we listed all 473k $n$-grams, and artificially added skips in the three possible manners, e.g.~\emph{in the previous section} has as three possible skipgrams \emph{in \{1\} previous section} (1), \emph{in the \{1\} section} (2), and \emph{in \{2\} section} (1,2). We then put occurrence ratio tresholds (20, 10, 5) on the words in the skips. For ratio 20 this means that if the skip is \{1\} that word must occur at most 20 times less than the least frequent of the three other words, and in case of \{2\} the two words must occur at most 20 times less than the least frequent of the other two words. This ratio models the suspicion that skipgrams are particularly useful in situations where the skip models a low-frequent word. 
+
+\begin{table*}
+	\begin{center}
+		\begin{tabular}{l*{3}{l}l*{3}{l}l*{3}{l}}
+			& \multicolumn{3}{c}{5} & & \multicolumn{3}{c}{10} & & \multicolumn{3}{c}{20} \\
+			& \obw & tokens & types & & \obw & tokens & types & & \obw & tokens & types \\
+			\cline{2-4}\cline{6-8}\cline{10-12}
+			1 & 7.5M & 3.6k & 1.9k & & 5.8M & 2.9k & 1.4k & & 4.4M & 2.2k & 1.0k \\
+			2 & 7.6M & 5.2k & 3.6k & & 5.9M & 4.2k & 2.1k & & 4.4M & 3.3k & 1.5k \\
+			1,2 & 5.2M & 2.9k & 526 & & 4.2M & 2.3k & 362 & & 3.3M & 1.8k & 258 \\
+		\end{tabular}
+		\caption{The number of patterns with skipped-word-ratio respectively in \obw, the number of skipgram token matches with the \emea test set, and the skipgram types that match with the frequency ratio filtered skipgrams. The rows denote the position of the skip (starting with index $0$), and the columns indicate the ratio in which the words in the skip must occur with respect to their surrounding words. This table shows that there are only few patterns that benefit from adding skipgrams.}\label{ta:skipratio}
+	\end{center}
+\end{table*}
+
+In the last phase we count all the skipgram types generated from the fourgrams that yielded a lower perplexity when adding skipgram features. Table~\ref{ta:skipratio} lists the occurrence counts of skipgram tokens and types for the 1bws-emea experiment where we varied the frequency ratio in which the skipped words must occur with respect to their surrounding words. It becomes apparent that only a limited number of patterns benefit from adding skipgrams as features.
+
 As an illustration we list in the last two columns of \cref{ta:examples} the five most frequent skipgrams types with the skip on position 2 and with occurrence ratio 20, and with a skip on position 3.
 
 %	If we look at which patterns are predicted better, and if we drop the concept of frequency ratio in skipgrams, then different patterns do emerge. For example, in the training data there is only one mention of `Merck Sharp \& Dohme'. Being a pharmaceutical company, there are many mentions in the test data (emea), but in more variations, such as: `Merck Sharp \& Dohme', `Merck Sharp and Dohme', `Merck Sharp E Dohme'. The pattern that attains a lower perplexity skips the third word. This is a case where skipgrams help with patterns that are not composed of function words.
@@ -424,5 +442,10 @@ In this subsection we briefly show an analysis of the variability of the perplex
 \end{figure*}
 
 
-We evaluate on the test sets jrc and 1bw, trained on $n$-grams and skipgrams, with backoff strategies \emph{ngram} and \emph{full}, in ten individual runs with up to 150 iterations each, with the same training data. We measure perplexity on the respective test sets at every iteration. We find that there are only minor differences in perplexities between runs (maximal and minimal values denoted by the blue lines) with respect to the average over the 10 runs (the red line). This is the case in high-perplexity scenarios such as jrc-1bw-\emph{full}, with perplexities around 1184, and low-perplexity scenarios such as jrc-jrc-\emph{full} with perplexities around 13.2. The perplexities also converge quickly, within 50 iterations.
-%(although we do not take burn-in and autocorrelation between iterations into consideration).
+We evaluate on the test sets \jrc and \obw, trained on $n$-grams and skipgrams, with backoff strategies \BON and \BOF}, in ten individual runs with up to 150 iterations each, with the same training data. We measure perplexity on the respective test sets at every iteration. We find that there are only minor differences in perplexities between runs (maximal and minimal values denoted by the blue lines) with respect to the average over the 10 runs (the red line). This is the case in high-perplexity scenarios such as \jrc-\obw-\BOF, with perplexities around 1184, and low-perplexity scenarios such as \jrc-\jrc-\BOF with perplexities around 13.2. The perplexities also converge quickly, within 50 iterations.
+\footnote{Although we do not take burn-in and autocorrelation between iterations into consideration.}
+
+\section{Discussion}
+In this paper we showed that by adding skipgrams, a simple generalisation of $n$-gram word patterns, we can reduce the perplexity of a Bayesian language model in a cross-domain language modelling task. The model, a Hierarchical Pitman-Yor Process Language Model (HPYLM) was observed to attain lower perplexities than the standard modified Kneser-Ney smoothing $n$-gram language model in all training-test conditions, confirming results reported in earlier work \cite{teh2006hierarchical}.
+
+Although the extension of HPYPLM to skipgrams is relatively easy to implement, it has a considerable impact on the complexity. Since the number of patterns almost doubles, so does the run-time of the learning phase. Compared to the modified Kneser-Ney implementation of SRILM, training the HPYLM is markedly slower. However, within a single iteration of sampling the approach already improves over modified Kneser-Ney. If one would halt here, runtime complexity is reduced to a factor two compared to modified Kneser-Ney with SRILM. The improvements of our HPYLM variant over the SRILM (and most other) modified Kneser-Ney implementations is that it can handle skipgrams in their full form. The testing phase of either methods is comparable in terms of computational complexity, which puts the HPYLM in a preferable position.
