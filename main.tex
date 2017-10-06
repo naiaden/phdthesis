@@ -8,6 +8,7 @@
 style=verbose,autocite=footnote,backend=biber,maxbibnames=99]{biblatex}
 \addbibresource{superpaper.bib}
 \AtEveryCitekey{\clearfield{booktitle}}
+\AtEveryCitekey{\clearfield{journaltitle}}
 \AtEveryCitekey{\clearfield{pages}}	
 \AtEveryCitekey{\clearfield{author}}
 \AtEveryCitekey{\clearfield{url}}
@@ -16,6 +17,7 @@ style=verbose,autocite=footnote,backend=biber,maxbibnames=99]{biblatex}
 \AtEveryCitekey{\clearfield{address}}
 \AtEveryCitekey{\clearfield{month}}
 \AtEveryCitekey{\clearfield{volume}}
+\AtEveryCitekey{\clearlist{organization}}
 
 
 \renewbibmacro{in:}{}
