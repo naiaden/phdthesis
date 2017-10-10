@@ -204,15 +204,15 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
  
     
     \subsection{Transcribed speech: Corpus Gesproken Nederlands (\cgn)}
-    For testing we use the Flemish part of the Spoken Dutch Corpus (CGN, and henceforth denoted as \cgn) \citep{oostdijk2000spoken} comprising 3 million words, divided over 15 components (see~\cref{tab:cgn}), ranging from spontaneous speech to read-aloud books. The corpus aimed to be a plausible sample of contemporary standard Dutch as spoken by adult speakers in Flanders and the Netherlands. One third of the data were to be collected in Flanders, the other two thirds were to originate from the Netherlands.
+    For testing we use the Flemish part of the Spoken Dutch Corpus (CGN, and henceforth denoted as \cgn)\autocite{oostdijk2000spoken} comprising 3 million words, divided over 15 components (see~\cref{tab:cgn}), ranging from spontaneous speech to read-aloud books. The corpus aimed to be a plausible sample of contemporary standard Dutch as spoken by adult speakers in Flanders and the Netherlands. One third of the data were to be collected in Flanders, the other two thirds were to originate from the Netherlands.
 
     \begin{table}
     	\begin{tabular}{llllllll}
                   & \obw & \emea & \jrc & \wp & \mediargus & \cgn & nbest \\ \cline{2-8}
-        	train & 769m & 12m & 31m & 1.4b & 1.3b &    & \\
-            test  & 8m   & 3m  & 8m  & 367m &      & 3m & 0.5m
+        	train & 769M & 12M & 31M & 1.4G & 1.3G &    & \\
+            test  & 8M   & 3M  & 8M  & 367M &      & 3M & 0.5M
         \end{tabular}
-        \caption[][-2em]{Summary of the number of words for each training and test set. m denote millions of words, and b denotes billions of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
+        \caption[][-2em]{Summary of the number of words for each training and test set. M denote millions of words, and G denotes billions ($10^9$) of words. Some pairs are not complete, which means that that particular part is not used in this thesis, for example, we have not trained models on \cgn. }
         \setfloatalignment{b}
     \end{table}
     
@@ -240,7 +240,7 @@ Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT
         \setfloatalignment{b}
     \end{table}
     
-    The second series of test sets are the Flemish parts of the NBest benchmark \cite{kessens2007n} (475 thousand words; the train, development and test sets). The benchmark was introduced to stimulate further development on Dutch ASR systems, and contain a wide variety of texts, among \mediargus and \cgn in the language models, and \cgn\footnote{Components f, i, j, k, l, c, and d.}  in the acoustic models.
+    The second series of test sets are the Flemish parts of the NBest benchmark\autocite{kessens2007n} (475 thousand words; the train, development and test sets). The benchmark was introduced to stimulate further development on Dutch ASR systems, and contain a wide variety of texts, among \mediargus and \cgn in the language models, and \cgn\footnote{Components f, i, j, k, l, c, and d.}  in the acoustic models.
  
     
 
