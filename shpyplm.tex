@@ -69,14 +69,14 @@ Suppose we have a collected the frequencies of patterns from \obw:\footnote{With
 	\item[0] bananas are \{1\} favourite fruit
 	\item[0] bananas are \{2\} fruit
 	\item[0] bananas are my \{1\} fruit
-\end{enumerate}\label{enum:minicorpus}\end{multicols}
-
-
-Then for all patterns in \cref{fig:bol} that occur in this corpus, we remove their backoff steps.
+\end{enumerate}\label{enum:minicorpus}\end{multicols}%
+%
+%
+\noindent Then for all patterns in \cref{fig:bol} that occur in this corpus, we remove their backoff steps.
 
 \input{figbol}
 
-In a setup with only $n$-gram features, \BON and \BOF are functionally the same in terms of backoff strategy. The nuance lies in the way they do the backoff. \BOF tries to backoff to skipgrams,\footnote{It tries, does not find the skipgram, since it is not trained on skipgrams, and continues with the backoff procedure.} independent of whether it was trained with skipgrams. The \BON strategy has only one way to get to the a-priori word probability. 
+In a setup with only $n$-gram features, \BON and \BOF are functionally the same in terms of backoff strategy. The nuance lies in the way they do the backoff. \BOF tries to backoff to skipgrams,\footnote[][5em]{It tries, does not find the skipgram, since it is not trained on skipgrams, and continues with the backoff procedure.} independent of whether it was trained with skipgrams. The \BON strategy has only one way to get to the a-priori word probability. 
 For \BOF it can get to the word probabilities for each skipgram that is generated, hence it puts more emphasis on the word probabilities.\footnote{Compare the number of paths to e in \cref{fig:bon} and \cref{fig:bof}.}
 
 Now for the formal definition of the strategies, for all strategies, we have that $p(w|\mathbf{u})=G_0(w)$ if $\mathbf{u} = \emptyset$. For \BON, the other case is defined as:
@@ -124,9 +124,7 @@ We test each model on different test sets, and we collect their intrinsic perfor
 \section{Results}
 In this section we describe the results of multiple experiments. First we compare the HPYPLM approach to a traditional $n$-gram language model. We then show the influence of using skipgrams in addition to $n$-grams, and investigate whether this influence holds in a cross-domain evaluation. Second, we compare the backoff strategies, and investigate which domains fit which backoff strategy best.
 \clearpage
-\autocite{pickhardt2014generalized} report perplexity values on two subsets of the test material of jrc-p and wp-p\footnote{\textbf{Tell something about this!!}}. Of particular interest are the values for $n =4$, where for training on \wp and testing on wp-p a perplexity of 404 is reported with MKN smoothing, and 378 with their generalised language model (GLM). Similarly for the \jrc and jrc-p, they show a reduction of perplexity from 83 with MKN to 81 with their GLM. In our attempts to reproduce these values with SRILM\autocite{stolcke2002srilm}, we found substantially lower perplexity values for MKN,
-\footnote{Lower perplexity values indicate a higher intrinsic performance, which is better.} as can be seen in \cref{tab:mknvsglm}.
-\footnote{We used the following program call: \texttt{ngram-count -kndiscount -gt3min 1 -gt4min 1 -order 4 -interpolate -kndiscount -unk}.}
+Pickhardt and colleagues\autocite{pickhardt2014generalized} report perplexity values on two subsets of the test material of jrc-p and wp-p\footnote{Both consist of 100 thousand $4$-gram patterns sampled from their respective test set, as described in \cref{chap:data}.}. Of particular interest are the values for $n =4$, where for training on \wp and testing on wp-p a perplexity of 404 is reported with MKN smoothing, and 378 with their generalised language model (GLM). Similarly for the \jrc and jrc-p, they show a reduction of perplexity from 83 with MKN to 81 with their GLM. In our attempts to reproduce these values with SRILM\autocite{stolcke2002srilm}, we found substantially lower perplexity values for MKN,\footnote{Lower perplexity values indicate a higher intrinsic performance, which is better.} as can be seen in \cref{tab:mknvsglm}.\footnote{We used the following program call: \texttt{ngram-count -kndiscount -gt3min 1 -gt4min 1 -order 4 -interpolate -kndiscount -unk}.}
  The rows represent the train corpora; columns represent the test corpora. Comparing our results with the perplexity values reported for the GLM thus yields an unfair comparison. For this reason we choose the baseline to be the perplexity values from SRILM.
 
 \begin{table*}
@@ -138,11 +136,11 @@ In this section we describe the results of multiple experiments. First we compar
 		\emea & 769 & 1552 & 4 & 1097 & 774 & 1093 & & 1115 & 1745 & 10 &1669 & 993 & 1444 \\
 		wps & 555 & 455 & 1005 & 217 & 537 & 212 & & 842 & 598 & 1590 & 449 & 1088 & 646
 	\end{tabular}
-	\caption{A side-by-side comparison of perplexities of two $n$-gram language models with $n=4$: the Bayesian hierarchical Pitman-Yor language model (HPYLM) and the frequentist modified Kneser-Ney, as implemented by SRILM. The rows represent the training corpora, and the columns the test sets. }\label{tab:mknvsglm}
+	\caption[][1.5em]{A side-by-side comparison of perplexities of two $n$-gram language models with $n=4$: the Bayesian hierarchical Pitman-Yor language model (HPYLM) and the frequentist modified Kneser-Ney, as implemented by SRILM. The rows represent the training corpora, and the columns the test sets. }\label{tab:mknvsglm}
 		%The two additional data sets jrc-p and wp-p are around 100k randomly selected 4-grams from jrc and wp respectively, as selected by \newcite{pickhardt2014generalized}. 
 \end{table*}
 
-\autocite{teh2006hierarchical} shows that the HPYPLM can outperform MKN. In our experiments we reach the same conclusion, on the basis of the results listed in \cref{tab:mknvsglm}. On the right we show the results with SRILM's implementation of MKN, now without sentence boundaries, equal to the settings of our HPYPLM. The perplexities obtained by the HPYPLM are consistently lower by a substantial margin.
+Teh\sidecite<12em>[]{teh2006hierarchical} shows that the HPYPLM can outperform MKN. In our experiments we reach the same conclusion, on the basis of the results listed in \cref{tab:mknvsglm}. On the right we show the results with SRILM's implementation of MKN, now without sentence boundaries, equal to the settings of our HPYPLM. The perplexities obtained by the HPYPLM are consistently lower by a substantial margin.
 
 Bayesian language models are more complex than their frequentist counterparts such as MKN. Not only the model itself is more complex, but also the computational complexity, both in terms of time and memory. On an Intel Xeon E5-2660 with 512G working memory it takes 3 days to compute the \obw model, and serialize the model to file. However, if we only use one iteration for sampling,\footnote{With zero sampling iterations, we have effectively reduced the HPYPLM to IKN.} we already achieve perplexities approaching the perplexities reported in \cref{tab:mknvsglm} with 50 iterations, in all setups. This one-iteration learning process does not alleviate the burden of memory complexity\footnote{The number of parameters only changes when a restaurant has no visitors, or when one is being founded. The number of customers stays constant over all sampling iterations.}, but training is now only a factor two slower than traditional MKN, and the performance is already notably better.
 Yet, in the remainder of this chapter we use 50 iterations for Gibbs sampling. For testing, once the model has been loaded into memory, there is no time penalty involved when choosing HPYPLM over MKN, which is an important property for extrinsic and time-dependent evaluation.
@@ -161,11 +159,11 @@ We also observe an effect of domain-specific versus generic corpora. The within-
 		\emea	& 600	& 1143	& 4		& 843	& & 581	& 1155	& 4		& 842	& & -3	& 1	& 1		& 0		\\
 		wps		& 555	& 455	& 1005	& 217	& & 565	& 470	& 990	& 227	& & 2	& 3	& -1	& 4
 	\end{tabular} 
-	\caption{An overview of the results to compare the influence and contribution of skipgrams for English. 
+	\caption[][1.5em]{An overview of the results to compare the influence and contribution of skipgrams for English. 
 		The perplexities can only be compared row-wise, as the vocabulary depends on the training set. For these values we chose the best-performing backoff strategy. The relative difference is the percentual change, with a negative value indicating an improvement with skipgrams.}\label{ta:ngramvsskipgram}
 \end{table*} 
 
-However, we find that adding skipgrams does tend to contribute to a lower perplexity in a cross-domain setting, with many non-diagonal cells showing lower perplexities. We observe absolute perplexity reductions up to 33, and relative reductions up to 3.2\%. We are mostly interested in the effects of training on a generic corpus, and testing on a domain-specific corpus: it is generally easier to obtain generic texts, and even if there is a corpus for that specific domain, there will always be more generic data. If it turns out that the generic corpora can be used to model domain-specific corpora without much deterioration, this paves the way to fully use the billion-word data sets that are currently available for many languages.\footnote{COW CORPUS} If we focus on the rows for \obw and \wp, we see that for the cross-domain setups with \jrc and \emea, the performance improves when we add skipgrams to the input features, except when we test \jrc trained on \wp.
+However, we find that adding skipgrams does tend to contribute to a lower perplexity in a cross-domain setting, with many non-diagonal cells showing lower perplexities. We observe absolute perplexity reductions up to 33, and relative reductions up to 3.2\%. We are mostly interested in the effects of training on a generic corpus, and testing on a domain-specific corpus: it is generally easier to obtain generic texts, and even if there is a corpus for that specific domain, there will always be more generic data. If it turns out that the generic corpora can be used to model domain-specific corpora without much deterioration, this paves the way to fully use the billion-word data sets that are currently available for many languages.\footnote{Corpora such as News on the Web (NOW), Wikipedia, Corpora from the Web (COW), inter alia.} If we focus on the rows for \obw and \wp, we see that for the cross-domain setups with \jrc and \emea, the performance improves when we add skipgrams to the input features, except when we test \jrc trained on \wp.
 
 In particular we focus on \obw for the remainder of this thesis, since compared to \wp, which contains articles in Wikipedia's encyclopaedic style, it contains a wider variety of text, and is less restricted in language use. Supported by the perplexity results, we consider \wp to be less generic.\footnote{This is independent of the number of words.} This is reflected in the perplexity scores as well, where a within-domain experiment on \wp (227 ppl) appears to be more difficult than on \obw (141 ppl). In the \obw-\wp and \wp-\obw experiments the perplexities are more in range, 542 and 470 respectively.
 
@@ -229,7 +227,7 @@ For within-domain we have reached a point where we have seen enough $n$-grams to
 	\addlegendentry{\emea \BOF}
 	\end{axis}
 	\end{tikzpicture}
-	\caption{Learning curve for training on \obw, and testing on \obw and \wp on the left, and \jrc and \emea on the right. The solid lines indicate the perplexity of the \BON model, the dotted line \BOL for testing on \obw, and the dashed lines \BOF for \jrc, \emea, and \wp.}\label{fig:1bwlc}
+	\caption[][1.5em]{Learning curve for training on \obw, and testing on \obw and \wp on the left, and \jrc and \emea on the right. The solid lines indicate the perplexity of the \BON model, the dotted line \BOL for testing on \obw, and the dashed lines \BOF for \jrc, \emea, and \wp.}\label{fig:1bwlc}
 \end{figure*}
 
  \section{Behaviour of the Language Models}
@@ -255,7 +253,7 @@ In this section we approach the question from three different angles. First we c
 		product \{1\} due to & & see section \{1\} ) & & The \{1\} of the & & of the \{1\} of\\
 		result \{1\} due to & & of \{2\} and & & and \{1\} of the & & of the \{1\} . \\
 	\end{tabular}
-	\caption{First column contains the 5 most-helpful patterns; the second column the 5 most-frequently helpful patterns. The third and fourth column contain the top-5 most-frequent skipgrams with their frequency, with the skip on the second (left) and third (right) position, when the skipped word is 20 or more times less frequent than the least frequent word in the skipgram.}\label{ta:examples}
+	\caption[][1.5em]{First column contains the 5 most-helpful patterns; the second column the 5 most-frequently helpful patterns. The third and fourth column contain the top-5 most-frequent skipgrams with their frequency, with the skip on the second (left) and third (right) position, when the skipped word is 20 or more times less frequent than the least frequent word in the skipgram.}\label{ta:examples}
 \end{table*}
 
 
@@ -296,7 +294,7 @@ In the analysis we listed all 473k $n$-grams, and artificially added skips in th
 			2 & 7.6M & 5.2k & 3.6k & & 5.9M & 4.2k & 2.1k & & 4.4M & 3.3k & 1.5k \\
 			1,2 & 5.2M & 2.9k & 526 & & 4.2M & 2.3k & 362 & & 3.3M & 1.8k & 258 \\
 		\end{tabular}
-		\caption{The number of patterns with skipped-word-ratio respectively in \obw, the number of skipgram token matches with the \emea test set, and the skipgram types that match with the frequency ratio filtered skipgrams. The rows denote the position of the skip (starting with index $0$), and the columns indicate the ratio in which the words in the skip must occur with respect to their surrounding words. This table shows that there are only few patterns that benefit from adding skipgrams.}\label{ta:skipratio}
+		\caption[][0.5em]{The number of patterns with skipped-word-ratio respectively in \obw, the number of skipgram token matches with the \emea test set, and the skipgram types that match with the frequency ratio filtered skipgrams. The rows denote the position of the skip (starting with index $0$), and the columns indicate the ratio in which the words in the skip must occur with respect to their surrounding words. This table shows that there are only few patterns that benefit from adding skipgrams.}\label{ta:skipratio}
 	\end{center}
 \end{table*}
 
@@ -442,8 +440,7 @@ In this subsection we briefly show an analysis of the variability of the perplex
 \end{figure*}
 
 
-We evaluate on the test sets \jrc and \obw, trained on $n$-grams and skipgrams, with backoff strategies \BON and \BOF, in ten individual runs with up to 150 iterations each, with the same training data. We measure perplexity on the respective test sets at every iteration. We find that there are only minor differences in perplexities between runs (maximal and minimal values denoted by the blue lines) with respect to the average over the 10 runs (the red line). This is the case in high-perplexity scenarios such as \jrc-\obw-\BOF, with perplexities around 1184, and low-perplexity scenarios such as \jrc-\jrc-\BOF with perplexities around 13.2. The perplexities also converge quickly, within 50 iterations.
-\footnote{Although we do not take burn-in and autocorrelation between iterations into consideration.}
+We evaluate on the test sets \jrc and \obw, trained on $n$-grams and skipgrams, with backoff strategies \BON and \BOF, in ten individual runs with up to 150 iterations each, with the same training data. We measure perplexity on the respective test sets at every iteration. We find that there are only minor differences in perplexities between runs (maximal and minimal values denoted by the blue lines) with respect to the average over the 10 runs (the red line). This is the case in high-perplexity scenarios such as \jrc-\obw-\BOF, with perplexities around 1184, and low-perplexity scenarios such as \jrc-\jrc-\BOF with perplexities around 13.2. The perplexities also converge quickly, within 50 iterations.\footnote{Although we do not take burn-in and autocorrelation between iterations into consideration.}
 
 \section{Discussion}
 In this paper we showed that by adding skipgrams, a simple generalisation of $n$-gram word patterns, we can reduce the perplexity of a Bayesian language model in a cross-domain language modelling task. The model, a Hierarchical Pitman-Yor Process Language Model (HPYPLM) was observed to attain lower perplexities than the standard modified Kneser-Ney smoothing $n$-gram language model in all training-test conditions, confirming results reported in earlier work \autocite{teh2006hierarchical}.

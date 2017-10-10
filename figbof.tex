@@ -2,7 +2,7 @@
     \begin{tikzpicture}[every node/.style={node distance=10pt, rectangle, minimum size=1cm}]
 	\node[rectangle, minimum size=1cm](abcde) {abcde};
 %     % I [above right=0.7cm and 4cm of A]
-    \node[above left=0cm and 1cm of abcde](abcxe) {abc\{1\}e};
+    \node[above left=0cm and 1.2cm of abcde](abcxe) {abc\{1\}e};
     \node[above=of abcxe](axcxe1) {a\{1\}c\{1\}e};
     \node[left=of axcxe1](bcxe1) {bc\{1\}e};
     \node[right=of axcxe1](abxxe1) {ab\{2\}e};
@@ -10,6 +10,7 @@
     \node[above=of axcxe1](bxxe1) {b\{2\}e};
     \node[above=of abxxe1](axxxe1) {a\{3\}e};
     \node[above=of bxxe1](e1) {e};
+    \node[above=of e1](empty1) {.};
    %\draw (abxde) -> (bxde1);
     \draw (abcxe) -> (abxxe1);
     \draw (abcxe) -> (axcxe1);
@@ -23,8 +24,9 @@
     \draw (axxxe1) -> (e1);
     \draw (bxxe1) -> (e1);
     \draw (cxe1) -> (e1);
+    \draw (e1) -> (empty1);
 %     % II
-    \node[above right=0cm and 1cm of abcde](axcde) {a\{1\}cde};
+    \node[above right=0cm and 0.8cm of abcde](axcde) {a\{1\}cde};
     \node[above=of axcde](axxde1) {a\{2\}de};
     \node[left=of axxde1](cde1) {cde};
     \node[right=of axxde1](axcxe2) {a\{1\}c\{1\}e};   
@@ -32,6 +34,7 @@
     \node[left=of cxe2](de1) {de};
     \node[right=of cxe2](axxxe2) {a\{3\}e}; %
     \node[above=of cxe2](e2) {e};
+    \node[above=of e2](empty2) {.};
     \draw (abxde) -> (bxde1);
     \draw (axcde) -> (axcxe2);
     \draw (axcde) -> (axxde1);
@@ -45,14 +48,16 @@
     \draw (de1) -> (e2);
     \draw (axxxe2) -> (e2);
     \draw (axcxe2) -> (cxe2);
+    \draw (e2) -> (empty2);
     % III %% below
-    \node[above left=0cm and 5.5cm of abcde](abxde) {ab\{1\}de};
+    \node[above left=0cm and 5.7cm of abcde](abxde) {ab\{1\}de};
     \node[above=of abxde](axxde2) {a\{2\}de};
     \node[left=of axxde2](bxde1) {b\{1\}de};
     \node[right=of axxde2](abxxe2) {ab\{2\}e};
     \node[above = of $(bxde1)!0.5!(axxde2)$](de2) {de};
     \node[above = of $(axxde2)!0.5!(abxxe2)$](bxxe2) {b\{2\}e};
     \node[above = of $(de2)!0.5!(bxxe2)$](e3) {e};
+    \node[above = of e3](empty3) {.};
     \draw (abxde) -> (bxde1);
     \draw (abxde) -> (axxde2);
     \draw (abxde) -> (abxxe2);
@@ -61,8 +66,9 @@
     \draw (abxxe2) -> (bxxe2);
     \draw (de2) -> (e3);
     \draw (bxxe2) -> (e3);
+    \draw (e3) -> (empty3);
     % IV %% below
-    \node[above right=0cm and 5.5cm of abcde](bcde) {bcde};
+    \node[above right=0cm and 6cm of abcde](bcde) {bcde};
     \node[above=of bcde](bcxe2) {bc\{1\}e};
     \node[left=of bcxe2](bxde2) {b\{1\}de};
     \node[right=of bcxe2](cde2) {cde};
@@ -70,6 +76,7 @@
     \node[left=of de3](bxxe3) {b\{2\}e};
     \node[right=of de3](cxe3) {c\{1\}e};
     \node[above=of de3](e4) {e};
+    \node[above=of e4](empty4) {.};
     \draw (bcde) -> (bxde2);
     \draw (bcde) -> (bcxe2);
     \draw (bcde) -> (cde2);
@@ -82,6 +89,7 @@
     \draw (bxxe3) -> (e4);
     \draw (de3) -> (e4);
     \draw (cxe3) -> (e4);
+    \draw (e4) -> (empty4);
     %
     \draw (abcde) -> (abcxe);
     \draw (abcde) -> (bcde);
