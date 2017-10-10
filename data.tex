@@ -89,7 +89,7 @@ For the experiments on English we use four corpora: one large generic mixed-doma
     
     
     \section{Analysis of cross-corpora OOV and hit rates}
-Most corpora comprise a coherent set of texts that share certain properties. This can be because of phenomena that you want to investigate, such as the usage of constructs of language, or in diachronic corpora where you can track changes in meaning of words. With the inherent differences in usage for the corpora, the most obvious differences are the words.
+Most corpora comprise a coherent set of texts that share certain properties. The composition of the corpus and properties of the texts may be selected or sampled because of a specific research question concerning a phenomenon, such as genre-specific fixed phrases, or diachronic change of word meanings. With the inherent differences in usage for the corpora, the most obvious differences are the words.
 
 \begin{figure*}
 	%	\centering
@@ -164,7 +164,7 @@ Most corpora comprise a coherent set of texts that share certain properties. Thi
 	\caption[][2em]{The plots show the difference in word use, by means of their word ranks and frequency. The blue line represents the training data, the red line the test data. These lines are comparable, modulo the difference in size. The other two lines are the other two corpora. Not only do they differ in size, but compared to the training corpus they do not follow it's Zipf's law.}
 \end{figure*}
 
-The problem with out-of-vocabulary words is not only that you do not learn specific probabilities per OOV word\footnote{Unlike all the other words that are in the vocabulary.}, but also that you have to resort to other means such as a specific OOV probability, or using a hierarchical structure with a character language model.
+The problem with out-of-vocabulary words is not only that the specific probabilities per OOV word\footnote{Unlike all the other words that are in the vocabulary.} cannot be learned, but also that you have to resort to other means such as a specific OOV probability, or using a hierarchical structure with a character language model.
 
 The second problem is that perplexity is the default evaluation criterion for language models, and OOV words are not considered when computing perplexity. This has many implications, especially since the evaluation can hardly be used for downstream tasks where OOV words are a real issue.
 
@@ -176,11 +176,11 @@ Similarly, it is also interesting to look at the hit rates for the higher order 
 % For the other test corpora this number is obviously much lower. 
 In the same table it also shows that the coverage with \emea as training corpus is much lower compared than \obw.
     
-\section{Flemish-Dutch data}
+\section{Dutch data}
 \subsection{Newspaper texts: Mediargus corpus (\mediargus)}
-For the experiments on Flemish-Dutch data, we use the Mediargus corpus as training material. It contains 5 years of newspaper texts from 12 Flemish newspapers and magazines, totaling 1.4 billion words.
+For the experiments on Dutch data, we use the Mediargus corpus as training material. It contains 5 years of newspaper texts from 12 Dutch newspapers and magazines in Flanders, totaling 1.4 billion words.
 
-Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT, the department of Electrotechnical Engineering at the KU Leuven obtained the texts from Mediargus, the supplier for Southern Dutch news paper texts for language model training. The corpus is also not publicly available.} we briefly introduce it here.
+Since there is no official paper introducing the Mediargus corpus,\footnote{ESAT, the department of Electrical Engineering at the KU Leuven obtained the texts from Mediargus, the supplier for Southern Dutch news paper texts for language model training. The corpus is also not publicly available.} we briefly introduce it here.
 
 \begin{table}
 	\begin{tabular}{ll}
