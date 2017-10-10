@@ -1,6 +1,9 @@
 \documentclass[nobib]{tufte-book}
 \usepackage[maxfloats=255]{morefloats}
 
+\usepackage{xparse}
+\usepackage{xpatch}
+
 %\hypersetup{colorlinks}% uncomment this line if you prefer colored hyperlinks (e.g., for onscreen viewing)
 
 \usepackage{hyphenat}
@@ -24,6 +27,32 @@ style=verbose,autocite=footnote,backend=biber,maxbibnames=99, backref=true, back
 
 
 \renewbibmacro{in:}{}
+
+\makeatletter
+\xpatchcmd{\@footnotetext}%
+{\color@begingroup}
+{\color@begingroup\toggletrue{blx@footnote}}
+{}
+{}
+\makeatother
+
+\DeclareCiteCommand{\sidecitehelper}[\bibfootnotewrapper]
+{\usebibmacro{prenote}}
+{\usebibmacro{citeindex}%
+	\usebibmacro{cite}}
+{\multicitedelim}
+{\usebibmacro{cite:postnote}}
+
+\ExplSyntaxOn
+\NewDocumentCommand\sidecite{D<>{}O{}om}{%
+	\iftoggle{blx@footnote}
+	{\cs_set_protected_nopar:Npn \__sct_wrapper:nn ##1 ##2 {\mkbibparens{##2}}}
+	{\cs_set_protected_nopar:Npn \__sct_wrapper:nn ##1 ##2 {\sidenote[][##1]{##2}}}
+	{\IfNoValueTF{#3}
+		{\__sct_wrapper:nn{#1}{\sidecitehelper[#2]{#4}}}
+		{\__sct_wrapper:nn{#1}{\sidecitehelper[#2][#3]{#4}}}}
+}
+\ExplSyntaxOff
 
 %\usepackage{etoolbox}
 \usepackage{pgfplotstable}
@@ -307,11 +336,11 @@ box/.style={%draw,%
 %\input{introduction}
 %\input{languagemodels}
 %\input{bayesianstuff}
-%\input{data}
+\input{data}
 
 
 %%\part{Intrinsic evaluation}
-\input{shpyplm}
+%\input{shpyplm}
 %\input{interpolation}
 %%\chapter{Domain-adaptation with a double hierarchical Pitman-Yor skipgram language model}
 
