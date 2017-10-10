@@ -1,50 +1,50 @@
 \chapter{Chapter 3\newline Introduction to the data}\label{chap:data}
-\newthought{The results that we present} later in this thesis are the outcome of many experiments that we ran, on different data sets, with different settings. We used multiple data sets to investigate the effect of performance in cross-domain settings, and did this for two languages: English and Flemish-Dutch.\footnote{Since the experiments on improving automatic speech recognition are being done at the KU Leuven, we use their acoustic models. These acoustic models are trained on the Flemish-Dutch part of the Dutch spoken corpus (introduced later in this section), and are part of an automatic speech recogniser for Flemish-Dutch speech (see~\cref{ch:speech}).} 
+\newthought{The results that we present} later in this thesis are the outcome of many experiments that we ran, on different data sets, with different settings. We used multiple data sets to investigate the effect of performance in cross-domain settings, and did this for two languages: English and Dutch, in particular the Dutch that is being spoken in Flanders.\footnote{Since the experiments on improving automatic speech recognition are carried out at the KU Leuven, we use their acoustic models. These acoustic models are trained on the Flemish-Dutch part of the Dutch spoken corpus (introduced later in this section), and are part of an automatic speech recogniser for Flemish-Dutch speech (see~\cref{ch:speech}).} 
 
-In this section we introduce these data sets individually, and throughout the thesis we will refer back to this section for the details of the data sets.
+In this section we introduce these data sets, and throughout the thesis we will refer back to this section for the details of the data sets.
 
 \section{English data}
 For the experiments on English we use four corpora: one large generic mixed-domain news corpus and two smaller domain-specific corpora. %Although the two generic corpora comprise encyclopedic and news texts, we consider them less domain-specific.\footnote{waarom vinden we dit?}
   
-  \subsection{\obw}
+  \subsection{News commentary: One billion word benchmark (\obw)}
   
-  The first generic corpus is the Google 1 billion word benchmark for measuring progress in statistical language modelling (henceforth \obw). It comprises shuffled web corpus of 769 million tokens.\cite{chelba2013one} For training we use sets 1 through 100, out of the 101 available training sets; for testing we use all available 50 test sets (8 million tokens).
+  The first generic corpus is the Google 1 billion word benchmark for measuring progress in statistical language modelling (henceforth \obw). It comprises a shuffled web corpus of 769 million tokens.\autocite{chelba2013one} For training we use sets 1 through 100, out of the 101 available training sets; for testing we use all available 50 test sets (8 million tokens).
   
-  The corpus is based on the corpora provided for the sixth workshop on machine translation (WMT11). They only used the English part, as other languages were also available to use for training machine translation systems. For postprocessing duplicate sentences were removed, sentences were shuffled into a random order\footnote{Whilst maintaining the order within the sentences}, and a word type threshold of 3 was used. The word types that did not make the threshold were mapped to an UNK-token.
+  The corpus is based on the corpora provided for the sixth workshop on machine translation (WMT11). Chelba and colleagues only used the English part of the News Crawl data.\footnote{reference} For postprocessing they removed duplicate sentences, sentences were shuffled into a random order\footnote{Whilst maintaining the order within the sentences}, and a word type threshold of 3 was used. The word types that did not make the threshold were mapped to an UNK-token.
   
   This resulted in a corpus of 800 million tokens with sentences markers\footnote{1 begin of sentence and 1 end of sentence marker}, and around 793 thousand word types.
   
-% \subsection{\wp}
-%  The second generic corpus, is a Wikipedia snapshot (henceforth \wp) of November 2013 as used and provided by \textcite{pickhardt2014generalized}. 
-%  
-%  The data consists of Wikipedia articles which are not postprocessed, except for cleaning of the markup, and tokenisation\footnote{``We filtered the word tokens by removing all character sequences which did not contain any letter, digit or common punctuation marks.''}.
-%  
-%  However, we find that some of the tokenisation is too rigorous, as this has introduced errors such as separating abbreviations:
-%  
-%  \begin{quote}The vacuum state is defined as the state with no particle or antiparticle , i . e . , and . </s>\footnote{This example also lacks the formulae before and after `and': ``$a_k |0\rangle=0$ and $b_k |0\rangle=0$''.}\end{quote}
-%  
-%  \begin{quote}All of Solzhenitsyn's sons became U . S . citizens . </s>\footnote{Especially when the final dot of U . S . is also the sentence final punctuation, this is misleading.}\end{quote}
-%  Other frequently occurring errors are runons such as 
-%  
-%  \begin{quote}Stephen C Kleene defined as his nowfamousThesis Iknown as the ChurchTuring thesis . </s>\end{quote}
-%  where dashes and quotation marks have been stripped, as well as whitespace; and boxed content is not always separated from the main text, which causes a lot of tables and other marked-up context to be in the data.
-%  
-%  In total the data comprises 1.4 billion words for training and 367 million words for testing.
+ \subsection{Encyclopaedic articles: Wikipedia corpus (\wp)}
+  The second generic corpus, is a Wikipedia snapshot (henceforth \wp) of November 2013 as used and provided by \textcite{pickhardt2014generalized}. 
+  
+  The data consists of Wikipedia articles which are not postprocessed, except for cleaning of the markup, and tokenisation\footnote{``We filtered the word tokens by removing all character sequences which did not contain any letter, digit or common punctuation marks.''}.
+  
+  However, we find that some of the tokenisation is too rigorous, as this has introduced errors such as separating abbreviations:
+  
+  \begin{quote}The vacuum state is defined as the state with no particle or antiparticle , i . e . , and . </s>\footnote{This example also lacks the formulae before and after `and': ``$a_k |0\rangle=0$ and $b_k |0\rangle=0$''.}\end{quote}
+  
+  \begin{quote}All of Solzhenitsyn's sons became U . S . citizens . </s>\footnote{Especially when the final dot of U . S . is also the sentence final punctuation, this is misleading.}\end{quote}
+  Other frequently occurring errors are runons such as 
+  
+  \begin{quote}Stephen C Kleene defined as his nowfamousThesis Iknown as the ChurchTuring thesis . </s>\end{quote}
+  where dashes and quotation marks have been stripped, as well as whitespace; and boxed content is not always separated from the main text, which causes a lot of tables and other marked-up context to be in the data.
+  
+  In total the data comprises 1.4 billion words for training and 367 million words for testing.
 
-   \subsection{\jrc}
+   \subsection{Legislative texts: JRC-Acquis corpus (\jrc)}
   The first domain-specific corpus is from JRC-Acquis v3.0\cite{steinberger2006jrc}, which contains legislative text of the European Union. It is part of the joint research centre collection of the Acquis Communautaire\footnote{The Acquis Communautaire (AC) is the total body of European Union (EU) law applicable in the the EU Member States.} in 22 of the official languages of the European Union. The collection comprises selected texts written between the 1950s and 2007.
   
-  We only use the English part of this parallel-aligned multilingual corpus. We shuffle the sentences and create a train (31 million words, 288 thousand types) and test split (8 million words).
+  We only use the English part of this parallel-aligned multilingual corpus. We shuffle the sentences and create a training (31 million words, 288 thousand types) and test split (8 million words).
     
    
-  \subsection{\emea}
-  The second domain-specific corpus consists of converted\footnote{The composers of the corpus note that there are known problems with tables and multi-column layouts, as the documents are converted with \texttt{pdftotext}.} PDF documents from the European Medicines Agency, EMEA\cite{tiedemann2009news}. Similar to \jrc, \emea is the English part of the multilingual aligned parallel corpus.
+  \subsection{Biomedical texts: European Medicines Agency corpus (\emea)}
+  The second domain-specific corpus consists of converted\footnote{The composers of the corpus note that there are known problems with tables and multi-column layouts, as the documents are converted with \texttt{pdftotext}.} PDF documents from the European Medicines Agency, EMEA\autocite{tiedemann2009news}. Similar to \jrc, \emea is the English part of the multilingual aligned parallel corpus.
   
   We shuffled all sentences, and selected 20\% of them as the test set (3 million tokens), and the remaining 80\% was reserved for training (12 million tokens, 61 thousand types).
   
   
   \subsection{Data handling}
-	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model.\footnote[][-3em]{\label{fn:shareghi}This area is still under investigation, as this topic of memory expensiveness is addressed in recent papers such as: \cite{shareghi2017compressed}} We used a high occurrence threshold of 100 on the unigrams,\footnote{Compared the original threshold of 3 used in the corpus.} yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs\footnote{We map their UNK type to our \emph{\{?\}}.} occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Recent work such as mentioned in \cref{fn:shareghi} do not report on the number of types, making it hard to compare our memory usage to theirs.}
+	Since the HPYLM uses a substantial amount of memory, even with histogram-based sampling, we cannot model the complete 1bw data set without thresholding the patterns in the model.\footnote[][-3em]{\label{fn:shareghi}This area is still under investigation, as this topic of memory expensiveness is addressed in recent papers such as: \autocite{shareghi2017compressed}} We used a high occurrence threshold of 100 on the unigrams,\footnote{Compared the original threshold of 3 used in the corpus.} yielding 99,553 types that occur above this threshold. We use all $n$-grams and skipgrams that occurred at least twice, consisting of the included unigrams as focus words, with UNKs\footnote{We map their UNK type to our \emph{\{?\}}.} occupying the positions of words not in the vocabulary. Note that because these settings are different from models competing on this benchmark, the results in this paper cannot be compared to those results.\footnote{Recent work such as mentioned in \cref{fn:shareghi} do not report on the number of types, making it hard to compare our memory usage to theirs.}
     
 % hit rates: 
 % determine: colibri-patternmodeller -i /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.patternmodel -f /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.dat -c /vol/tensusers/lonrust/slm/models/1bw_4S_W100_t2_T2_s10_p0_v2_train.cls -l 4 -m 4 -u -P | cut -f 1 > /scratch/lonrust/train-1bw.4gram 
