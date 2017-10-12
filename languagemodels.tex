@@ -157,7 +157,7 @@ In \cref{fig:maxgrowth} we added the maximum number of possible $n$-grams to the
 \subsection{Skipgrams}\marginnote{With the surge of neural network-based language models, the meaning of the word skipgram has shifted from being an $n$-gram with a skipped word, to the skipgram paradigm in word2vec. In our case skipgrams are not in the output of the model, but rather on the input side, and do not have a fixed amount of left and right context.}
 A problem of $n$-gram models is that they can only model contiguous sequences of words; this rules out any form of long-distance relationship\footnote{With long-distance we mean spanning over multiple words. Not necessarily the dependency-tree interpretation between words.} between words. A common example is the interjection of an adjective between a determiner and a noun: \emph{the delicious banana}, \emph{the yellow banana}. To give the model expressive power to such examples, we introduce the skipgram language model, where we now allow $n$-grams to contain a abitrary number of skips, where each skip represents skipping one word. 
 
-Let us first formally introduce the skipgrams as used in this thesis. Let $\{m\}$ be a skip of length $m$, then \emph{the $\{1\}$ banana} can match \emph{the delicious banana}, or \emph{the yellow banana}, etc. We do not allow skips to be at the beginning or end of the skipgram, so for $n>2$ skipgrams are a generalisation of $n$-grams \cite{goodman2001bit,shazeer2015sparse,Pickhardt2014GLM}.
+Let us first formally introduce the skipgrams as used in this thesis. Let $\{m\}$ be a skip of length $m$, then \emph{the $\{1\}$ banana} can match \emph{the delicious banana}, or \emph{the yellow banana}, etc. We do not allow skips to be at the beginning or end of the skipgram, so for $n>2$ skipgrams are a generalisation of $n$-grams \autocite{goodman2001bit,shazeer2015sparse,Pickhardt2014GLM}.
 
 Now let $\sigma_{\rotatebox[origin=c]{180}{m}}$ be the operator that adds a skip to a pattern $\mathbf{u}$ on the $\rotatebox[origin=c]{180}{m}$th position if there is not already a skip. Then $\boldsymbol\sigma(\mathbf{u}) \left[\sigma_{\rotatebox[origin=c]{180}{m}}(\mathbf{u})\right]_{\rotatebox[origin=c]{180}{m}=2}^{|\mathbf{u}|-1}$ is the set of patterns with one skip more than the number of skips currently in $\mathbf{u}$. 
 
@@ -165,7 +165,7 @@ Now let $\sigma_{\rotatebox[origin=c]{180}{m}}$ be the operator that adds a skip
 
 For a 4-gram $\mathbf{u}w$ = \emph{ate the ripe banana}, $\sigma_2(\mathbf{u}w)$ = \emph{ate \{1\} ripe banana}, $\sigma_3(\mathbf{u}w)$ = \emph{ate the \{1\} banana}, and $\boldsymbol\sigma(\mathbf{u}w) = \left[\sigma_2(\mathbf{u}), \sigma_3(\mathbf{u})\right]$. To get to the 4-gram with two skips, we apply the operator on a skipgram that already contains a skip, e.g.~$\sigma_3(\sigma_2(\mathbf{u}w))$ = \emph{the \{1\} \{1\} banana}.\footnote{We can abbreviate this skipgram to \emph{ate \{2\} banana}.}
 
-This definition limits to one additional skip per application of the operator.\footnote{The main reason to limit only adding one skip per application is because in the backoff procedure skipgrams with more skips have a probability that is in a different range compared to skipgrams with less skips. When in a later stage this probabilities are interpolated, this undoes the expressive power, because one of the two completely overpowers the other. In the current implementation at least the number of content-bearing words is the same after the application of the skipgram operator.} However, the skipgram can be generalised further into a flexgram\cite{gompel2016efficient}, but this is computationally even more expensive than skipgrams, and preliminary results show no further improvements over just using skipgrams.
+This definition limits to one additional skip per application of the operator.\footnote{The main reason to limit only adding one skip per application is because in the backoff procedure skipgrams with more skips have a probability that is in a different range compared to skipgrams with less skips. When in a later stage this probabilities are interpolated, this undoes the expressive power, because one of the two completely overpowers the other. In the current implementation at least the number of content-bearing words is the same after the application of the skipgram operator.} However, the skipgram can be generalised further into a flexgram\autocite{gompel2016efficient}, but this is computationally even more expensive than skipgrams, and preliminary results show no further improvements over just using skipgrams.
 
 Remember that we extend a language model to overcome the problem of poor generalisation, especially in scenarios where many OOVs are encountered, this hurts the performance. With skipgrams we can on one hand partially solve the sparseness of $n$-grams, without losing the information of word order, and on the other hand we now have a mechanism to jump over unknown words.
 
@@ -173,7 +173,7 @@ But this is not the end of the story, since we also have to change the models to
 
 
 \section{Smoothing, Interpolation, and Backoff Methods}
-Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation. On the other hand we observe that many of these trigrams have count zero\footnote{Combine the large feature space with relatively few observations, of which the elements mostly occur in standard patterns, and it is clear that we are dealing with a very sparse feature space.}, which causes divisions by zero in \cref{eq:pmle}. For many language modelling applications such as automatic speech recognition, having zero $n$-gram probabilities implies that such word sequence can never be hypothesised. Generally, we want to assign non-zero probabilities to all $n$-grams.\cite{jevtic2005estimation}
+Earlier we saw that even for a small vocabulary of $50000$ words and a trigram language model, we have to model $O(50000^3)$ parameters. With this number of parameters, we can model the train data very precisely, which as a result causes severe overfitting on train data, especially in the context of maximum-likelihood estimation. On the other hand we observe that many of these trigrams have count zero\footnote{Combine the large feature space with relatively few observations, of which the elements mostly occur in standard patterns, and it is clear that we are dealing with a very sparse feature space.}, which causes divisions by zero in \cref{eq:pmle}. For many language modelling applications such as automatic speech recognition, having zero $n$-gram probabilities implies that such word sequence can never be hypothesised. Generally, we want to assign non-zero probabilities to all $n$-grams.\autocite{jevtic2005estimation}
 
 One of the first ways to overcome assigning a zero probability to an $n$-gram, is to smooth the probability distribution, and adjust the empirical counts to expected counts.
 
@@ -193,7 +193,7 @@ Another tool is backoff. One of the basic techniques involves subtracting a smal
         \alpha_{\operatorname{uni}}(\mathbf{u}), & c(\mathbf{u}w) = 0\textnormal{ unseen}
     \end{cases}\right.
 \end{equation}
-which describes uniform backoff. To ensure that $\sum_wp(w|\mathbf{u})=1$, \cite{chen1996empirical} define $N_{1+}(\mathbf{u}\cdot) = |\{w:c(\mathbf{u}w) > 0\}|$ and
+which describes uniform backoff. To ensure that $\sum_wp(w|\mathbf{u})=1$, \autocite{chen1996empirical} define $N_{1+}(\mathbf{u}\cdot) = |\{w:c(\mathbf{u}w) > 0\}|$ and
 \begin{equation}
 \alpha_{\operatorname{uni}}(\mathbf{u}) = \frac{D}{\sum_{w'}c(\mathbf{u}w')}\frac{N_{1+}(\mathbf{u}\cdot)}{W - N_{1+}(\mathbf{u}\cdot)}.
 \end{equation}
@@ -209,7 +209,7 @@ In some cases you have bigrams with the same frequency count, but with different
     \alpha_{\operatorname{prop}}(\mathbf{u}) =& \frac{1 - \sum_{N_{1+}}p_{\operatorname{prop}}(w|\mathbf{u})}{1 - \sum_{N_{1+}}p_{\operatorname{prop}}(w|\pi(\mathbf{u}))}
 \end{split}\end{equation}
 
-Now we have the issue that with proportional backoff smoothing, equally observed $n$-grams with the same history have the same probability. We want to create a bias towards a more frequently occurring focus word. One approach would be to interpolate all $n$-gram probabilities with the lower-order backoff model, independent of whether the $n$-grams are observed. This method is known as absolute discounting\cite{ney1994structuring}:
+Now we have the issue that with proportional backoff smoothing, equally observed $n$-grams with the same history have the same probability. We want to create a bias towards a more frequently occurring focus word. One approach would be to interpolate all $n$-gram probabilities with the lower-order backoff model, independent of whether the $n$-grams are observed. This method is known as absolute discounting\autocite{ney1994structuring}:
 \begin{equation}\begin{split}
 p_{\operatorname{abs}}(w|\mathbf{u})=&\frac{\max(c(\mathbf{u}w)-D,0)}{\sum_{w'}c(\mathbf{u}w')} + \alpha_{\operatorname{abs}}(\mathbf{u})p_{\operatorname{abs}}(w|\pi(\mathbf{u})) \\
 \alpha_{\operatorname{abs}}(\mathbf{u})=&\frac{D\cdot N_{1+}(\mathbf{u}\cdot)}{\sum_{w'}c(\mathbf{u}w')}
@@ -223,7 +223,7 @@ where $N_{1}(\cdot)$ and $N_{1}(\cdot)$ are the number of $n$-grams that appear 
 \subsection{Kneser-Ney}
 With $n$-gram models we take the context of a word into consideration, but not the diversity of history for a word. For example, the word \emph{bulb} might be fairly frequent in a corpus, though very likely, its preceding word will be \emph{light}. The idea with Kneser-Ney smoothing is then to give less probability to the unigram \emph{bulb} than its raw could suggests, taking into account the diversity of history.
 
-In its simplest form\cite{kneser1995improved} Kneser-Ney smoothing replaces the raw word count $c(w)$ from MLE with the count of histories for a word. For example,  
+In its simplest form\autocite{kneser1995improved} Kneser-Ney smoothing replaces the raw word count $c(w)$ from MLE with the count of histories for a word. For example,  
 \begin{equation}
 p_{\operatorname{KN}}(w) = \frac{N_{1+} (\cdot w)}{\sum_{w_i}N_{1+} (w_iw)},
 \end{equation}
@@ -252,7 +252,7 @@ c_{\mathbf{u'}w} = t_{\cdot\mathbf{u'}w} = \sum_{w'}t_{w'\mathbf{u'}w}
 
 The value of $d_x$ is used for each length $x$, and can be estimated using formulas or by using cross-validation.
 
-Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. In \cite{} they found that the optimal amount of discount changes slowly as a function of the counts $c_{\mathbf{u}w}$. In the same study they also noticed that the optimal discounts for low values of $c_{\mathbf{u}w}$ differ substantially from those with higher values. The formed the basis for MKN, which uses different values of discounts for different counts, one for each $c_{\mathbf{u}w} = 1, 2, \ldots, c^{(\textnormal{max})}-1$ and another for $c_{\mathbf{u}w} \geq c^{(\textnormal{max})}$. MKN reduces to IKN when $c^{(\textnormal{max})} = 1$, while \cite{} use $c^{(\textnormal{max})} = 3$ as a compromise between diminishing improvements and increasing implementational complexity.
+Modified Kneser-Ney (MKN) is an improvement and generalisation upon IKN, where the amount of discount is allowed more variability. In \autocite{} they found that the optimal amount of discount changes slowly as a function of the counts $c_{\mathbf{u}w}$. In the same study they also noticed that the optimal discounts for low values of $c_{\mathbf{u}w}$ differ substantially from those with higher values. The formed the basis for MKN, which uses different values of discounts for different counts, one for each $c_{\mathbf{u}w} = 1, 2, \ldots, c^{(\textnormal{max})}-1$ and another for $c_{\mathbf{u}w} \geq c^{(\textnormal{max})}$. MKN reduces to IKN when $c^{(\textnormal{max})} = 1$, while \autocite{} use $c^{(\textnormal{max})} = 3$ as a compromise between diminishing improvements and increasing implementational complexity.
 
 In summary, MKN is defined as follows:
 \begin{equation}\begin{split}
