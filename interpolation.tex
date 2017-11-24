@@ -1,16 +1,26 @@
+\chapter{Chapter 5\newline Improving Bayesian skipgram language models \newline  with interpolation factors and backoff strategies}\label{chap:interpol}
+
+Statistical language models have been a staple technology and working horse of natural language processing (NLP) since decades. Many ideas have been proposed, and most have been improvements over existing models. Some of them were revolutionary in either their performance, or in their simplicity. In the nineties Kneser and Ney\autocite{kneser1995improved} published their work on frequentist language models that use count-of-count information to better estimate smoothed backoff probabilities. Two decades later, Mikolov culminated existing work on language models into word2vec,\autocite{mikolov2013distributed} as-of-now one of the most widely used language models.
+
+In this chapter, and more generally, in this thesis, we set out to improve over the more traditional count-based models in the form of their Bayesian generalisation by adding skipgrams to the set of input features, in addition to $n$-grams.
+
+To overcome the traditional problems of overestimating the probabilities of rare occurrences and underestimating the probabilities of unseen events, a range of smoothing algorithms have been proposed in the literature\autocite{goodman2001bit}. Most methods take a heuristic-frequentist approach combining $n$-gram probabilities for various values of $n$, using back-off schemes or interpolation.
+
+In this chapter we expand the hierarchical Pitman-Yor process language model (HPYPLM) with skipgrams,\autocite{onrust2016Improving} introduced in the previous chapter. We add interpolation factors, weighing the relative influence of skipgrams over $n$-grams, and the relative influence of interpolated backoff probabilities.
+
 \section{Interpolation factors}
 
 The use of interpolation factors in a language model is not new. In the literature we find lattice-based language models in
-\cite{dupont1997lattice} and a generalisation called factored language model with generalised parallel backoff \cite{bilmes2003factored}. 
+\autocite{dupont1997lattice} and a generalisation called factored language model with generalised parallel backoff \autocite{bilmes2003factored}. 
 %However, the context sizes are small (2 and 3), % ik snap de relevantie van die laatste zin niet, maar misschien omdat ze niet af is ? (einigt in een komma)
-  Maximum entropy language models \cite{ROSENFELD1996187} and distant bigram language models \cite{bassiou2011long} are other related cases in point. In \cite{gao2004long} each backoff level has its own weight, fixed for all features. These works are all implicitly using skipgram features, with variable skip sizes, spanning patterns that are larger than $n$. 
+  Maximum entropy language models \autocite{ROSENFELD1996187} and distant bigram language models \autocite{bassiou2011long} are other related cases in point. In \autocite{gao2004long} each backoff level has its own weight, fixed for all features. These works are all implicitly using skipgram features, with variable skip sizes, spanning patterns that are larger than $n$. 
   
 %  In \cite{gao2004long} each backoff level has its own weight, fixed for all features.
 % [AB] this sentence moved and copied above
 
-  A more recent paper on using skipgram language models only uses uniform linear interpolation with a generalisation of modified Kneser-Ney \cite{pickhardt2014generalized}. Even more recently, in \cite{pelemans2016sparse} a sparse non-negative feature weight matrix is computed on the basis of an adjusted version of relative frequency.
+  A more recent paper on using skipgram language models only uses uniform linear interpolation with a generalisation of modified Kneser-Ney \autocite{pickhardt2014generalized}. Even more recently, in \autocite{pelemans2016sparse} a sparse non-negative feature weight matrix is computed on the basis of an adjusted version of relative frequency.
   
-Inspired by these studies, we use six interpolation strategies:\marginnote{Hier een plaatje dat voor een run de waarden geeft, en de gemiddelde proporties ofzo.}
+Inspired by the previous studies, we use nine interpolation strategies:\marginnote{Hier een plaatje dat voor een run de waarden geeft, en de gemiddelde proporties ofzo.}
   
   \begin{itemize}
   \item \textsf{ngram}, where we ignore the skipgram probabilities (and prohibit the backoff step to skipgrams): \\
@@ -21,7 +31,7 @@ Inspired by these studies, we use six interpolation strategies:\marginnote{Hier 
   \end{cases}$
 \item \textsf{Uninformed uniform prior (uni)}, where all the weights are 1:\\ 
 	$ I(\mathbf{u}) = 1 $
-\item \textsf{Uninformed $n$-gram preference (npref)}, where we give the $n$-grams twice the importance of skipgrams: \\
+\item \textsf{Uninformed $n$-gram preference (npref)}, where we give the $n$-grams twice the importance of skipgrams:\footnote{Later in this chapter we do a more in-depth investigation to find the optimal preference ratio.} \\
 	$I(\mathbf{u}) =
   \begin{cases}
     2 & \text{if } \mathbf{u} \text{ is }n\text{-gram} \\
@@ -29,7 +39,8 @@ Inspired by these studies, we use six interpolation strategies:\marginnote{Hier 
   \end{cases}$
   \item \textsf{Maximum likelihood-based Linear Interpolation (mle)}, based on the maximum likelihood estimate of the context: \\[0.5ex]
 	$ I(\mathbf{u}) = \displaystyle \frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
-%    We also tried the unnormalised count, but this gave worse performance.
+\item \textsf{Unnormalised count (count)}, based on the occurrence count of the context: \\[0.5ex]
+$ I(\mathbf{u}) = \displaystyle c(\mathbf{u}) $ \\
 \item \textsf{Entropy-based Linear Interpolation (ent)}, based on the entropy of the context: \\
 	$E(\mathbf{u}) = -\displaystyle \sum_{w,c(\mathbf{u}w)>0}^W\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)}\log\frac{c(\mathbf{u})}{c(\mathbf{u}\cdot)} $ \\
     $ I(\mathbf{u}) = \displaystyle \frac{1}{1+E(\mathbf{u})}$ \\
@@ -39,24 +50,174 @@ Inspired by these studies, we use six interpolation strategies:\marginnote{Hier 
 	$\textstyle I(\mathbf{u}) = \displaystyle 2^{-E(\mathbf{u})} $
     \item \textsf{random}, where weights are uniformly distributed between 0 and 1 and assigned to the terms: \\
     $ I(\mathbf{u}) = \text{rand}(0,1) $
+\item \textsf{Skipgram-type based Linear Interpolation (value)}, in contrast to many of the interpolation strategies above, and more in line with \textsf{npref}, \textsf{value} assigns a predefined value not based on the content of the context, but on the shape of the context. For example, in \textsf{npref} we only consider the two cases, $n$-gram or skipgram. For \textsf{value} we can assign weights to individual skipgram types such as \emph{a \{1\} c} and \emph{b \{1\} \{1\}}. So if we use the same notation, with \emph{a}, \emph{b}, and \emph{c} as placeholders indicating there is a word in the context on that position\footnote{Positions 1, 2, and 3, respectively.}, and \emph{\{1\}} indicating a single skip, then we can define the function providing the interpolation values as:\footnote{We only outline the parameters for a 4-gram model. Higher-order models are extended analogously.} \\
+	$\textstyle I(\mathbf{u}) = \begin{cases}
+w_{d} & \text{if the context is empty}\\
+w_{cd} & \text{if } \mathbf{u} = \text{\emph{c}} \\
+w_{bcd} & \text{if } \mathbf{u} = \text{\emph{bc}} \\
+w_{b\{1\}d} & \text{if } \mathbf{u} = \text{\emph{b\{1\}}} \\
+w_{abcd} & \text{if } \mathbf{u} = \text{\emph{abc}} \\
+w_{a\{1\}cd} & \text{if } \mathbf{u} = \text{\emph{a\{1\}c}} \\
+w_{ab\{1\}d} & \text{if } \mathbf{u} = \text{\emph{ab\{1\}}} \\
+w_{a\{1\}\{1\}d} & \text{if } \mathbf{u} = \text{\emph{a\{1\}\{1\}}} \\
+	\end{cases}%
+	$ \\ \noindent
+	Setting all weights to 1 results in \textsf{uni}; setting $w_{d}$, $w_{cd}$, $w_{bcd}$, and $w_{abcd}$ to 1, and the others to 2,\footnote{With the special case that if you set these values to 0, you end up with \textsf{ngram}.} yields the default \textsf{npref}.
   \end{itemize} 
 
 The weights for the interpolation strategies \textsl{mle} and \textsl{ppl} are determined at test time, since precomputing and computing all these weights is expensive. To this end we have not ventured into learning the weights during training time, integrated into the Bayesian paradigm of the hierarchical Pitman-Yor process.
+As a compromise we have the context-based methods \textsf{ent}, \textsf{ppl}, \textsf{count} and \textsf{mle}, as opposed to the heuristic \textsf{npref}, and the learned \textsf{value}.
+
+
+We extend \cref{eq:interpolform} for the word probability by adding normalised interpolation weights $I(\cdot)$. The probability of a word $w$ with context $\mathbf{u}$ is then:
+
+
+\begin{equation}\begin{split}
+p(w|\mathbf{u}) &=
+\sum_{\mathbf{u}_m\in\boldsymbol\varsigma}
+\left[
+\frac{I(\mathbf{u}_m)}
+{\sum_{\mathbf{x}\in\boldsymbol\varsigma}
+	I(\mathbf{x})}
+\left(\frac{c_{\mathbf{u}_mw\cdot} - d_{|\mathbf{u}_m|}t_{\mathbf{u}_mw\cdot}}
+{\theta_{|\mathbf{u}_m|} + c_{\mathbf{u}_m\cdot\cdot}} + \frac{\theta_{|\mathbf{u}_m|} + d_{|\mathbf{u}_m|}t_{\mathbf{u}_m\cdot\cdot}}
+{\theta_{|\mathbf{u}_m|} + c_{\mathbf{u}_m\cdot\cdot}}
+Z_{\mathbf{u}_mw})
+\right)\right]
+\end{split}\label{eq:newinterpolform}\end{equation}
+with $c_{\mathbf{u}w\cdot}$ being the number of $\mathbf{u}w$ tokens, and $c_{\mathbf{u}\cdot\cdot}$ the number of patterns starting with context $\mathbf{u}$. Similarly, $t_{\mathbf{u}wk}$ is 1 if the $k$th draw from $G_{\mathbf{u}}$ was $w$, 0 otherwise. $t_{\mathbf{u}w\cdot}$ then denotes if there is a pattern $\mathbf{u}w$, and $t_{\mathbf{u}\cdot\cdot}$ is the number of types following context $\mathbf{u}$.
+
+For \textsl{ngram} and \textsl{full}
+\begin{equation}
+Z_{\mathbf{u}w} = p(w|\pi(\mathbf{u})),
+\end{equation}
+for \textsl{limited}\sidenote{Computing the normalisation factor is expensive, because for each word $w$ in the vocabulary that occurs after the context $\mathbf{u}$ you have to compute its probability. Combined with the enormous search space for all contexts of length up to three, computing the normalisation factor is best done at runtime, whilst maintaining a cache.}
+\begin{equation}
+Z_{\mathbf{u}w} = \left.
+\begin{cases}
+\frac{1 - \sum_{w\in \mathcal{B}} p_{\mathrm{L}}(w|\pi(\mathbf{u}))}{|\mathcal{N}|}, & \text{if } \mathrm{count}(\mathbf{u}w) > 0 \\
+p(w|\pi(\mathbf{u})), & \text{otherwise } 
+\end{cases}
+\right.
+\end{equation}
+where the words $w\in\mathcal{N}$ in the patterns $\mathbf{u}w$ have not been seen in the training data, and the patterns $\mathbf{u}w$ with $w\in\mathcal{B}$ are in the training data.
+
+The main difference between \cref{eq:interpolform} and \cref{eq:newinterpolform} is that in the latter we do not use an explicit discount term over the type counts, but a normalisation term. This ensures a simpler strategy, and it is theoretically sound with proper distributions.\footnote{See \cref{apx:proofinterpolform}.} 
+
+Note also that rather than two terms, \cref{eq:newinterpolform} only has one, because the \textsl{ngram} backoff strategy is now interpreted as an interpolation strategy.
 
 \section{Experiments}
-We train 4-gram language model on the two training corpora, the Google 1 billion word benchmark and the Mediargus corpus.\footnote{See~\ref{sec:data} for a description of the corpora.} We do not perform any preprocessing on the data except tokenisation. 
-   %The models are trained with a HPYLM. We do not use sentence beginning and end markers. The results for the {\sf ngram} backoff strategy are obtained by training without skipgrams; for {\sf limited} and {\sf full} we added skipgram features during training.
+In this section we investigate three hypotheses, of which two new hypotheses. First we confirm\footnote{Conform \cref{chap:shpyplm}.} that skipgrams help reduce the perplexity in an intrinsic language model evaluation.\footnote{For the extrinsic counterpart in an automatic speech recognition experiment, we refer to the next chapter.} Second, we investigate whether if we can see an additional effect of different interpolation factors and backoff strategies in a cross-domain setting where the test set is sampled from another text genre as the training data. And finally, we look in a more qualitative way at the effect of skipgrams.
 
-When setting up the experimental framework, we had to decide on the basis. Earlier work on hierarchical Pitman-Yor language models by Huang and Renals had accompanying software releases. An SRILM extension with HPYPLM was proposed in \cite{huang2007hierarchical}, and a frequentist approximation extension of the HPYPLM was described in \cite{huang2010power}. However, at the time I started this thesis, they were no longer accessible. With further inquiries we learned that also none of the source code has survived during the period. 
+\begin{figure}
+\begin{tikzpicture}%[remember picture,overlay]
+\node[right] (start) at (0,-0.5) {Worst performance};
+\node[left] (end) at (\linewidth-\pgflinewidth,-0.5) {Best performance};
+\node[] (mid) at ($(start)!0.5!(end)$) {mid};
+\path[left color=worstclr!25, right color=bestclr!25,middle color=avgclr!25]
+(0,0) rectangle ++(\linewidth-\pgflinewidth,1); 
+\end{tikzpicture}
+\caption{Throughout this section we use these colours to highlight numbers, to make it easier to compare the numbers. The range is best on both the \textcolor{worstclr!50}{worst performance}, and the \textcolor{bestclr!50}{best performance}. We use a linear scale (even though for perplexity a log scale might be more appropriate).}
+\label{fig:colourrange}
+\end{figure}
 
-We found an alternative in cpyp,\footnote{\url{https://github.com/redpony/cpyp}} which is an existing library for non-parametric Bayesian modelling with PY priors with histogram-based sampling \cite{blunsom2009note}. This library has an example application to showcase its performance with $n$-gram based language modelling. Limitations of the library, such as not natively supporting skipgrams, and the lack of other functionality such as thresholding and discarding of certain patterns, led us to extend the library with Colibri Core,\footnote{\url{http://proycon.github.io/colibri-core/}} a pattern modelling library. Colibri Core resolves the limitations, and together the libraries are a complete language model that handles skipgrams: cococpyp.\footnote{\url{https://github.com/naiaden/cococpyp}} This software in turn has been rewritten to allow also for reranking nbest lists, and being more in control of the underlying language model. We gave it the name SLM, for skipgram language model.\footnote{\url{https://github.com/naiaden/SLM}} Throughout the rest of the thesis the reported results were obtained with SLM.
+\subsection{Skipgrams and perplexity reductions}
+The first comparison is between \textsf{ngram} and \textsf{uni}, since these backoff strategies embody the difference between only $n$-gram features (\textsf{ngram}), and both $n$-gram and skipgram features (\textsf{uni}). We report the perplexities in \cref{tab:ngramsvsskipgrams}, and the relative difference in perplexity when choosing skipgrams\footnote{Read, skipgrams and $n$-grams. In our experiments we never use only skipgrams. We use this convention in the remainder of this thesis, except in cases where there might be some ambiguity otherwise.} over $n$-grams.
 
-  Each model is run for 50 iterations (without an explicit burn-in phase), with the initial values for hyperparameters $\theta=1.0$ and $\gamma=0.8$. The hyperparameters are resampled every 30 iterations with slice sampling \cite{walker2007sampling}.
-  
-  \textbf{Plot van dalende ppl over iteraties, effect resampling?}
-  
-  We test each model on different test sets, and we collect their intrinsic performance by means of perplexity. We compute the perplexity on all 4-grams, rather than computing the perplexity for sentences. 
-  Words in the test set that were unseen in the training data are ignored in computing the perplexity on test data.\footnote{This is common for perplexity. } 
+\npdecimalsign{.}
+\nprounddigits{0}
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:ngramsvsskipgrams}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{1bw}            &  & \multicolumn{4}{c}{emea} &  & \multicolumn{4}{c}{jrc}             \\
+		test     & 1bw  & emea  & jrc  & wp    
+		      &  & 1bw  & emea  & jrc  & wp 
+		      &  & 1bw  & emea  & jrc  & wp      \\
+		\textsf{ngram}   & \btc{25}\numprint{129.47} &  \numprint{1123.89} 
+					&  \numprint{941.4}  &  \numprint{456.27} &  
+		        &      &       
+			         &      &    &  
+		        &  \numprint{1520.1}  &  \numprint{1278.94} 
+			         &  \btc{25}\numprint{12.85} &  \numprint{1249.28} \\
+		\textsf{fulluni}  & \numprint{124.69} & \numprint{728.27}  
+				 	& \numprint{728.98} & \numprint{392.04} 
+				 &  &      &       &      
+				 	&    &  
+				 & \numprint{1303.66} & \numprint{1069.64} 
+				 	& \btc{25}\numprint{13.32} & \numprint{1067.99} \\
+		$\Delta$\% & \numprint{3.1} & \numprint{35.23} & \numprint{22.53}   &  \numprint{14.04}
+				& & & & & &
+				& \numprint{14.21} & \numprint{16.34} & \numprint{-3.65} & \numprint{14.49} \\
+	\end{tabular}
+\end{table}
+
+\subsection{Interpolation between $n$-grams and skipgrams}
+The previous results show that if we add skipgrams, we can reduce the perplexity. Since \textsf{uni} is a very naive prior weight, in this section we investigate the effect of adding weights as interpolation factors.
+
+If we would have enough training material, skipgrams might not be necessary, as all information is then captured by the $n$-grams. This hypothesis suggests that $n$-grams carry more information, and in cases where $n$-grams do not cover the encountered patterns, skipgrams are an additional help.
+
+An initial guess for $n$-gram preference was a ratio of 2:1, in favour of $n$-grams. The results for \textsf{fullnpref}\footnote{Unless otherwise noted for \textsf{fullnpref}, the preference ratio is 2.0.} are shown in \cref{tab:fullunivsfullnpref2}, show around 5\% reductions in perplexity compared to \textsf{fulluni}. Although in itself the reductions are not that impressive, they are combined with the reductions in \cref{tab:ngramsvsskipgrams}.
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:fullunivsfullnpref2}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		&  & \obw  & \emea  & \jrc  & \wp 
+		&  & \obw  & \emea  & \jrc  & \wp      \\
+		\textsf{fulluni}   & \numprint{124.69} &  \numprint{728.27} 
+		&  \numprint{728.98}  &  \numprint{392.04} &  
+		&      &       
+		&      &    &  
+		&  \numprint{1303.66}  &  \numprint{1069.64} 
+		&  \numprint{13.32} &  \numprint{1067.99} \\
+		\textsf{fullnpref}  & \numprint{118.28} & \numprint{699.91}  
+		& \numprint{694.32} & \numprint{372.06} 
+		&  & \numprint{1305.9} &  \numprint{5.59}     
+		  & \numprint{704.94} & \numprint{852.52}   &  
+		& \numprint{1215.52} & \numprint{1000.72} 
+		& \numprint{12.84} & \numprint{1000} \\
+		$\Delta$\% & \numprint{5.6} & \numprint{3.85} & \numprint{4.80}   &  \numprint{5.10}
+		& & & & & &
+		& \numprint{6.75} & \numprint{6.45} & \numprint{3.6} & \numprint{6.37} \\
+	\end{tabular}
+\end{table}
+
+Even with these positive results, it is hard to not verify whether 2.0 is indeed the optimal value for \textsf{fullnpref}.
+
+\begin{table*}\resizebox{\columnwidth}{!}{%
+		\begin{tabular}{llllllllllllllllllllllllll}
+			\textsf{fullnpref} & 0.05 & 0.06 & 0.08 & 0.11 & 0.14 & 0.17 & 0.22 & 0.29 & 0.37 & 0.47 & 0.61 & 0.78 & 1 & 1.28 & 1.65 & 2.11 & 2.71 & 3.48 & 4.47 & 5.73 & 7.36 & 9.44 & 12.12 & 15.55 & 19.95 \\
+			\obw & \wtc{19.4295700804}\numprint{170.844} & \wtc{17.642782244}\numprint{168.288} & \wtc{14.6752883607}\numprint{164.043} & \wtc{11.2023767913}\numprint{159.075} & \wtc{8.46696959105}\numprint{155.162} & \wtc{6.21740650122}\numprint{151.944} & \wtc{3.19328905977}\numprint{147.618} & \btc{0.045438657812}\numprint{142.985} & \btc{2.85424676686}\numprint{138.967} & \btc{5.52114645229}\numprint{135.152} & \btc{8.27123383432}\numprint{131.218} & \btc{10.6641034603}\numprint{127.795} & \btc{12.8381684726}\numprint{124.685} & \btc{14.7165326809}\numprint{121.998} & \btc{16.3257602237}\numprint{119.696} & \btc{17.5567983223}\numprint{117.935} & \btc{18.4781544914}\numprint{116.617} & \btc{19.0772457183}\numprint{115.76} & \btc{19.38273331}\numprint{115.323} & \btc{19.4295700804}\numprint{115.256} & \btc{19.2590003495}\numprint{115.5} & \btc{18.9171618315}\numprint{115.989} & \btc{18.4445997903}\numprint{116.665} & \btc{17.8818594897}\numprint{117.47} & \btc{17.2645927997}\numprint{118.353} \\
+			\emea & \wtc{19.7839277582}\numprint{1041.55} & \wtc{17.6333258196}\numprint{1022.85} & \wtc{14.0817274739}\numprint{991.968} & \wtc{9.95820701901}\numprint{956.113} & \wtc{6.74000947645}\numprint{928.13} & \wtc{4.1170801496}\numprint{905.323} & \wtc{0.633565030982}\numprint{875.033} & \btc{3.03234873333}\numprint{843.157} & \btc{6.13979602633}\numprint{816.137} & \btc{9.01194216606}\numprint{791.163} & \btc{11.8682175535}\numprint{766.327} & \btc{14.2343397077}\numprint{745.753} & \btc{16.2455550393}\numprint{728.265} & \btc{17.8203246834}\numprint{714.572} & \btc{18.9673890542}\numprint{704.598} & \btc{19.6067043578}\numprint{699.039} & \btc{19.7839277582}\numprint{697.498} & \btc{19.5042345007}\numprint{699.93} & \btc{18.802701248}\numprint{706.03} & \btc{17.737405753}\numprint{715.293} & \btc{16.3469898473}\numprint{727.383} & \btc{14.7095422323}\numprint{741.621} & \btc{12.8258679461}\numprint{758.0} & \btc{10.8975715449}\numprint{774.767} & \btc{8.84000901643}\numprint{792.658} \\
+			\jrc & \wtc{20.9393339638}\numprint{1053.15} & \wtc{18.8263550482}\numprint{1034.75} & \wtc{15.30204402}\numprint{1004.06} & \wtc{11.1624427185}\numprint{968.012} & \wtc{7.90156503985}\numprint{939.616} & \wtc{5.22577581638}\numprint{916.315} & \wtc{1.647606793}\numprint{885.156} & \btc{2.14955412126}\numprint{852.09} & \btc{5.39688117422}\numprint{823.812} & \btc{8.42774272415}\numprint{797.419} & \btc{11.4793895558}\numprint{770.845} & \btc{14.0498743409}\numprint{748.461} & \btc{16.2861869171}\numprint{728.987} & \btc{18.1019707548}\numprint{713.175} & \btc{19.5143363897}\numprint{700.876} & \btc{20.4275107558}\numprint{692.924} & \btc{20.9017826537}\numprint{688.794} & \btc{20.9393339638}\numprint{688.467} & \btc{20.5781753394}\numprint{691.612} & \btc{19.8758395215}\numprint{697.728} & \btc{18.8791795211}\numprint{706.407} & \btc{17.6627237791}\numprint{717.0} & \btc{16.2760813658}\numprint{729.075} & \btc{14.7856273796}\numprint{742.054} & \btc{13.2386741746}\numprint{755.525} \\
+			\wp & \wtc{20.7199743005}\numprint{558.048} & \wtc{18.7042539314}\numprint{548.73} & \wtc{15.3451526338}\numprint{533.202} & \wtc{11.4047849022}\numprint{514.987} & \wtc{8.2998659864}\numprint{500.634} & \wtc{5.74982180193}\numprint{488.846} & \wtc{2.33296161413}\numprint{473.051} & \btc{1.30671376792}\numprint{456.226} & \btc{4.43607745748}\numprint{441.76} & \btc{7.37767067265}\numprint{428.162} & \btc{10.3692350625}\numprint{414.333} & \btc{12.9246873827}\numprint{402.52} & \btc{15.1911289267}\numprint{392.043} & \btc{17.0848417525}\numprint{383.289} & \btc{18.6278910542}\numprint{376.156} & \btc{19.7157916483}\numprint{371.127} & \btc{20.4145227915}\numprint{367.897} & \btc{20.7199743005}\numprint{366.485} & \btc{20.666541919}\numprint{366.732} & \btc{20.3035478452}\numprint{368.41} & \btc{19.677502047}\numprint{371.304} & \btc{18.8515715502}\numprint{375.122} & \btc{17.8729152989}\numprint{379.646} & \btc{16.7984268815}\numprint{384.613} & \btc{15.6705060825}\numprint{389.827} \\
+			
+		\end{tabular}
+	}
+\caption{The perplexity values for different \textsf{fullnpref} preference rates with the \obw model. The 25 steps were sampled in a log space from $\[10^{-1.3},10^{1.3}\]$. The results show that indeed \textsf{fullnpref-2.0} was a good first guess, with optimal values somewhere between 2.71 and 4.47, depending on the test set.
+\end{table*}
+
+\subsection{A qualitative analysis into the contribution of skipgrams}
+
+%\section{Experiments}
+%We train 4-gram language model on the two training corpora, the Google 1 billion word benchmark and the Mediargus corpus.\footnote{See~\cref{sec:data} for a description of the corpora.} We do not perform any preprocessing on the data except tokenisation. 
+%   %The models are trained with a HPYLM. We do not use sentence beginning and end markers. The results for the {\sf ngram} backoff strategy are obtained by training without skipgrams; for {\sf limited} and {\sf full} we added skipgram features during training.
+%
+%When setting up the experimental framework, we had to decide on the basis. Earlier work on hierarchical Pitman-Yor language models by Huang and Renals had accompanying software releases. An SRILM extension with HPYPLM was proposed in \autocite{huang2007hierarchical}, and a frequentist approximation extension of the HPYPLM was described in \autocite{huang2010power}. However, at the time I started this thesis, they were no longer accessible. With further inquiries we learned that also none of the source code has survived during the period. 
+%
+%We found an alternative in cpyp,\footnote{\url{https://github.com/redpony/cpyp}} which is an existing library for non-parametric Bayesian modelling with PY priors with histogram-based sampling \cite{blunsom2009note}. This library has an example application to showcase its performance with $n$-gram based language modelling. Limitations of the library, such as not natively supporting skipgrams, and the lack of other functionality such as thresholding and discarding of certain patterns, led us to extend the library with Colibri Core,\footnote{\url{http://proycon.github.io/colibri-core/}} a pattern modelling library. Colibri Core resolves the limitations, and together the libraries are a complete language model that handles skipgrams: cococpyp.\footnote{\url{https://github.com/naiaden/cococpyp}} This software in turn has been rewritten to allow also for reranking nbest lists, and being more in control of the underlying language model. We gave it the name SLM, for skipgram language model.\footnote{\url{https://github.com/naiaden/SLM}} Throughout the rest of the thesis the reported results were obtained with SLM.
+%
+%  Each model is run for 50 iterations (without an explicit burn-in phase), with the initial values for hyperparameters $\theta=1.0$ and $\gamma=0.8$. The hyperparameters are resampled every 30 iterations with slice sampling \cite{walker2007sampling}.
+%  
+%  \textbf{Plot van dalende ppl over iteraties, effect resampling?}
+%  
+%  We test each model on different test sets, and we collect their intrinsic performance by means of perplexity. We compute the perplexity on all 4-grams, rather than computing the perplexity for sentences. 
+%  Words in the test set that were unseen in the training data are ignored in computing the perplexity on test data.\footnote{This is common for perplexity. } 
 
 \subsection{PPL}
 \subsection{Learning curves}
