@@ -217,10 +217,18 @@ box/.style={%draw,%
   \end{fullwidth}
 }
 
+\usepackage{colortbl}
+\definecolor{bestclr}{rgb}{0,0,1}
+\definecolor{worstclr}{rgb}{1,0,0}
+\definecolor{avgclr}{rgb}{1,1,1}
+\newcommand{\btc}[1]{\cellcolor{bestclr!#1}}
+
+
 % Inserts a blank page
 \newcommand{\blankpage}{\newpage\hbox{}\thispagestyle{empty}\newpage}
 
 \usepackage{units}
+\usepackage{numprint}
 
 % Typesets the font size, leading, and measure in the form of 10/12x26 pc.
 \newcommand{\measure}[3]{#1/#2$\times$\unit[#3]{pc}}
@@ -334,14 +342,14 @@ box/.style={%draw,%
 %% Start the main matter (normal chapters)
 \mainmatter
 %\input{introduction}
-\input{languagemodels}
-\input{bayesianstuff}
-\input{data}
+%\input{languagemodels}
+%\input{bayesianstuff}
+%\input{data}
 
 
 %%\part{Intrinsic evaluation}
-\input{shpyplm}
-%\input{interpolation}
+%\input{shpyplm}
+\input{interpolation}
 %%\chapter{Domain-adaptation with a double hierarchical Pitman-Yor skipgram language model}
 
 %%\part{Extrinsic evaluation}
@@ -351,12 +359,15 @@ box/.style={%draw,%
 
 %\chapter{Conclusion}
 
-%%\input{test}
+
 
 %%%
 %% The back matter contains appendices, bibliographies, indices, glossaries, etc.
 
 \backmatter
+
+\appendix
+\input{test}
 
 %\bibliography{superpaper}
 %\bibliographystyle{plainnat}
