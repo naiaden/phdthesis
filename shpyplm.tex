@@ -105,7 +105,7 @@ p(w|\pi(\mathbf{u}_m))\right)\right] \right\} \\
 & \frac{1}{\mathbf{\boldsymbol\varsigma}+1}\left[
 \frac{c_{\mathbf{u}w\cdot}-\delta_{\mathbf{u}}d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}+ S_{\mathbf{u}w}\left(\frac{\theta_{|\mathbf{u}|}+d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}
 p(w|\pi(\mathbf{u}))\right)\right]
-  \end{split}\end{equation}
+  \end{split}\label{eq:interpolform}\end{equation}
  
  The \BOL backoff strategy is an extension of the \BOF backoff strategy that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern. $S$ is the indicator function which tells if a pattern has been seen during training: $S_{\mathbf{u}w}(\cdot) = 0$ if $\mathrm{count}(\mathbf{u}w) > 0$, $1$ otherwise; and $\delta_{\mathbf{u}} = V-\sum_{w\in W} S_{\mathbf{u}w}(\cdot)$. Setting $S_{\mathbf{u}w}(\cdot) = 0$ stops the recursion.
 

@@ -1,13 +1,13 @@
 \chapter{Chapter 2\newline Introduction to Bayesian $n$-gram %and Domain-dependent 
-Language Modelling}\label{chap:introblm}\marginnote{Strictly speaking the G-CRP is a stochastic process that generates exchangeable random partitions
-whereas the Pitman-Yor process (PYP) is usually taken to define a stochastic process that generates prob-
-ability distributions. However, the two are closely connected: every distribution sampled from the PYP is
-associated with a partition that assigns each observation to a cluster, and the partitions associated with
-a PYP-generated distribution follow a G-CRP. Given the slightly inconsistent way in which the PYP is
-defined, we have chosen to adopt the terminology from Ishwaran and James (2003) in which G-CRP is used
-to describe the process that generates partitions, and the PYP is defined more narrowly to refer to the
-closely related process that generates probability distributions.}
-\footnote{Table 1 van \url{http://www.psy.cmu.edu/~ckemp/papers/navarrok_noneoftheaboveabayesianaccountofthedetectionofnovelcategories.pdf} is ook handig}
+Language Modelling}\label{chap:introblm}%\marginnote{Strictly speaking the G-CRP is a stochastic process that generates exchangeable random partitions
+%whereas the Pitman-Yor process (PYP) is usually taken to define a stochastic process that generates prob-
+%ability distributions. However, the two are closely connected: every distribution sampled from the PYP is
+%associated with a partition that assigns each observation to a cluster, and the partitions associated with
+%a PYP-generated distribution follow a G-CRP. Given the slightly inconsistent way in which the PYP is
+%defined, we have chosen to adopt the terminology from Ishwaran and James (2003) in which G-CRP is used
+%to describe the process that generates partitions, and the PYP is defined more narrowly to refer to the
+%closely related process that generates probability distributions.}
+%\footnote{Table 1 van \url{http://www.psy.cmu.edu/~ckemp/papers/navarrok_noneoftheaboveabayesianaccountofthedetectionofnovelcategories.pdf} is ook handig}
 
 \newthought{In the previous chapter we introduced language models} in which the word probabilities are based on the underlying fixed, but unknown, (joint) distributions from which we assume that we sample our training examples in a frequentist manner. Those distributions are observed by simply counting $n$-grams. If the corpus is too small compared to the model complexity, this yields unreliable counts; smoothing is a technique to rectify these counts.  The downside of most smoothing techniques is that they do not rely on a statistical model, but merely rely on heuristics such as discounting, interpolation, and back-off schemes.
 
@@ -15,7 +15,7 @@ In this chapter we introduce the Bayesian counterpart to language modelling, whe
 
 The Bayesian language models have a basis which is firmly nested in probability theory. The literature contains many metaphors to simplify mathematical concepts. The goal of this chapter is twofold. First we want to demystify the metaphors by first introducing them in their simplest form, and from thereon extend them to the variants often found in literature. Second, we show how you can build language models with these concepts, and why these concepts are a good basis for language models. Although this chapter requires some basic knowledge of probability theory, we provide explanations and references where this might be useful.
 
-After reading this chapter, we assume you know about using the Chinese restaurant process, the Hoppe-P\'olya urn, and stick-breaking processes, and how they can be used as a prior in mixture models such as the Dirichlet process mixture model and the nested Pitman-Yor process mixture model, which is the Bayesian $n$-gram language model that we use throughout this thesis.
+After reading this chapter, we assume you know about using the Chinese restaurant process, the Hoppe-P\'olya urn, and stick-breaking processes, and how they can be used as a prior in mixture models such as the Dirichlet process mixture model and the nested Pitman-Yor process mixture model, which is the Bayesian $n$-gram language model that we use throughout this thesis. We introduce a nested Pitman-Yor process language model in the next chapter, for which this introduction chapter serves as ground work.
 
 %
 
@@ -27,7 +27,7 @@ Here $A$ is the proposition, and $B$ the evidence or belief. $p(A)$ is the the p
 
 In this chapter we look at the priors and processes underlying a Bayesian language model. In most studies on the topic it is either considered from a bottom-up approach, or from a top-down approach. The first approach is really useful given a strong probabilistic background, whereas the latter is more convenient if the reader already has (vaguely) heard about the priors and processes involved. The approach of this chapter is to make the priors and processes understandable for the reader who has neither.
 
-Recall that our goal is to devise a language model within a non-parametric Bayesian (BNP) framework. The BNP approach is an alternative to parametric modelling and model selection.\footnote[][1em]{Model selection is the task of selecting a model from a set of candidate models. Given a data set, the goal is to select the model with the best explanatory power, and favourably also the simplest model. Famous criteria are cross-validation \citep{Kohavi1995A} and the Akaike information criterion \citep{Bozdogan1987Model}. For a more general introduction see \citep{Burnham2002Model}.}
+We set out to devise a language model within a non-parametric Bayesian (BNP) framework. The BNP approach is an alternative to parametric modelling and model selection.\footnote[][1em]{Model selection is the task of selecting a model from a set of candidate models. Given a data set, the goal is to select the model with the best explanatory power, and favourably also the simplest model. Famous criteria are cross-validation\autocite{Kohavi1995A} and the Akaike information criterion\autocite{Bozdogan1987Model}. For a more general introduction see\autocite{Burnham2002Model}.}
 In many statistical inference problems, we expect that structures or patterns continue to emerge as data accrue, perhaps even without limit. We want a modelling framework that supplies a growing, unbounded number of degrees of freedom to the data analysis. However, if we allow the degrees of freedom to accrue too quickly, we risk finding structures that are statistical artifacts; a typical example of such artifact is overfitting. Overfitting is a serious problem,\footnote{Overfitting can also be used as a tool, for example in text generation where you may want to force certain language.} and it motivates the Bayesian aspect of non-parametrics. In many parametric paradigms, a number of parameters needs to be set which optimises a certain value. However, more of different data might already require another number of parameters. 
 Although Bayesian methods are by no means immune to overfitting, they provide a natural resilience to it. By using a model with an unbounded complexity, underfitting is migitated, while computing, or approximating, the full posterior over parameters migitates overfitting.
 
@@ -45,7 +45,7 @@ Assume we have a data set $\mathcal{D}$ of $M$ data points $x_1, x_2, \ldots, x_
 v_i$ its frequency $c(v_i)$.\footnote{$c_\mathcal{D}(v_i) = \sum_{x\in\mathcal{D}} [x = v_i]$, with $[\cdot]$ being the indicator function, which returns $1$ if the expression evaluates to true, and returns $0$ otherwise.} In this abstraction we lose the sense of origin, the documents that contained the word, and we lose any positional information. Yet, for our unigram language model this is of no concern. We will store the words and their frequencies by means of the Chinese restaurant process.
 
 \section{The Chinese Restaurant Process}\marginnote{The Chinese restaurant process describes a family of probability distributions over partitions.}
-The Chinese restaurant process (CRP)\footnote{The restaurant metaphor was attributed to Jim Pitman by \citep{Aldous1985Exchangeability}} is one of the many metaphors to simplify difficult concepts and their underlying mathematical principles. 
+The Chinese restaurant process (CRP)\footnote{The restaurant metaphor was attributed to Jim Pitman by \cite{Aldous1985Exchangeability}} is one of the many metaphors to simplify difficult concepts and their underlying mathematical principles. 
 
 Imagine a restaurant with an infinite number of round tables, with enough space to host an infinite number of guests. Each table in the restaurant serves one dish, but multiple tables may serve the same dish.
 
@@ -101,8 +101,23 @@ An interesting property of the CRP is exchangeability. Although the CRP is speci
 %
 
 For example for the partition $\pi_{[12]}$ from \cref{eq:partitionexample}, the probability of this assignment is:
+%\begin{equation}\label{eq:partitionexampleprobability}
+%	p(\pi_{[12]}) = \frac{1}{1}\frac{1}{2}\frac{1}{3}\frac{1}{4}\frac{2}{5}\frac{1}{6}\frac{1}{7}\frac{2}{8}\frac{3}{9}\frac{3}{10}\frac{1}{11}\frac{2}{12}
+%\end{equation}
 \begin{equation}\label{eq:partitionexampleprobability}
-	p(\pi_{[12]}) = \frac{1}{1}\frac{1}{2}\frac{1}{3}\frac{1}{4}\frac{2}{5}\frac{1}{6}\frac{1}{7}\frac{2}{8}\frac{3}{9}\frac{3}{10}\frac{1}{11}\frac{2}{12}
+p(\pi_{[12]}) =
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (a1) {$\frac{1}{1}$};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (a2) {$\frac{1}{2}$};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (b3) {$\frac{1}{3}$};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (b4) {$\frac{1}{4}$};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (a5) {$\frac{2}{5}$};}
+\tikz[baseline,remember picture]{\node[box,fill=green!20] (c6) {$\frac{1}{6}$};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (d7) {$\frac{1}{7}$};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (b8) {$\frac{2}{8}$};}
+\tikz[baseline,remember picture]{\node[box,fill=blue!20] (a9) {$\frac{3}{9}$};}
+\tikz[baseline,remember picture]{\node[box,fill=red!20] (b10) {$\frac{3}{10}$};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (d11) {$\frac{1}{11}$};}
+\tikz[baseline,remember picture]{\node[box,fill=magenta!20] (d12) {$\frac{2}{12}$};}
 \end{equation}
 From these products, it also becomes clear that the order in which the customers enter does not matter, as long as they join the same tables. This also follows from the definition of exchangeability, which states that $X_1, X_2, \ldots$ is infinitely exchangeable if for any $n$, $p(X_1,\ldots,X_m)$ is invariant under permutation. More precise: a finite sequence $(X_1, \ldots, X_m)$ of random variables is called exchangeable if $p(X_1,\ldots,X_m) = p(X_{\sigma(1)},\ldots,X_{\sigma(m)})$, for each permutation $\sigma$ of $\{1,\ldots,m\}$. An infinite sequence $(X_1,X_2,\ldots)$ is called exchangeable if $p(X_1,X_2,\ldots)=p(X_{\sigma(1)},X_{\sigma(2)},\ldots)$ for each finite permutation $\sigma$ of $\{1,2,\ldots\}$, that is, each permutation for which $\#\{i: \sigma(i)\neq i\} < \infty$.
 
@@ -162,7 +177,7 @@ The expected number of tables as $M \rightarrow \infty$ is... This can be seen a
 \subsection{Stick-breaking}\marginnote{The stick-breaking process describes a probability distribution over partition sizes.}
 In the previous section we defined a process to generate a distribution over partitions by means of a seating arrangement. In this section we introduce a new metaphor: the stick-breaking distribution, which defines the distribution of customers sitting at the tables, without generating an explicit seating arrangement.
 
-The stick-breaking process\cite{Ishwaran2001Gibbs} is a distribution on the infinite sequence  $\xi = (\xi_1,\xi_2,\ldots)$; it is also known as the GEM distribution.\footnote{The GEM distribution is named after Griffiths, Engen, and McCloskey, cf.\ \cite{Pitman1997The}}
+The stick-breaking process\autocite{Ishwaran2001Gibbs} is a distribution on the infinite sequence  $\xi = (\xi_1,\xi_2,\ldots)$; it is also known as the GEM distribution.\footnote{The GEM distribution is named after Griffiths, Engen, and McCloskey, cf.\ \cite{Pitman1997The}}
 
 The metaphor is as follows: imagine you have a stick of length $1$. You generate $\xi_1$ by snapping the stick into two pieces. The length of one of the two pieces becomes the value $\xi_1$. To generate $\xi_2$ you then snap the other piece in two; again the length of one of these pieces becomes $\xi_2$. As you repeat this stick-breaking, the length of the stick that you have left approaches zero.
 
@@ -204,11 +219,11 @@ The urn works as follows. An urn contains objects of various types, where the ob
 
 In the section on CRP mixture models we saw that the underlying distributions were far from static, hence we need a replacement scheme that matches this distribution: the Hoppe-P\'olya urn.\footnote{The Hoppe-P\'olya urn is a distribution on sequences of random variables.} In the literature this scheme is often simply called the P\'olya urn.\footnote{Compare this simplified naming to the interchangeability of CRP and the Dirichlet Process CRP in the literature. We will undo this unclarity in a later section.} In this section we will introduce the P\'olya urn, the Hoppe-P\'olya urn, and the missing link between the two urn schemes, the multivariate P\'olya urn scheme.
 
-The P\'olya urn scheme\cite{Johnson1977Urn} is the simplest of the three schemes. The urn contains only white and black balls. For each ball that is drawn (randomly) from the urn, we observe its colour,  replace\footnote{Read: put it back into the urn.} it, and add an additional ball of the same colour to the urn. 
+The P\'olya urn scheme\autocite{Johnson1977Urn} is the simplest of the three schemes. The urn contains only white and black balls. For each ball that is drawn (randomly) from the urn, we observe its colour,  re-place\footnote{Read: put it back into the urn.} it, and add an additional ball of the same colour to the urn. 
 
 A modest generalisation of the P\'olya urn scheme is the multivariate P\'olya urn scheme. Here the generalisation entails that the balls can have other colours as well, although each ball still has only one colour. Image a Chinese restaurant where the number of tables is limited to $\kappa$ and $\kappa$ unique dishes are served; each table has a unique dish. The restaurant hosts $\nu$ customers. We can translate this scenario to the multivariate P\'olya urn, where we have $\kappa$ different colours, and $\nu$ balls. In the CRP\footnote{And in our reduced example.} we modelled word types as tables, and word tokens as the customers sitting around the same table. In the urn metaphor, the colours are the types, and the number of balls with a colour are the tokens. Since we limited $K=\kappa$ in this example, customers cannot choose to join a new table. The chance of joining another word is now $\frac{1}{\nu}$, and the chance of being of the same colour $h$ as ball $b$ is $\frac{c(h)}{\nu}$ with $c(x)$ denoting the count of balls with colour $x$. 
 
-More interesting is a generalisation of the P\'olya urn scheme that can behave the same way as a CRP. With the multivariate P\'olya urn scheme, we came close, but lacked the means to generate new tables.\footnote{And thus also the means to generate new dishes.} With the Hoppe-P\'olya urn scheme\cite{Hoppe1984Polya}, we can overcome this problem as follows. We start with an urn with one black\footnote{Read black as uncoloured, as we also do not take it into account when we count the number of different colours in the urn.} ball. When drawing from the urn, if we draw a black ball, we replace the ball, and alongside add a new ball of a new non-black colour randomly generated from a probability distribution. Otherwise, we put the ball back along with another ball of the same colour, as for the standard multivariate P\'olya urn scheme. The colours of an infinite sequence of draws from the Hoppe-P\'olya urn scheme follow a CRP. If instead of generating new colours (tables in the CRP), we draw a random value from a given base distribution such as $G_0$, we can model a CRPMM.\footnote{Compare this to \cref{eq:CRPMMlatent}. Also note that the P\'olya urn scheme models a beta-binomial distribution, with the parameters of the beta distribution depending on the initial layout of the urn. The multivariate P\'olya urn models a Dirichlet-multinomial distribution, where we set the Dirichlet parameter vector $\alpha=1$. The Hoppe-P\'olya urn scheme models the Dirichlet process, with $\alpha=1$. We will come back to this in a later section on the Dirichlet Process.} Similar to the CRP, the number of colours grows logarithmically to infinity, as the expected number of colours at time $n$ is $\sum_{i=1}^n i^{-1}$.
+More interesting is a generalisation of the P\'olya urn scheme that can behave the same way as a CRP. With the multivariate P\'olya urn scheme, we came close, but lacked the means to generate new tables.\footnote{And thus also the means to generate new dishes.} With the Hoppe-P\'olya urn scheme\autocite{Hoppe1984Polya}, we can overcome this problem as follows. We start with an urn with one black\footnote{Read black as uncoloured, as we also do not take it into account when we count the number of different colours in the urn.} ball. When drawing from the urn, if we draw a black ball, we replace the ball, and alongside add a new ball of a new non-black colour randomly generated from a probability distribution. Otherwise, we put the ball back along with another ball of the same colour, as for the standard multivariate P\'olya urn scheme. The colours of an infinite sequence of draws from the Hoppe-P\'olya urn scheme follow a CRP. If instead of generating new colours (tables in the CRP), we draw a random value from a given base distribution such as $G_0$, we can model a CRPMM.\footnote{Compare this to \cref{eq:CRPMMlatent}. Also note that the P\'olya urn scheme models a beta-binomial distribution, with the parameters of the beta distribution depending on the initial layout of the urn. The multivariate P\'olya urn models a Dirichlet-multinomial distribution, where we set the Dirichlet parameter vector $\alpha=1$. The Hoppe-P\'olya urn scheme models the Dirichlet process, with $\alpha=1$. We will come back to this in a later section on the Dirichlet Process.} Similar to the CRP, the number of colours grows logarithmically to infinity, as the expected number of colours at time $n$ is $\sum_{i=1}^n i^{-1}$.
 
 \textcite{Blackwell1973Ferguson} define the P\'olya urn scheme as follows. Let $\mu$ be any finite positive measure on a complete separable metric space $X$, and $(B_1,\dots,B_r)$ a finite partition of $X$. Now every sequence $\{X_n,n\geq 1\}$ of random variables with values in $X$ is a P\'olya sequence with parameter $\mu$ if for every $B\subset X$:
 \begin{equation}
@@ -255,7 +270,7 @@ Assume we have a corpus $\mathcal{C}$ with $W$ words and vocabulary $V$, and we 
 
 In practice the distribution of words is not uniform, and the probability mass function is then of length $W$ but normalised over the empirical word frequencies. 
 
-More formally, let $Q = [Q_1, Q_2, \ldots, Q_K]$ be a random probability mass function (pmf) with $K$ components, with $Q_i \geq 0$ for $i = 1,2,\ldots,K$ and $\sum_{i=1}^K Q_i = 1$. In addition, suppose that parameter vector $\alpha = [\alpha_1,\alpha_2,\ldots,\alpha_K]$,\footnote{Although perhaps confusing, this is not necessarily the same $\alpha$ as the Dirichlet process concentration parameter, although in practice this is often the case. Here we just follow the convention of the literature, where $\alpha$ is also used to denote the concentration parameter of the Dirichlet distribution.} with $\alpha_i > 0$ for each $i$ and let $\hat{\alpha} = \sum_{i=1}^K \alpha_i$.\footnote{If $\alpha_1=\alpha_2=\ldots=\alpha_K$, then we call $\alpha$ symmetric, and the distribution a symmetric Dirichlet distribution.} Then $Q$ is said to have a Dirichlet distribution with parameter $\alpha$, which we can denote by $Q \sim \operatorname{Dir}(\alpha)$:\footnote{See Section 2 of \citet{Ferguson1973A} for a more elaborate introduction, with many technicalities that we assume to be true; where not, we will indicate this.\cite{Ferguson1973A}}% * <a.vandenbosch@let.ru.nl> 2014-10-20T20:45:36.363Z:
+More formally, let $Q = [Q_1, Q_2, \ldots, Q_K]$ be a random probability mass function (pmf) with $K$ components, with $Q_i \geq 0$ for $i = 1,2,\ldots,K$ and $\sum_{i=1}^K Q_i = 1$. In addition, suppose that parameter vector $\alpha = [\alpha_1,\alpha_2,\ldots,\alpha_K]$,\footnote{Although perhaps confusing, this is not necessarily the same $\alpha$ as the Dirichlet process concentration parameter, although in practice this is often the case. Here we just follow the convention of the literature, where $\alpha$ is also used to denote the concentration parameter of the Dirichlet distribution.} with $\alpha_i > 0$ for each $i$ and let $\hat{\alpha} = \sum_{i=1}^K \alpha_i$.\footnote{If $\alpha_1=\alpha_2=\ldots=\alpha_K$, then we call $\alpha$ symmetric, and the distribution a symmetric Dirichlet distribution.} Then $Q$ is said to have a Dirichlet distribution with parameter $\alpha$, which we can denote by $Q \sim \operatorname{Dir}(\alpha)$:\footnote{See Section 2 of \cite{Ferguson1973A} for a more elaborate introduction, with many technicalities that we assume to be true; where not, we will indicate this.\cite{Ferguson1973A}}% * <a.vandenbosch@let.ru.nl> 2014-10-20T20:45:36.363Z:
 %
 % leg uit wat 'pmf' is
 %
@@ -281,7 +296,7 @@ when $\sum_{i=1}^K x_i = n$, $0$ otherwise. We can also express this with gamma 
 	\left(\frac{\Gamma(\sum_{i=1}^K x_i+1)}{\prod_{i=1}^K \Gamma(x_i+1)}\prod_{i=1}^K q_i^{x_1}\right)\left(\frac{\Gamma(\alpha_0)}{\prod_{i=1}^K \Gamma(\alpha_i)} \prod_{j=1}^K q_i^{\alpha_j-1}\right)
 \end{equation}
 
-Now consider an example in which we have $L$ documents, each assigned to a pmf $q^{(1)}, \ldots, q^{(L)}$, each drawn from the a distribution $Q$ such that $q^{(i)} \overset{\text{iid}}{\leftarrow} Q$, and $Q\sim\operatorname{Dir}(\alpha)$ being a distribution drawn from a distribution over distributions. If we draw iid $n_i$ samples from each pmf $q^{(i)}$
+Now consider an example in which we have $L$ documents, each assigned to a pmf $q^{(1)}, \ldots, q^{(L)}$, each drawn from a distribution $Q$ such that $q^{(i)} \overset{\text{iid}}{\leftarrow} Q$, and $Q\sim\operatorname{Dir}(\alpha)$ being a distribution drawn from a distribution over distributions. If we draw iid $n_i$ samples from each pmf $q^{(i)}$
 \begin{equation}
 	\operatorname{Dir}(\alpha) \overset{\text{iid}}{\rightarrow}
     \begin{cases}
@@ -301,26 +316,26 @@ If we start with the urn scheme, then we want to generate a realisation $Q\sim\o
 
 The model can be described by:
 \begin{align}
-    Q|\alpha &\sim \operatorname{Dir}(\frac{\alpha}{K},\ldots,\frac{\alpha}{K}) \\
+    Q|\alpha &\sim \operatorname{Dir}\left(\frac{\alpha}{K},\ldots,\frac{\alpha}{K}\right) \\
     q^{(i)}|Q&\sim\operatorname{Mult}(\pi) \\
     \phi_k | G_0 &\overset{\text{iid}}{\sim} G_0 \\
-    x_i|q^{(i)},\{\phi_K\}&\overset{\text{ind}}{\sim} F(\phi_{z_i}).
+    x_i|q^{(i)},\{\phi_K\}&\overset{\text{ind}}{\sim} F\left(\phi_{z_i}\right).
 \end{align}
 
 
 \subsection{Formalising The Dirichlet Process}
 Earlier we already made a remark that vocabularies are not necessarily of finite length. With the Dirichlet distribution we have to set $k$ upfront, because it is a parametrised model. In order to facilitate this, we use the Dirichlet process. 
 
-For a random distribution $G$ to be distributed according to a Dirichlet process, its marginal distributions have to be Dirichlet distributed. Let the Dirichlet process be parametrised by a base distribution $G_0$ and a positive scaling parameter $\alpha$.\footnote{\citet{Ferguson1973A} parametrises the Dirichlet process with a base measure, which is $\alpha G_0$ is our notation.} Then for any finite partition $A_1,\ldots,A_k$ of $\{\phi\}$ the vector $(G(A_1),\ldots,G(A_k))$ is random since $G$ is random. We then say $G$ is Dirichlet process distributed with base distribution $G_0$ and concentration parameter $\alpha$, which we denote as $G\sim\operatorname{DP}(\alpha, G_0)$, if 
+For a random distribution $G$ to be distributed according to a Dirichlet process, its marginal distributions have to be Dirichlet distributed. Let the Dirichlet process be parametrised by a base distribution $G_0$ and a positive scaling parameter $\alpha$.\footnote{\cite{Ferguson1973A} parametrises the Dirichlet process with a base measure, which is $\alpha G_0$ in our notation.} Then for any finite partition $A_1,\ldots,A_k$ of $\{\phi\}$ the vector $(G(A_1),\ldots,G(A_k))$ is random since $G$ is random. We then say $G$ is Dirichlet process distributed with base distribution $G_0$ and concentration parameter $\alpha$, which we denote as $G\sim\operatorname{DP}(\alpha, G_0)$, if 
 \begin{align}
-	(G(A_1),\ldots,G(A_k)) \sim \operatorname{Dir}(\alpha G_0(A_1), \ldots,\alpha G_0(A_k)).
+	(G(A_1),\ldots,G(A_k)) \sim \operatorname{Dir}(\alpha G_0(A_1), \ldots,\alpha G_0(A_k)).\label{eq:dirtodp}
 \end{align}
 
 The base distribution $G_0$ is basically the mean of the Dirichlet process, since for any measurable set $A\subset\{\phi\}$ we have $\mathbb{E}[G(A)]=G_0(A)$. The concentration parameter can be understood as the inverse variance: $\operatorname{Var}(G_0(A))= \frac{1-G_0(A)}{\alpha +1 }G_0(A)$. The larger $\alpha$ is, the smaller the variance, and the Dirichlet process will concentrate more of its mass around the mean. Other names for $\alpha$ are the mass parameter, as this prior strength can be measured in units of mass of observations. Sometimes it is also called the strength parameter, when they refer to the strength of the prior when using the Dirichlet process as a nonparametric prior.
 
 For the Dirichlet distribution and the multivariate P\'olya urn scheme, we saw that if we kept on drawing and placing balls according to its replacement scheme, we approached the true underlying distribution. For the Dirichlet process we can do a similar exercise. Let $G$ be a random distribution $G\sim\operatorname{Dir}(\alpha, G_0)$. Let $\theta_1,\ldots,\theta_n$ be a sequence of independent draws from $G$. 
-\textbf{Not finished}
 
+Now $G$ is not a fixed distribution, but a distribution of distributions. Each draw $\theta$ for colour $k$ is no longer proportional to $\frac{\alpha}{K}$, with $K$ the number of colours, but to the number of balls already picked with that colour: $A_k$. That means that instead of the Dirichlet with $\operatorname{Dir}\left(\frac{\alpha}{K}, \ldots,\frac{\alpha}{K}\right)$, it now follows $\operatorname{Dir}\left(\alpha G_0(A_1), \ldots, \alpha G_0(A_k)\right)$, which is also what we stated in \cref{eq:dirtodp}.
 
 Recall the Chinese restaurant process. Now the process for a Dirichlet process CRP (DPCRP) is as follows: the first customer enters the restaurant and sits at the first table. Each $(m+1)$th customer either joins an already occupied table $t$ with a probability $\frac{|t|}{m+\alpha}$, or sits at a new table with a probability $\frac{\alpha}{m+\alpha}$:\footnote{Compare this to the probabilities for the CRP: \cref{eq:crp-table}.}
 \begin{equation}\label{eq:dpcrp-table}
@@ -331,7 +346,7 @@ Recall the Chinese restaurant process. Now the process for a Dirichlet process C
   	\end{cases}
 \end{equation}
 
-The properties on exchangeability still hold. In \cref{partitionexampleprobability} we computed the probability of $\pi_{[12]}$ (\cref{eq:partitionexample}) as generated by a CRP:
+The properties on exchangeability still hold. In \cref{eq:partitionexampleprobability} we computed the probability of $\pi_{[12]}$ (\cref{eq:partitionexample}) as generated by a CRP:
 \begin{equation}
 	\pi_{[12]} = \{\{1,2,5,9\},\{3,4,8,10\},\{6\},\{7,11,12\}\}.
 \end{equation}
@@ -361,7 +376,7 @@ Then $G\sim\operatorname{DP}(\alpha,G_0)$. The distribution over $\xi$ is also w
 For the urn scheme the extension with a concentration parameter $\alpha$ is more straight-forward. Recall the Hoppe-P\'olya urn. In the original model there was only one black ball. If you drew the black ball, you had to put the black ball back, alongside a ball of a new colour. For any other coloured ball that was drawn, two balls of the same colour were placed in the urn. Now in the parametrised version, there are $\alpha$ black balls in the urn. Similar to the DRCRP where the chance of starting a new table was proportional to $\alpha$, independent of what other customers did, the chance in the DP Hoppe-P\'olya urn of adding a new colour is $\alpha$.
 
 \subsection{The Dirichlet Process Mixture Model}
-The most common application of the Dirichlet process is in clustering data using mixture models\cite{Antoniak1974Mixtures,Escobar1995Bayesian}. Here the nonparametric nature of the Dirichlet process translates to mixture models with a countably infinite number of components. We model a set of observations $\{x_1, x_2, \ldots, x_n\}$ using a set of latent variables $\{\theta_1,\theta_2,\ldots,\theta_n\}$. Each $\theta_i$ is drawn idd from $G$, while each $x_i$ has distribution $F(\theta_i)$ parametrised by $\theta_i$:
+The most common application of the Dirichlet process is in clustering data using mixture models\autocite{Antoniak1974Mixtures,Escobar1995Bayesian}. Here the nonparametric nature of the Dirichlet process translates to mixture models with a countably infinite number of components. We model a set of observations $\{x_1, x_2, \ldots, x_n\}$ using a set of latent variables $\{\theta_1,\theta_2,\ldots,\theta_n\}$. Each $\theta_i$ is drawn idd from $G$, while each $x_i$ has distribution $F(\theta_i)$ parametrised by $\theta_i$:
 \begin{align}
 	x_i|\theta_i&\sim F(\theta_i) \\
     \theta_i|G&\sim G \\
@@ -394,10 +409,11 @@ The Pitman-Yor process can also be described by the Chinese restaurant process (
            	\frac{\alpha+k\gamma}{\alpha+m}, & \text{otherwise}\\ 
         \end{cases}.
 \end{align}
-Two characteristic properties can be observed easily from the description. \begin{enumerate*}
+Two characteristic properties can be observed easily from the description. 
+\begin{enumerate}
 \item As more customers join a table, that table becomes a more likely choice for future customers too;
 \item Irrespective of how many customers are in the restaurant, there is always a positive probability of joining an unoccupied table. This probability depends on the number of tables, as $k$ grows, the probability of starting table $(k+1)$ grows as well with rate $\gamma$.
-\end{enumerate*}
+\end{enumerate}
 
 Its conditional distribution is:
 \begin{align}\label{eq:pycrpconddist}
@@ -433,9 +449,9 @@ by aggregating the probabilities in \cref{eq:pycrpconddist} corresponding to eac
 
 We can achieve hierarchy in a Bayesian model in various ways. In this section, and in the next section, we will discuss two different hierarchical models. The hierarchical Pitman-Yor process will be discussed in the next section, and can be used to model domain knowledge. In the remainder of this section we introduce the nested Pitman-Yor process, which we can use to model $n$-grams.\footnote[][-24em]{The difference can be considered as modelling the hierarchy within data (the nested Pitman-Yor process), and hierarchy between data (the hierarchical Pitman-Yor process). However, note that in the literature the nested Pitman-Yor process as a language model is often referred to as hierachical Pitman-Yor language model.} 
 
-We introduce dependence between distributions through linear combinations of realisations of independent Pitman-Yor processes, which we call the nested Pitman-Yor process.\cite[-19em]{Teh2006AHierarchical,Teh2006ATechnical} There is also a body of similar work on nested Dirichlet processes.\cite[-9em]{Blei2010The,Rodriguez2008The}
+We introduce dependence between distributions through linear combinations of realisations of independent Pitman-Yor processes, which we call the nested Pitman-Yor process.\autocite{Teh2006AHierarchical,Teh2006ATechnical} There is also a body of similar work on nested Dirichlet processes.\autocite{Blei2010The,Rodriguez2008The}
 
-Let $x_{ij}$ be the $i$th observation, with $i = 1,\ldots,k_n$ for subjects within layer $n$, for $n=1,\ldots,N$. In the context of our Bayesian language model, $n$ refers to the $n$-grams, $N$ is then the maximum $n$-gram length we model.\footnote[][-3em]{The Sequence memoizer introduced by \citet{Wood2009A} is a nested Pitman-Yor model with $N\rightarrow\infty$. \cite{Wood2009A}} And for each $n$-gram layer $n$ we have $k_n$ observations.
+Let $x_{ij}$ be the $i$th observation, with $i = 1,\ldots,k_n$ for subjects within layer $n$, for $n=1,\ldots,N$. In the context of our Bayesian language model, $n$ refers to the $n$-grams, $N$ is then the maximum $n$-gram length we model.\footnote{The Sequence memoizer introduced by \cite{Wood2009A} is a nested Pitman-Yor model with $N\rightarrow\infty$. \cite{Wood2009A}} And for each $n$-gram layer $n$ we have $k_n$ observations.
 
 From the previous section on Pitman-Yor unigram language models we had a finite vocabulary $V$ with $W$ words. For each word $w\in V$, we have $F(w)$ be the estimated probability of $w$. Now let $F=\{F(w)\}_{w\in V}$ be the vector of unigram probabilities, with a prior distribution given by $G_0$: 
 \begin{align}\label{eq:pypcontext}
@@ -479,7 +495,13 @@ The first clause in \cref{eq:npyp1} states that if the there are no tables in re
 \Cref{eq:npyp2} shows the marginalising step: the number of customers easting desert $w$ in restaurant $u$ is the sum of all people who may have had a different main course, but chose the same desert.
 
 \section{The Bayesian Approach to Skipgram Language Modelling}
-essentially the same, but backoff refer to later chapter
+%essentially the same, but backoff refer to later chapter
+In this chapter we introduced many concepts such as the Chinese restaurant process, the stick-breaking process, and the related urn process. They all are closely connected to the Dirichlet Process, and depending on the properties of modelling that you are after, they prove to be more tractable marginalisations of the Dirichlet Process. We also showed how unigram and $n$-gram language models fit in the paradigm of non-parametric Bayesian models, with the culmination of the Pitman-Yor process language models. 
+
+Each of the topics mentioned in this chapter, are, and have been, topic of research. This overview is therefore never complete, but we hope that it serves to be a round-up of literature that is otherwise fragmented, and stained with using words for concepts that are similar, but not the same.
+
+In the next chapter we continue with the notion of $n$-gram Pitman-Yor process language models, in particular we add skipgrams as features.
+
 
 % \section{The Bayesian Approach to Domain-dependent $n$-gram Language Modelling}
 
