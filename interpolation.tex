@@ -210,9 +210,31 @@ These results to some extent weaken the position of skipgrams, as $n$-grams are 
 \subsection{Individual interpolation values per backoff step}
 In the previous chapter we graphically introduced the backoff steps in \cref{fig:bof}. If we consider the directed edges in the tree going from one node to a smaller node\footnote{Where we measure the size of a node by the length of a pattern minus the number of skips.}, then for \textsf{uni} the edges are weighted 1, and for \textsf{npref} the edges $w_{d}$, $w_{cd}$, $w_{bcd}$, and $w_{abcd}$ have weight 1, with the others being 2.
 
-In the following example we convert the graph into a tree for a 4-gram model, and we add the names of the backoff weights, corresponding to the terms introduced for \textsf{value} earlier this chapter.
+In the following example in \cref{fig:value} we convert the graph into a tree for a 4-gram model, and we add the names of the backoff weights, corresponding to the terms introduced for \textsf{value} earlier this chapter.
+
+In an attempt to find the optimal values, we only have to consider the weights that can be combined. For example, $w_d$ is never interpolated with another term, and since the weighted terms are normalised, its value does not matter. This leaves us with 6 unique weights: $w_{axcd}$, $w_{abxd}$, and $w_{bcd}$, for the first level; $w_{axxd}$, $w_{cd}$, and $w_{bxd}$ for the second level.
+
+We limit the weights to be integers between 0 through 10. We optimise the value per backoff weight, and set it to the lowest, after which we continue to the next parameter. After a period of stagnation in finding a lower perplexity, we randomise all values to escape possible local minima.
 
 \input{figvalue}
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:obwvalue}
+	\begin{tabular}{lllllllllllll}
+		training              & test & \multicolumn{2}{c}{ppl}         & \multicolumn{8}{c}{weights}                           &    \\
+		\multirow{12}{*}{\obw} &      & \textsf{uni}            & optimum        & d   & cd & b\{1\}d & a\{1\}d & bcd & a\{1\}cd & ab\{1\}d & abcd &    \\
+		& \emea & \numprint{728.265}        & \numprint{717.17}         & 9   & 9  & 4    & 10     & 9   & 4     & 2     & 9    &    \\
+		&      & \multicolumn{2}{c}{\numprint{1.523483897}} & 100 & 39 & 17   & 43     & 60  & 27    & 13    & 100  & \% \\
+		& \jrc  & \numprint{728.987}        & \numprint{687.015}        & 9   & 9  & 3    & 7      & 10  & 4     & 2     & 9    &    \\
+		&      & \multicolumn{2}{c}{\numprint{5.757578667}} & 100 & 47 & 16   & 37     & 63  & 25    & 13    & 100  & \% \\
+		& \obw  & \numprint{124.685}        & \numprint{113.711}        & 9   & 9  & 1    & 2      & 9   & 4     & 2     & 9    &    \\
+		&      & \multicolumn{2}{c}{\numprint{8.801379476}} & 100 & 75 & 8    & 17     & 60  & 27    & 13    & 100  & \% \\
+		& \wp   & \numprint{392.043}        & \numprint{363.846}        & 4   & 6  & 2    & 3      & 5   & 2     & 1     & 8    &    \\
+		&      & \multicolumn{2}{c}{\numprint{7.192323291}} & 100 & 55 & 18   & 27     & 63  & 25    & 13    & 100  & \%
+	\end{tabular}
+\end{table}
 
 
 \subsection{A qualitative analysis into the contribution of skipgrams}

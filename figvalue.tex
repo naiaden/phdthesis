@@ -1,0 +1,44 @@
+\begin{figure*}
+    \begin{tikzpicture}[every node/.style={node distance=10pt, rectangle, minimum size=1cm}]
+    
+    \node[] (d1) {d};
+    \node[below=of d1] (d2) {d};
+    \node[below=of d2] (d3) {d};
+    \node[below=of d3] (d4) {d};
+    \node[below=of d4] (d5) {d};
+    \node[below=of d5] (d6) {d};
+    
+    \node[left=0cm and 2.5cm of d1] (axxd1) {axxd};
+    \node[left=0cm and 2.5cm of d3] (axxd2) {axxd};
+    \node[left=0cm and 2.5cm of d2] (cd1) {cd};
+    \node[left=0cm and 2.5cm of d5] (cd2) {cd};
+    \node[left=0cm and 2.5cm of d4] (bxd1) {bxd};
+    \node[left=0cm and 2.5cm of d6] (bxd2) {bxd};
+    
+    \node[left=0cm and 2.5cm of $(axxd1)!0.5!(cd1)$] (axcd) {axcd};
+    \node[left=0cm and 2.5cm of $(axxd2)!0.5!(bxd1)$] (abxd) {abxd};
+    \node[left=0cm and 2.5cm of $(cd2)!0.5!(bxd2)$] (bcd) {bcd};
+    
+    \node[left=0cm and 2.5cm of abxd] (abcd) {abcd};
+    
+    \draw (abcd) -- node[above] {$w_{axcd}$} ++ (axcd);
+    \draw (abcd) -- node[above] {$w_{abxd}$} ++ (abxd);
+    \draw (abcd) -- node[below] {$w_{bcd}$} ++ (bcd);
+    
+    \draw (axcd) -- node[above] {$w_{axxd}$} ++ (axxd1);
+    \draw (axcd) -- node[below] {$w_{cd}$} ++ (cd1);
+    \draw (abxd) -- node[above] {$w_{axxd}$} ++ (axxd2);
+    \draw (abxd) -- node[below] {$w_{bxd}$} ++ (bxd1);
+    \draw (bcd) -- node[above] {$w_{cd}$} ++ (cd2);
+    \draw (bcd) -- node[below] {$w_{bxd}$} ++ (bxd2);
+    
+    \draw (axxd1) -- node[below] {$w_d$} ++ (d1);
+    \draw (cd1) -- node[below] {$w_d$} ++ (d2);
+    \draw (axxd2) -- node[below] {$w_d$} ++ (d3);
+    \draw (bxd1) -- node[below] {$w_d$} ++ (d4);
+    \draw (cd2) -- node[below] {$w_d$} ++ (d5);
+    \draw (bxd2) -- node[below] {$w_d$} ++ (d6);
+   	\end{tikzpicture}
+    \caption{}
+    \label{fig:value}
+    \end{figure*}
