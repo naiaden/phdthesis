@@ -137,18 +137,19 @@ The first comparison is between \textsf{ngram} and \textsf{uni}, since these bac
 		      &  & 1bw  & emea  & jrc  & wp      \\
 		\textsf{ngram}   & \btc{25}\numprint{129.47} &  \numprint{1123.89} 
 					&  \numprint{941.4}  &  \numprint{456.27} &  
-		        &      &       
-			         &      &    &  
+		        & \numprint{1761.34} & \numprint{5.63033} 
+		            & \numprint{898} & \numprint{1123.58} &  
 		        &  \numprint{1520.1}  &  \numprint{1278.94} 
 			         &  \btc{25}\numprint{12.85} &  \numprint{1249.28} \\
 		\textsf{fulluni}  & \numprint{124.69} & \numprint{728.27}  
 				 	& \numprint{728.98} & \numprint{392.04} 
-				 &  &      &       &      
-				 	&    &  
+				 &  & \numprint{1393.81} & \numprint{5.6754} 
+				 	& \numprint{773.116} & \numprint{907.558} &  
 				 & \numprint{1303.66} & \numprint{1069.64} 
 				 	& \btc{25}\numprint{13.32} & \numprint{1067.99} \\
 		$\Delta$\% & \numprint{3.1} & \numprint{35.23} & \numprint{22.53}   &  \numprint{14.04}
-				& & & & & &
+				& & \numprint{20.840} & \numprint{-0.800} 
+					& \numprint{13.91982} & \numprint{19.217} &
 				& \numprint{14.21} & \numprint{16.34} & \numprint{-3.65} & \numprint{14.49} \\
 	\end{tabular}
 \end{table}
@@ -171,8 +172,8 @@ An initial guess for $n$-gram preference was a ratio of 2:1, in favour of $n$-gr
 		&  & \obw  & \emea  & \jrc  & \wp      \\
 		\textsf{fulluni}   & \numprint{124.69} &  \numprint{728.27} 
 		&  \numprint{728.98}  &  \numprint{392.04} &  
-		&      &       
-		&      &    &  
+		& \numprint{1393.81} & \numprint{5.6754} 
+			& \numprint{773.116} & \numprint{907.558} &  
 		&  \numprint{1303.66}  &  \numprint{1069.64} 
 		&  \numprint{13.32} &  \numprint{1067.99} \\
 		\textsf{fullnpref}  & \numprint{118.28} & \numprint{699.91}  
@@ -182,12 +183,13 @@ An initial guess for $n$-gram preference was a ratio of 2:1, in favour of $n$-gr
 		& \numprint{1215.52} & \numprint{1000.72} 
 		& \numprint{12.84} & \numprint{1000} \\
 		$\Delta$\% & \numprint{5.6} & \numprint{3.85} & \numprint{4.80}   &  \numprint{5.10}
-		& & & & & &
+		& &\numprint{6.312769}&\numprint{1.5047}
+			&\numprint{8.796895}&\numprint{6.0572687}&
 		& \numprint{6.75} & \numprint{6.45} & \numprint{3.6} & \numprint{6.37} \\
 	\end{tabular}
 \end{table}
 
-Even with these positive results, it is hard to not verify whether 2.0 is indeed the optimal value for \textsf{fullnpref}.
+Even with these positive results, it is hard to not verify whether 2.0 is indeed the optimal value for \textsf{fullnpref}. In \cref{tab:nprefgrid} we show the results of a search for the lowest perplexity, in 25 steps in the logarithmic space from 0.05 through 20.
 
 \begin{table*}\resizebox{\columnwidth}{!}{%
 		\begin{tabular}{llllllllllllllllllllllllll}
@@ -200,7 +202,18 @@ Even with these positive results, it is hard to not verify whether 2.0 is indeed
 		\end{tabular}
 	}
 \caption{The perplexity values for different \textsf{fullnpref} preference rates with the \obw model. The 25 steps were sampled in a log space from $[10^{-1.3},10^{1.3}]$. The results show that indeed \textsf{fullnpref-2.0} was a good first guess, with optimal values somewhere between 2.71 and 4.47, depending on the test set.}
+\label{tab:nprefgrid}
 \end{table*}
+
+These results to some extent weaken the position of skipgrams, as $n$-grams are given a preference of at least 2 times, up to 4. But nonetheless, the skipgrams contribute to a lower perplexity,\footnote{See \cref{tab:ngramsvsskipgrams,tab:fullunivsfullnpref2}.} where this could not be achieved with solely using $n$-grams.
+
+\subsection{Individual interpolation values per backoff step}
+In the previous chapter we graphically introduced the backoff steps in \cref{fig:bof}. If we consider the directed edges in the tree going from one node to a smaller node\footnote{Where we measure the size of a node by the length of a pattern minus the number of skips.}, then for \textsf{uni} the edges are weighted 1, and for \textsf{npref} the edges $w_{d}$, $w_{cd}$, $w_{bcd}$, and $w_{abcd}$ have weight 1, with the others being 2.
+
+In the following example we convert the graph into a tree for a 4-gram model, and we add the names of the backoff weights, corresponding to the terms introduced for \textsf{value} earlier this chapter.
+
+\input{figvalue}
+
 
 \subsection{A qualitative analysis into the contribution of skipgrams}
 
