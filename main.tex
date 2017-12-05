@@ -323,13 +323,17 @@ box/.style={%draw,%
 
 \usepackage{pgfkeys}
 \newcommand{\copr}[3]{% colour & print
-\ifnum\pgfkeysvalueof{/#1/min/#2}>\eval{round(#3)}%
-\pgfkeys{/#1/min/#2 = \eval{round(#3)-0.5}}%
-\fi%
-\ifnum\pgfkeysvalueof{/#1/max/#2}<\eval{round(#3)}%
-\pgfkeys{/#1/max/#2 = \eval{round(#3)+0.5}}
-\fi%
-\ptc{\eval{round(100*(((#3-\pgfkeysvalueof{/#1/min/#2}))/(\pgfkeysvalueof{/#1/max/#2}-\pgfkeysvalueof{/#1/min/#2})))}}%
+%\{\pgfkeysvalueof{/#1/min/#2},\pgfkeysvalueof{/#1/max/#2}\}
+%\ifdim\pgfkeysvalueof{/#1/min/#2} pt>#3 pt%
+%\pgfkeys{/#1/min/#2 = #3}%
+%\fi%
+%\ifdim\pgfkeysvalueof{/#1/max/#2} pt<#3 pt%
+%\pgfkeys{/#1/max/#2 = #3}
+%\fi%
+\ptc{
+\eval{round(100*(((#3-\pgfkeysvalueof{/#1/min/#2}))/(\pgfkeysvalueof{/#1/max/#2}-\pgfkeysvalueof{/#1/min/#2})))}
+%\eval{#3}
+}%
 \numprint{#3}
 }
 
@@ -449,36 +453,36 @@ box/.style={%draw,%
 
 %\printindex
 
-\makeatletter
-\protected@write\@auxout{}{%
-  \protect\providecommand\protect\@begindocumenthook{}% Make sure \@begindocumenthook is defined
-  \protect\g@addto@macro\protect\@begindocumenthook{\protect\pgfkeys{%
-  		 /obw/min/obw=\pgfkeysvalueof{/obw/min/obw},%
-         /obw/max/obw=\pgfkeysvalueof{/obw/max/obw},%
-         /obw/min/emea=\pgfkeysvalueof{/obw/min/emea},%
-         /obw/max/emea=\pgfkeysvalueof{/obw/max/emea},%
-         /obw/min/jrc=\pgfkeysvalueof{/obw/min/jrc},%
-         /obw/max/jrc=\pgfkeysvalueof{/obw/max/jrc},%
-         /obw/min/wp=\pgfkeysvalueof{/obw/min/wp},%
-         /obw/max/wp=\pgfkeysvalueof{/obw/max/wp},%
-         /emea/min/obw=\pgfkeysvalueof{/emea/min/obw},%
-         /emea/max/obw=\pgfkeysvalueof{/emea/max/obw},%
-         /emea/min/emea=\pgfkeysvalueof{/emea/min/emea},%
-         /emea/max/emea=\pgfkeysvalueof{/emea/max/emea},%
-         /emea/min/jrc=\pgfkeysvalueof{/emea/min/jrc},%
-         /emea/max/jrc=\pgfkeysvalueof{/emea/max/jrc},%
-         /emea/min/wp=\pgfkeysvalueof{/emea/min/wp},%
-         /emea/max/wp=\pgfkeysvalueof{/emea/max/wp},%
-  		 /jrc/min/obw=\pgfkeysvalueof{/jrc/min/obw},%
-         /jrc/max/obw=\pgfkeysvalueof{/jrc/max/obw},%
-         /jrc/min/emea=\pgfkeysvalueof{/jrc/min/emea},%
-         /jrc/max/emea=\pgfkeysvalueof{/jrc/max/emea},%
-         /jrc/min/jrc=\pgfkeysvalueof{/jrc/min/jrc},%
-         /jrc/max/jrc=\pgfkeysvalueof{/jrc/max/jrc},%
-         /jrc/min/wp=\pgfkeysvalueof{/jrc/min/wp},%
-         /jrc/max/wp=\pgfkeysvalueof{/jrc/max/wp},%
-         }}
-}
-\makeatother
+%\makeatletter
+%\protected@write\@auxout{}{%
+%  \protect\providecommand\protect\@begindocumenthook{}% Make sure \@begindocumenthook is defined
+%  \protect\g@addto@macro\protect\@begindocumenthook{\protect\pgfkeys{%
+%  		 /obw/min/obw=\pgfkeysvalueof{/obw/min/obw},%
+%         /obw/max/obw=\pgfkeysvalueof{/obw/max/obw},%
+%         /obw/min/emea=\pgfkeysvalueof{/obw/min/emea},%
+%         /obw/max/emea=\pgfkeysvalueof{/obw/max/emea},%
+%         /obw/min/jrc=\pgfkeysvalueof{/obw/min/jrc},%
+%         /obw/max/jrc=\pgfkeysvalueof{/obw/max/jrc},%
+%         /obw/min/wp=\pgfkeysvalueof{/obw/min/wp},%
+%         /obw/max/wp=\pgfkeysvalueof{/obw/max/wp},%
+%         /emea/min/obw=\pgfkeysvalueof{/emea/min/obw},%
+%         /emea/max/obw=\pgfkeysvalueof{/emea/max/obw},%
+%         /emea/min/emea=\pgfkeysvalueof{/emea/min/emea},%
+%         /emea/max/emea=\pgfkeysvalueof{/emea/max/emea},%
+%         /emea/min/jrc=\pgfkeysvalueof{/emea/min/jrc},%
+%         /emea/max/jrc=\pgfkeysvalueof{/emea/max/jrc},%
+%         /emea/min/wp=\pgfkeysvalueof{/emea/min/wp},%
+%         /emea/max/wp=\pgfkeysvalueof{/emea/max/wp},%
+%  		 /jrc/min/obw=\pgfkeysvalueof{/jrc/min/obw},%
+%         /jrc/max/obw=\pgfkeysvalueof{/jrc/max/obw},%
+%         /jrc/min/emea=\pgfkeysvalueof{/jrc/min/emea},%
+%         /jrc/max/emea=\pgfkeysvalueof{/jrc/max/emea},%
+%         /jrc/min/jrc=\pgfkeysvalueof{/jrc/min/jrc},%
+%         /jrc/max/jrc=\pgfkeysvalueof{/jrc/max/jrc},%
+%         /jrc/min/wp=\pgfkeysvalueof{/jrc/min/wp},%
+%         /jrc/max/wp=\pgfkeysvalueof{/jrc/max/wp},%
+%         }}
+%}
+%\makeatother
 
 \end{document}
