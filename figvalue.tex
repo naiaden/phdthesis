@@ -1,36 +1,36 @@
 \begin{figure*}
     \begin{tikzpicture}[every node/.style={node distance=10pt, rectangle, minimum size=1cm}]
     
-    \node[] (d1) {d};
-    \node[below=of d1] (d2) {d};
-    \node[below=of d2] (d3) {d};
-    \node[below=of d3] (d4) {d};
-    \node[below=of d4] (d5) {d};
-    \node[below=of d5] (d6) {d};
+    \node[] (d1) {\emph{d}};
+    \node[below=of d1] (d2) {\emph{d}};
+    \node[below=of d2] (d3) {\emph{d}};
+    \node[below=of d3] (d4) {\emph{d}};
+    \node[below=of d4] (d5) {\emph{d}};
+    \node[below=of d5] (d6) {\emph{d}};
     
-    \node[left=0cm and 2.5cm of d1] (axxd1) {axxd};
-    \node[left=0cm and 2.5cm of d3] (axxd2) {axxd};
-    \node[left=0cm and 2.5cm of d2] (cd1) {cd};
-    \node[left=0cm and 2.5cm of d5] (cd2) {cd};
-    \node[left=0cm and 2.5cm of d4] (bxd1) {bxd};
-    \node[left=0cm and 2.5cm of d6] (bxd2) {bxd};
+    \node[left=0cm and 2.5cm of d1] (axxd1) {\emph{a\{2\}d}};
+    \node[left=0cm and 2.5cm of d3] (axxd2) {\emph{a\{2\}d}};
+    \node[left=0cm and 2.5cm of d2] (cd1) {\emph{cd}};
+    \node[left=0cm and 2.5cm of d5] (cd2) {\emph{cd}};
+    \node[left=0cm and 2.5cm of d4] (bxd1) {\emph{b\{1\}d}};
+    \node[left=0cm and 2.5cm of d6] (bxd2) {\emph{b\{1\}d}};
     
-    \node[left=0cm and 2.5cm of $(axxd1)!0.5!(cd1)$] (axcd) {axcd};
-    \node[left=0cm and 2.5cm of $(axxd2)!0.5!(bxd1)$] (abxd) {abxd};
-    \node[left=0cm and 2.5cm of $(cd2)!0.5!(bxd2)$] (bcd) {bcd};
+    \node[left=0cm and 2.5cm of $(axxd1)!0.5!(cd1)$] (axcd) {\emph{a\{1\}cd}};
+    \node[left=0cm and 2.5cm of $(axxd2)!0.5!(bxd1)$] (abxd) {\emph{ab\{1\}d}};
+    \node[left=0cm and 2.5cm of $(cd2)!0.5!(bxd2)$] (bcd) {\emph{bcd}};
     
-    \node[left=0cm and 2.5cm of abxd] (abcd) {abcd};
+    \node[left=0cm and 2.5cm of abxd] (abcd) {\emph{abcd}};
     
-    \draw (abcd) -- node[above] {$w_{axcd}$} ++ (axcd);
-    \draw (abcd) -- node[above] {$w_{abxd}$} ++ (abxd);
+    \draw (abcd) -- node[above] {$w_{a\{1\}cd}$} ++ (axcd);
+    \draw (abcd) -- node[above] {$w_{ab\{1\}d}$} ++ (abxd);
     \draw (abcd) -- node[below] {$w_{bcd}$} ++ (bcd);
     
-    \draw (axcd) -- node[above] {$w_{axxd}$} ++ (axxd1);
+    \draw (axcd) -- node[above] {$w_{a\{2\}d}$} ++ (axxd1);
     \draw (axcd) -- node[below] {$w_{cd}$} ++ (cd1);
-    \draw (abxd) -- node[above] {$w_{axxd}$} ++ (axxd2);
-    \draw (abxd) -- node[below] {$w_{bxd}$} ++ (bxd1);
+    \draw (abxd) -- node[above] {$w_{a\{2\}d}$} ++ (axxd2);
+    \draw (abxd) -- node[below] {$w_{b\{1\}d}$} ++ (bxd1);
     \draw (bcd) -- node[above] {$w_{cd}$} ++ (cd2);
-    \draw (bcd) -- node[below] {$w_{bxd}$} ++ (bxd2);
+    \draw (bcd) -- node[below] {$w_{b\{1\}d}$} ++ (bxd2);
     
     \draw (axxd1) -- node[below] {$w_d$} ++ (d1);
     \draw (cd1) -- node[below] {$w_d$} ++ (d2);
@@ -39,6 +39,6 @@
     \draw (cd2) -- node[below] {$w_d$} ++ (d5);
     \draw (bxd2) -- node[below] {$w_d$} ++ (d6);
    	\end{tikzpicture}
-    \caption{}
+    \caption{The backoff strategy in a tree shape for the 4-gram \emph{abcd}. The labelled edges show the names corresponding the weights in \textsf{value}, and in \cref{tab:obwvalues}.}
     \label{fig:value}
     \end{figure*}

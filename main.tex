@@ -219,12 +219,7 @@ box/.style={%draw,%
   \end{fullwidth}
 }
 
-\usepackage{colortbl}
-\definecolor{bestclr}{rgb}{0,0,1}
-\definecolor{worstclr}{rgb}{1,0,0}
-\definecolor{avgclr}{rgb}{1,1,1}
-\newcommand{\btc}[1]{\cellcolor{bestclr!#1}}
-\newcommand{\wtc}[1]{\cellcolor{worstclr!#1}}
+
 
 
 % Inserts a blank page
@@ -298,9 +293,80 @@ box/.style={%draw,%
 %\usepackage{backref} 
 
 
+\usepackage{colortbl}
+\definecolor{bestclr}{rgb}{0,0,1}
+\definecolor{worstclr}{rgb}{1,0,0}
+\definecolor{avgclr}{rgb}{1,1,1}
+\newcommand{\btc}[1]{\cellcolor{bestclr!#1}}
+\newcommand{\wtc}[1]{\cellcolor{worstclr!#1}}
+
+
+
+
+
+\usepackage{pgf}
+\usepackage{expl3}
+\ExplSyntaxOn
+\cs_set_eq:NN \eval \fp_eval:n
+\ExplSyntaxOff
+
+\usepackage{xintexpr}
+\newcommand{\ptc}[1]{% percentage to colour
+\ifnum#1>50%
+\edef\processme{\noexpand\btc{\eval{round((#1-50)/2)}}}%
+    \processme
+\else%
+\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
+    \processme
+\fi%
+}
+
+\usepackage{pgfkeys}
+\newcommand{\copr}[3]{% colour & print
+\{\pgfkeysvalueof{/#1/min/#2},\pgfkeysvalueof{/#1/max/#2}\}:#3 
+\ifnum\pgfkeysvalueof{/#1/min/#2}>\eval{round(#3)}%
+\pgfkeys{/#1/min/#2 = \eval{round(#3)-0.5}}%
+\fi%
+\ifnum\pgfkeysvalueof{/#1/max/#2}<\eval{round(#3)}%
+\pgfkeys{/#1/max/#2 = \eval{round(#3)+0.5}}
+\fi%
+\ptc{\eval{round(100*(((#3-\pgfkeysvalueof{/#1/min/#2}))/(\pgfkeysvalueof{/#1/max/#2}-\pgfkeysvalueof{/#1/min/#2})))}}%
+\numprint{#3}
+}
+
+\pgfkeys{/obw/min/obw/.initial=1000}
+\pgfkeys{/obw/max/obw/.initial=1}
+\pgfkeys{/obw/min/emea/.initial=1000}
+\pgfkeys{/obw/max/emea/.initial=1}
+\pgfkeys{/obw/min/jrc/.initial=1000}
+\pgfkeys{/obw/max/jrc/.initial=1}
+\pgfkeys{/obw/min/wp/.initial=1000}
+\pgfkeys{/obw/max/wp/.initial=1}
+
+\pgfkeys{/emea/min/obw/.initial=1000}
+\pgfkeys{/emea/max/obw/.initial=1}
+\pgfkeys{/emea/min/emea/.initial=1000}
+\pgfkeys{/emea/max/emea/.initial=1}
+\pgfkeys{/emea/min/jrc/.initial=1000}
+\pgfkeys{/emea/max/jrc/.initial=1}
+\pgfkeys{/emea/min/wp/.initial=1000}
+\pgfkeys{/emea/max/wp/.initial=1}
+
+\pgfkeys{/jrc/min/obw/.initial=1000}
+\pgfkeys{/jrc/max/obw/.initial=1}
+\pgfkeys{/jrc/min/emea/.initial=1000}
+\pgfkeys{/jrc/max/emea/.initial=1}
+\pgfkeys{/jrc/min/jrc/.initial=1000}
+\pgfkeys{/jrc/max/jrc/.initial=1}
+\pgfkeys{/jrc/min/wp/.initial=1000}
+\pgfkeys{/jrc/max/wp/.initial=1}
+
+\usepackage{array}
+
+\newcolumntype{L}{l<{\hspace{14pt}}}
 
 \begin{document}
-
+ 
 %% Front matter
 %\frontmatter
 
@@ -383,5 +449,37 @@ box/.style={%draw,%
 
 
 %\printindex
+
+\makeatletter
+\protected@write\@auxout{}{%
+  \protect\providecommand\protect\@begindocumenthook{}% Make sure \@begindocumenthook is defined
+  \protect\g@addto@macro\protect\@begindocumenthook{\protect\pgfkeys{%
+  		 /obw/min/obw=\pgfkeysvalueof{/obw/min/obw},%
+         /obw/max/obw=\pgfkeysvalueof{/obw/max/obw},%
+         /obw/min/emea=\pgfkeysvalueof{/obw/min/emea},%
+         /obw/max/emea=\pgfkeysvalueof{/obw/max/emea},%
+         /obw/min/jrc=\pgfkeysvalueof{/obw/min/jrc},%
+         /obw/max/jrc=\pgfkeysvalueof{/obw/max/jrc},%
+         /obw/min/wp=\pgfkeysvalueof{/obw/min/wp},%
+         /obw/max/wp=\pgfkeysvalueof{/obw/max/wp},%
+         /emea/min/obw=\pgfkeysvalueof{/emea/min/obw},%
+         /emea/max/obw=\pgfkeysvalueof{/emea/max/obw},%
+         /emea/min/emea=\pgfkeysvalueof{/emea/min/emea},%
+         /emea/max/emea=\pgfkeysvalueof{/emea/max/emea},%
+         /emea/min/jrc=\pgfkeysvalueof{/emea/min/jrc},%
+         /emea/max/jrc=\pgfkeysvalueof{/emea/max/jrc},%
+         /emea/min/wp=\pgfkeysvalueof{/emea/min/wp},%
+         /emea/max/wp=\pgfkeysvalueof{/emea/max/wp},%
+  		 /jrc/min/obw=\pgfkeysvalueof{/jrc/min/obw},%
+         /jrc/max/obw=\pgfkeysvalueof{/jrc/max/obw},%
+         /jrc/min/emea=\pgfkeysvalueof{/jrc/min/emea},%
+         /jrc/max/emea=\pgfkeysvalueof{/jrc/max/emea},%
+         /jrc/min/jrc=\pgfkeysvalueof{/jrc/min/jrc},%
+         /jrc/max/jrc=\pgfkeysvalueof{/jrc/max/jrc},%
+         /jrc/min/wp=\pgfkeysvalueof{/jrc/min/wp},%
+         /jrc/max/wp=\pgfkeysvalueof{/jrc/max/wp},%
+         }}
+}
+\makeatother
 
 \end{document}

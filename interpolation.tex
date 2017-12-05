@@ -65,6 +65,7 @@ w_{a\{1\}\{1\}d} & \text{if } \mathbf{u} = \text{\emph{a\{1\}\{1\}}} \\
 	Setting all weights to 1 results in \textsf{uni}; setting $w_{d}$, $w_{cd}$, $w_{bcd}$, and $w_{abcd}$ to 1, and the others to 2,\footnote{With the special case that if you set these values to 0, you end up with \textsf{ngram}.} yields the default \textsf{npref}.
   \end{itemize} 
 
+
 The weights for the interpolation strategies \textsl{mle} and \textsl{ppl} are determined at test time, since precomputing and computing all these weights is expensive. To this end we have not ventured into learning the weights during training time, integrated into the Bayesian paradigm of the hierarchical Pitman-Yor process.
 As a compromise we have the context-based methods \textsf{ent}, \textsf{ppl}, \textsf{count} and \textsf{mle}, as opposed to the heuristic \textsf{npref}, and the learned \textsf{value}.
 
@@ -106,6 +107,7 @@ The main difference between \cref{eq:interpolform} and \cref{eq:newinterpolform}
 
 Note also that rather than two terms, \cref{eq:newinterpolform} only has one, because the \textsl{ngram} backoff strategy is now interpreted as an interpolation strategy.
 
+
 \section{Experiments}
 In this section we investigate three hypotheses, of which two new hypotheses. First we confirm\footnote{Conform \cref{chap:shpyplm}.} that skipgrams help reduce the perplexity in an intrinsic language model evaluation.\footnote{For the extrinsic counterpart in an automatic speech recognition experiment, we refer to the next chapter.} Second, we investigate whether if we can see an additional effect of different interpolation factors and backoff strategies in a cross-domain setting where the test set is sampled from another text genre as the training data. And finally, we look in a more qualitative way at the effect of skipgrams.
 
@@ -121,6 +123,7 @@ In this section we investigate three hypotheses, of which two new hypotheses. Fi
 \label{fig:colourrange}
 \end{figure}
 
+
 \subsection{Skipgrams and perplexity reductions}
 The first comparison is between \textsf{ngram} and \textsf{uni}, since these backoff strategies embody the difference between only $n$-gram features (\textsf{ngram}), and both $n$-gram and skipgram features (\textsf{uni}). We report the perplexities in \cref{tab:ngramsvsskipgrams}, and the relative difference in perplexity when choosing skipgrams\footnote{Read, skipgrams and $n$-grams. In our experiments we never use only skipgrams. We use this convention in the remainder of this thesis, except in cases where there might be some ambiguity otherwise.} over $n$-grams.
 
@@ -131,28 +134,30 @@ The first comparison is between \textsf{ngram} and \textsf{uni}, since these bac
 	\caption{My caption}
 	\label{tab:ngramsvsskipgrams}
 	\begin{tabular}{lllllllllllllll}
-		training & \multicolumn{4}{c}{1bw}            &  & \multicolumn{4}{c}{emea} &  & \multicolumn{4}{c}{jrc}             \\
-		test     & 1bw  & emea  & jrc  & wp    
-		      &  & 1bw  & emea  & jrc  & wp 
-		      &  & 1bw  & emea  & jrc  & wp      \\
-		\textsf{ngram}   & \btc{25}\numprint{129.47} &  \numprint{1123.89} 
-					&  \numprint{941.4}  &  \numprint{456.27} &  
-		        & \numprint{1761.34} & \numprint{5.63033} 
-		            & \numprint{898} & \numprint{1123.58} &  
-		        &  \numprint{1520.1}  &  \numprint{1278.94} 
-			         &  \btc{25}\numprint{12.85} &  \numprint{1249.28} \\
-		\textsf{fulluni}  & \numprint{124.69} & \numprint{728.27}  
-				 	& \numprint{728.98} & \numprint{392.04} 
-				 &  & \numprint{1393.81} & \numprint{5.6754} 
-				 	& \numprint{773.116} & \numprint{907.558} &  
-				 & \numprint{1303.66} & \numprint{1069.64} 
-				 	& \btc{25}\numprint{13.32} & \numprint{1067.99} \\
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		      &  & \obw  & \emea  & \jrc  & \wp 
+		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{ngram}   & \copr{obw}{obw}{129.47} &  \copr{obw}{emea}{1123.89} 
+					&  \copr{obw}{jrc}{941.4}  &  \copr{obw}{wp}{456.27} &  
+		        & \copr{emea}{obw}{1761.34} & \copr{emea}{emea}{5.63033} 
+		            & \copr{emea}{jrc}{898} & \copr{emea}{wp}{1123.58} &  
+		        &  \copr{jrc}{obw}{1520.1}  &  \copr{jrc}{emea}{1278.94} 
+			         &  \copr{jrc}{jrc}{12.85} &  \copr{jrc}{wp}{1249.28} \\
+		\textsf{fulluni}  & \copr{obw}{obw}{124.69} & \copr{obw}{emea}{728.27}  
+				 	& \copr{obw}{jrc}{728.98} & \copr{obw}{wp}{392.04} 
+				 &  & \copr{emea}{obw}{1393.81} & \copr{emea}{emea}{5.6754} 
+				 	& \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{907.558} &  
+				 & \copr{jrc}{obw}{1303.66} & \copr{jrc}{emea}{1069.64} 
+				 	& \copr{jrc}{jrc}{13.32} & \copr{jrc}{wp}{1067.99} \\
 		$\Delta$\% & \numprint{3.1} & \numprint{35.23} & \numprint{22.53}   &  \numprint{14.04}
 				& & \numprint{20.840} & \numprint{-0.800} 
 					& \numprint{13.91982} & \numprint{19.217} &
 				& \numprint{14.21} & \numprint{16.34} & \numprint{-3.65} & \numprint{14.49} \\
 	\end{tabular}
 \end{table}
+
+
 
 \subsection{Interpolation between $n$-grams and skipgrams}
 The previous results show that if we add skipgrams, we can reduce the perplexity. Since \textsf{uni} is a very naive prior weight, in this section we investigate the effect of adding weights as interpolation factors.
@@ -169,19 +174,19 @@ An initial guess for $n$-gram preference was a ratio of 2:1, in favour of $n$-gr
 		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
 		test     & \obw  & \emea  & \jrc  & \wp    
 		&  & \obw  & \emea  & \jrc  & \wp 
-		&  & \obw  & \emea  & \jrc  & \wp      \\
-		\textsf{fulluni}   & \numprint{124.69} &  \numprint{728.27} 
-		&  \numprint{728.98}  &  \numprint{392.04} &  
-		& \numprint{1393.81} & \numprint{5.6754} 
-			& \numprint{773.116} & \numprint{907.558} &  
-		&  \numprint{1303.66}  &  \numprint{1069.64} 
-		&  \numprint{13.32} &  \numprint{1067.99} \\
-		\textsf{fullnpref}  & \numprint{118.28} & \numprint{699.91}  
-		& \numprint{694.32} & \numprint{372.06} 
-		&  & \numprint{1305.9} &  \numprint{5.59}     
-		  & \numprint{704.94} & \numprint{852.52}   &  
-		& \numprint{1215.52} & \numprint{1000.72} 
-		& \numprint{12.84} & \numprint{1000} \\
+		&  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{fulluni}   & \copr{obw}{obw}{124.69} &  \copr{obw}{emea}{728.27} 
+		&  \copr{obw}{jrc}{728.98}  &  \copr{obw}{wp}{392.04} &  
+		& \copr{emea}{obw}{1393.81} & \copr{emea}{emea}{5.6754} 
+			& \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{907.558} &  
+		&  \copr{jrc}{obw}{1303.66}  &  \copr{jrc}{emea}{1069.64} 
+		&  \copr{jrc}{jrc}{13.32} &  \copr{jrc}{wp}{1067.99} \\
+		\textsf{fullnpref}  & \copr{obw}{obw}{118.28} & \copr{obw}{emea}{699.91}  
+		& \copr{obw}{jrc}{694.32} & \copr{obw}{wp}{372.06} 
+		&  & \copr{emea}{obw}{1305.9} &  \copr{emea}{emea}{5.59}     
+		  & \copr{emea}{jrc}{704.94} & \copr{emea}{wp}{852.52}   &  
+		& \copr{jrc}{obw}{1215.52} & \copr{jrc}{emea}{1000.72} 
+		& \copr{jrc}{jrc}{12.84} & \copr{jrc}{wp}{1000} \\
 		$\Delta$\% & \numprint{5.6} & \numprint{3.85} & \numprint{4.80}   &  \numprint{5.10}
 		& &\numprint{6.312769}&\numprint{1.5047}
 			&\numprint{8.796895}&\numprint{6.0572687}&
@@ -220,22 +225,190 @@ We limit the weights to be integers between 0 through 10. We optimise the value 
 
 \begin{table}[]
 	\centering
-	\caption{My caption}
-	\label{tab:obwvalue}
-	\begin{tabular}{lllllllllllll}
-		training              & test & \multicolumn{2}{c}{ppl}         & \multicolumn{8}{c}{weights}                           &    \\
-		\multirow{12}{*}{\obw} &      & \textsf{uni}            & optimum        & d   & cd & b\{1\}d & a\{1\}d & bcd & a\{1\}cd & ab\{1\}d & abcd &    \\
-		& \emea & \numprint{728.265}        & \numprint{717.17}         & 9   & 9  & 4    & 10     & 9   & 4     & 2     & 9    &    \\
-		&      & \multicolumn{2}{c}{\numprint{1.523483897}} & 100 & 39 & 17   & 43     & 60  & 27    & 13    & 100  & \% \\
-		& \jrc  & \numprint{728.987}        & \numprint{687.015}        & 9   & 9  & 3    & 7      & 10  & 4     & 2     & 9    &    \\
-		&      & \multicolumn{2}{c}{\numprint{5.757578667}} & 100 & 47 & 16   & 37     & 63  & 25    & 13    & 100  & \% \\
-		& \obw  & \numprint{124.685}        & \numprint{113.711}        & 9   & 9  & 1    & 2      & 9   & 4     & 2     & 9    &    \\
-		&      & \multicolumn{2}{c}{\numprint{8.801379476}} & 100 & 75 & 8    & 17     & 60  & 27    & 13    & 100  & \% \\
-		& \wp   & \numprint{392.043}        & \numprint{363.846}        & 4   & 6  & 2    & 3      & 5   & 2     & 1     & 8    &    \\
-		&      & \multicolumn{2}{c}{\numprint{7.192323291}} & 100 & 55 & 18   & 27     & 63  & 25    & 13    & 100  & \%
+	\caption{1bw}
+	\label{tab:obwvalues}
+	\begin{tabular}{llllllllllllll}
+	        & \multicolumn{2}{c}{ppl}                    & \multicolumn{10}{c}{weights}                                                                                                                                              &    \\
+                    & \multicolumn{2}{c}{   }                    & \multicolumn{3}{c}{\emph{abcd}}                & \multicolumn{2}{c}{\emph{a\{1\}cd}} & \multicolumn{2}{c}{\emph{ab\{1\}d}} & \multicolumn{2}{c}{\emph{bcd}} &             &    \\ \cline{2-3}\cline{4-6}\cline{7-8}\cline{9-10}\cline{11-12}
+                  test  & \textsf{uni}       & \textsf{value}               & $w_{a\{1\}cd}$  & $w_{ab\{1\}d}$  & $w_{bcd}$  & $w_{a\{2\}d}$  & $w_{cd}$           & $w_{a\{2\}d}$  & $w_{b\{1\}d}$      & $w_{cd}$   & $w_{b\{1\}d}$     & $w_{d}$     &    \\
+		  \emea & \numprint{728.265} & \numprint{717.17}     & 4               & 2               & 9          & 10             & 9                  & 10             & 4                  & 9          & 4                 & 9           &    \\
+		        & \multicolumn{2}{c}{\numprint{1.523483897}} & \wtc{9}27       & \wtc{15}13      & \btc{4}60  & \btc{1}53      & \wtc{1}47          & \btc{8}71      & \wtc{8}29          & \btc{8}69  & \wtc{8}31         & \btc{20}100 & \% \\
+		  \jrc  & \numprint{728.987} & \numprint{687.015}    & 4               & 2               & 10         & 7              & 9                  & 7              & 3                  & 9          & 3                 & 9           &    \\
+		        & \multicolumn{2}{c}{\numprint{5.757578667}} & \wtc{10}25      & \wtc{15}13      & \btc{5}62  & \wtc{2}44      & \btc{2}56          & \btc{8}70      & \wtc{8}30          & \btc{10}75 & \wtc{10}25        & \btc{20}100 & \% \\
+		  \obw  & \numprint{124.685} & \numprint{113.711}    & 4               & 2               & 9          & 2              & 9                  & 2              & 1                  & 9          & 1                 & 9           &    \\
+		        & \multicolumn{2}{c}{\numprint{8.801379476}} & \wtc{11}27      & \wtc{15}13      & \btc{4}60  & \wtc{13}18     & \btc{13}82         & \btc{7}66      & \wtc{6}34          & \btc{16}90 & \wtc{16}10        & \btc{20}100 & \% \\
+		  \wp   & \numprint{392.043} & \numprint{363.846}    & 2               & 1               & 5          & 3              & 9                  & 3              & 2                  & 6          & 2                 & 4           &    \\
+		        & \multicolumn{2}{c}{\numprint{7.192323291}} & \wtc{10}25      & \wtc{15}13      & \btc{5}62  & \wtc{7}33      & \btc{6}66          & \btc{4}60      & \wtc{4}40          & \btc{10}75 & \wtc{10}25        & \btc{20}100 & \% \\
 	\end{tabular}
 \end{table}
 
+\begin{table}[]
+	\centering
+	\caption{jrc}
+	\label{tab:jrcvalues}
+	\begin{tabular}{llllllllllllll}
+	            & \multicolumn{2}{c}{ppl}                    & \multicolumn{10}{c}{weights}                                                                                                                                              &    \\
+                & \multicolumn{2}{c}{   }                    & \multicolumn{3}{c}{\emph{abcd}}                & \multicolumn{2}{c}{\emph{a\{1\}cd}} & \multicolumn{2}{c}{\emph{ab\{1\}d}} & \multicolumn{2}{c}{\emph{bcd}} &             &    \\ \cline{2-3}\cline{4-6}\cline{7-8}\cline{9-10}\cline{11-12}
+          test  & \textsf{uni}       & \textsf{value}        & $w_{a\{1\}cd}$  & $w_{ab\{1\}d}$  & $w_{bcd}$  & $w_{a\{2\}d}$  & $w_{cd}$           & $w_{a\{2\}d}$  & $w_{b\{1\}d}$      & $w_{cd}$   & $w_{b\{1\}d}$     & $w_{d}$     &    \\
+		  \emea & \numprint{1100.26} & \numprint{971.437}    & 1               & 1               & 9          & 8              & 6                  & 8              & 4                  & 6          & 4                 & 2           &    \\
+		        & \multicolumn{2}{c}{\numprint{11.70841437}} & \wtc{16}9       & \wtc{16}9       & \btc{13}82 & \btc{3}57      & \wtc{3}43          & \btc{7}67      & \wtc{7}33          & \btc{4}60  & \wtc{4}40         & \btc{20}100 & \% \\
+		  \jrc  & \numprint{12.588}  & \numprint{11.6829}    & 2               & 1               & 10         & 2              & 8                  & 2              & 1                  & 8          & 1                 & 8           &    \\
+		        & \multicolumn{2}{c}{\numprint{7.190181125}} & \wtc{14}15      & \wtc{16}8       & \btc{11}77 & \wtc{12}20     & \btc{12}80         & \btc{7}67      & \wtc{7}33          & \btc{16}89 & \wtc{16}11        & \btc{20}100 & \% \\
+		  \obw  & \numprint{1329.83} & \numprint{1166.39}    & 2               & 0.1             & 10         & 2              & 1                  & 2              & 1                  & 1          & 1                 & 1           &    \\
+		        & \multicolumn{2}{c}{\numprint{12.29029274}} & \wtc{13}17      & \wtc{20}1       & \btc{13}82 & \wtc{7}67      & \btc{7}33          & \btc{7}67      & \wtc{7}33          & \btc{0}50  & \wtc{0}50         & \btc{20}100 & \% \\
+		  \wp   & \numprint{1079.26} & \numprint{954.277}    & 2               & 0.1             & 10         & 1              & 1                  & 1              & 1                  & 1          & 1                 & 1           &    \\
+		        & \multicolumn{2}{c}{\numprint{11.58043474}} & \wtc{13}17      & \wtc{20}1       & \btc{13}82 & \wtc{0}50      & \btc{0}50          & \wtc{0}50      & \btc{0}50          & \wtc{0}50  & \btc{0}50        & \btc{20}100 & \% \\
+	\end{tabular}
+\end{table}
+
+\begin{table}[]
+	\centering
+	\caption{emea}
+	\label{tab:emeavalues}
+     \begin{tabular}{llllllllllllll}
+	            & \multicolumn{2}{c}{ppl}                    & \multicolumn{10}{c}{weights}                                                                                                                                              &    \\
+                & \multicolumn{2}{c}{   }                    & \multicolumn{3}{c}{\emph{abcd}}                & \multicolumn{2}{c}{\emph{a\{1\}cd}} & \multicolumn{2}{c}{\emph{ab\{1\}d}} & \multicolumn{2}{c}{\emph{bcd}} &             &    \\ \cline{2-3}\cline{4-6}\cline{7-8}\cline{9-10}\cline{11-12}
+          test  & \textsf{uni}       & \textsf{value}        & $w_{a\{1\}cd}$  & $w_{ab\{1\}d}$  & $w_{bcd}$  & $w_{a\{2\}d}$  & $w_{cd}$           & $w_{a\{2\}d}$  & $w_{b\{1\}d}$      & $w_{cd}$   & $w_{b\{1\}d}$     & $w_{d}$     &    \\
+		  \emea & \numprint{5.66484} & \numprint{5.50167}    & 2               & 1               & 10         & 2              & 8                  & 2              & 1                  & 8          & 1                 & 8           &    \\
+		        & \multicolumn{2}{c}{\numprint{2.880399093}} & \wtc{14}15      & \wtc{16}8       & \btc{11}77 & \wtc{12}20     & \btc{12}80         & \btc{7}67      & \wtc{7}33          & \btc{16}89 & \wtc{16}11        & \btc{20}100 & \% \\
+		  \jrc  & \numprint{762.331} & \numprint{630.976}    & 1               & 1               & 10         & 8              & 6                  & 8              & 5                  & 6          & 5                 & 2           &    \\
+		        & \multicolumn{2}{c}{\numprint{17.23070425}} & \wtc{17}8       & \wtc{17}8       & \btc{15}88 & \btc{3}57      & \wtc{3}43          & \btc{5}62      & \wtc{5}38          & \btc{2}55  & \wtc{2}45         & \btc{20}100 & \% \\
+		  \obw  & \numprint{1389.33} & \numprint{1217.06}    & 2               & 0.1             & 1          & 1              & 1                  & 1              & 1                  & 1          & 1                 & 1           &    \\
+		        & \multicolumn{2}{c}{\numprint{12.39950192}} & \btc{6}65       & \wtc{19}3       & \wtc{7}32  & \wtc{0}50      & \btc{0}50          & \wtc{0}50      & \btc{0}50          & \wtc{0}50  & \btc{0}50         & \btc{20}100 & \% \\
+		  \wp   & \numprint{899.598} & \numprint{798.043}    & 2               & 0.1             & 1          & 1              & 1                  & 1              & 1                  & 1          & 1                 & 1           &    \\
+		        & \multicolumn{2}{c}{\numprint{11.28893128}} & \btc{6}65       & \wtc{19}3       & \wtc{7}32  & \wtc{0}50      & \btc{0}50          & \wtc{0}50      & \btc{0}50          & \wtc{0}50  & \btc{0}50         & \btc{20}100 & \% \\
+	\end{tabular}
+\end{table}
+
+We report the findings in \cref{tab:obwvalues}. We use \obw as training set, and report the lowest perplexities found on development sets for \emea, \jrc, \wp, and within-domain \obw. On the rightside of the table, we list the weight values for the \textsf{value} strategy with the lowest perplexity. For each of the weight we also report the relative weight for a particular backoff step. For example, in the case of \jrc, the pattern \emph{abcd} can backoff to three steps \emph{a\{1\}cd}, \emph{ab\{1\}d}, and \emph{bcd}. These respective steps have been assigned weights 4, 2, and 10. During the search for the best weights, we only kept track of the first time the lowest perplexity was found, however, when a set of weights with the same relative distribution have been found per backoff step, these yielded the same perplexity. Since the weight values are normalised, only their relative weight is important. Which is why it does not make a difference whether the value for \emph{d} is 4 or 9.
+
+From \cref{tab:obwvalues} the first thing that jumps out is that for \emph{abcd} the relative weights estimated for all 4 development sets are almost the same. But this is not the case for the three other steps \emph{a\{1\}cd}, \emph{ab\{1\}d}, and \emph{bcd}.
+
+If we do not read the table from left to right, but from top to bottom, we notice that there seems to be a distinction between within-domain behaviour, and cross-domain behaviour.
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:allvalues}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		      &  & \obw  & \emea  & \jrc  & \wp 
+		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{uni}   & \copr{obw}{obw}{124.685} &  \copr{obw}{emea}{728.265} 
+					&  \copr{obw}{jrc}{728.987}  &  \copr{obw}{wp}{392.043} &  
+		        & \copr{emea}{obw}{1393.81} & \copr{emea}{emea}{5.6754} 
+		            & \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{908} &  
+		        &  \copr{jrc}{obw}{1303.66}  &  \copr{jrc}{emea}{1069.64} 
+			         &  \copr{jrc}{jrc}{13.32} &  \copr{jrc}{wp}{1067.99} \\
+		\obw-\textsf{value}  & \copr{obw}{obw}{114.537} & \copr{obw}{emea}{712.609}  
+				 	& \copr{obw}{jrc}{694.436} & \copr{obw}{wp}{365.706} 
+				 &  & \copr{emea}{obw}{1212.13} & \copr{emea}{emea}{5.56569} 
+				 	& \copr{emea}{jrc}{655.143} & \copr{emea}{wp}{655.143} &  
+				 & \copr{jrc}{obw}{1155.22} & \copr{jrc}{emea}{950.893} 
+				 	& \copr{jrc}{jrc}{12.6641} & \copr{jrc}{wp}{949.983} \\
+        \emea-\textsf{value}  & \copr{obw}{obw}{115.966} & \copr{obw}{emea}{692.109}  
+				 	& \copr{obw}{jrc}{685.726} & \copr{obw}{wp}{366.04} 
+				 &  & \copr{emea}{obw}{1221.16} & \copr{emea}{emea}{5.55541} 
+				 	& \copr{emea}{jrc}{650.849} & \copr{emea}{wp}{804.805} &  
+				 & \copr{jrc}{obw}{1234.75} & \copr{jrc}{emea}{1021.2} 
+				 	& \copr{jrc}{jrc}{12.4544} & \copr{jrc}{wp}{1019.34} \\
+        \jrc-\textsf{value}  & \copr{obw}{obw}{115.186} & \copr{obw}{emea}{694}  
+				 	& \copr{obw}{jrc}{684.972} & \copr{obw}{wp}{364.5} 
+				 &  & \copr{emea}{obw}{1372.8} & \copr{emea}{emea}{5.52968} 
+				 	& \copr{emea}{jrc}{708.803} & \copr{emea}{wp}{890.016} &  
+				 & \copr{jrc}{obw}{1155.73} & \copr{jrc}{emea}{948.762} 
+				 	& \copr{jrc}{jrc}{12.6653} & \copr{jrc}{wp}{951.25} \\
+        \wp-\textsf{value}  & \copr{obw}{obw}{115.009} & \copr{obw}{emea}{696.297}  
+				 	& \copr{obw}{jrc}{685.437} & \copr{obw}{wp}{316.727} 
+				 &  & \copr{emea}{obw}{1211.78} & \copr{emea}{emea}{5.56345} 
+				 	& \copr{emea}{jrc}{653.655} & \copr{emea}{wp}{653.655} &  
+				 & \copr{jrc}{obw}{1153.54} & \copr{jrc}{emea}{950.737} 
+				 	& \copr{jrc}{jrc}{12.6445} & \copr{jrc}{wp}{949.004} \\
+         \end{tabular}
+\end{table}
+
+\subsection{Interpolation weights with contextual knowledge}
+In contrast to parameters based on heuristics, or parameters learned on a development set, we can also use knowledge from the training corpus to estimate certain contextual knowledge. Here we investigate three such examples: \textsf{mle}, \textsf{count}, \textsf{ent}, and \textsf{ppl}. \cref{tab:contextbasedinterpol}
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:contextbasedinterpol}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		      &  & \obw  & \emea  & \jrc  & \wp 
+		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{uni}   & \copr{obw}{obw}{124.685} &  \copr{obw}{emea}{728.265} 
+					&  \copr{obw}{jrc}{728.987}  &  \copr{obw}{wp}{392.043} &  
+		        & \copr{emea}{obw}{1393.81} & \copr{emea}{emea}{5.6754} 
+		            & \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{908} &  
+		        &  \numprint{1303.66}  &  \numprint{1069.64} 
+			         &  \numprint{13.32} &  \numprint{1067.99} \\
+		\textsf{mle}  & \copr{obw}{obw}{125.17} & \numprint{000}  
+				 	& \numprint{000} & \numprint{000} 
+				 &  & \copr{emea}{obw}{1931.25} & \copr{emea}{emea}{5.63} 
+				 	& \copr{emea}{jrc}{1015.46} & \copr{emea}{wp}{1225.27} &  
+				 & \copr{jrc}{obw}{1535.75} & \copr{jrc}{emea}{1244.74} 
+				 	& \numprint{000} & \numprint{000} \\
+        \textsf{count}  & \copr{obw}{obw}{122.086} & \copr{obw}{emea}{893.166}  
+				 	& \copr{obw}{jrc}{885.283} & \copr{obw}{wp}{421.195} 
+				 &  & \copr{emea}{obw}{1681.37} & \copr{emea}{emea}{5.61967} 
+				 	& \copr{emea}{jrc}{888.956} & \copr{emea}{wp}{1075.4} &  
+				 & \copr{jrc}{obw}{1436.12} & \copr{jrc}{emea}{1168.68} 
+				 	& \copr{jrc}{jrc}{12.8619} & \copr{jrc}{wp}{1192.74} \\
+        \textsf{ent}  & \copr{obw}{obw}{132.26} & \copr{obw}{emea}{794.05}  
+				 	& \copr{obw}{jrc}{791.69} & \copr{obw}{wp}{434.24} 
+				 &  & \copr{emea}{obw}{1552.49} & \copr{emea}{emea}{5.69} 
+				 	& \copr{emea}{jrc}{880.78} & \copr{emea}{wp}{1032.07} &  
+				 & \copr{jrc}{obw}{1453.86} & \copr{jrc}{emea}{1179.18} 
+				 	& \copr{jrc}{jrc}{13.4475} & \copr{jrc}{wp}{1197.05} \\
+        \textsf{ppl}  & \copr{obw}{obw}{157.065} & \copr{obw}{emea}{1002.24}  
+				 	& \copr{obw}{jrc}{1027.3} & \copr{obw}{wp}{555.01} 
+				 &  & \copr{emea}{obw}{2007.03} & \copr{emea}{emea}{5.82737} 
+				 	& \copr{emea}{jrc}{1217.94} & \copr{emea}{wp}{1329.48} &  
+				 & \copr{jrc}{obw}{1868.78} & \copr{jrc}{emea}{1475.07} 
+				 	& \copr{jrc}{jrc}{14.2414} & \copr{jrc}{wp}{1544.06} \\
+		$\Delta$\% & \numprint{000} & \numprint{000} & \numprint{000}   &  \numprint{000}
+				& & \numprint{000} & \numprint{000} 
+					& \numprint{000} & \numprint{000} &
+				& \numprint{000} & \numprint{000} & \numprint{000} & \numprint{000} \\
+	\end{tabular}
+\end{table}
+
+\subsection{Random interpolation weights}
+As a sanity check we have also implemented a random interpolation weight \textsf{random}. The weights are normally distributed between 0 through 1.  \cref{tab:randominterpol}
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:randominterpol}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		      &  & \obw  & \emea  & \jrc  & \wp 
+		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{ngram}   & \copr{obw}{obw}{129.47} &  \copr{obw}{emea}{1123.89} 
+					&  \copr{obw}{jrc}{941.4}  &  \copr{obw}{wp}{456.27} &  
+		        & \copr{emea}{obw}{1761.34} & \copr{emea}{emea}{5.63033} 
+		            & \copr{emea}{jrc}{898} & \copr{emea}{wp}{1123.58} &  
+		        &  \copr{jrc}{obw}{1520.1}  &  \copr{jrc}{emea}{1278.94} 
+			         &  \copr{jrc}{jrc}{12.85} &  \copr{jrc}{wp}{1249.28} \\
+		\textsf{random}  & \copr{obw}{obw}{129.713} & \copr{obw}{emea}{769.142}  
+				 	& \copr{obw}{jrc}{769.019} & \copr{obw}{wp}{411.774} 
+				 &  & \copr{emea}{obw}{1483.92} & \copr{emea}{emea}{5.72414} 
+				 	& \copr{emea}{jrc}{826.277} & \copr{emea}{wp}{961.939} &  
+				 & \copr{jrc}{obw}{1372.32} & \copr{jrc}{emea}{1119.66} 
+				 	& \copr{jrc}{jrc}{13.5574} & \copr{jrc}{wp}{1122.53} \\
+		$\Delta$\% & \numprint{000} & \numprint{000} & \numprint{000}   &  \numprint{000}
+				& & \numprint{000} & \numprint{000} 
+					& \numprint{000} & \numprint{000} &
+				& \numprint{000} & \numprint{000} & \numprint{000} & \numprint{000} \\
+	\end{tabular}
+\end{table}
+
+\subsection{\textsf{full} backoff versus \textsf{lim}ited backoff strategies}
 
 \subsection{A qualitative analysis into the contribution of skipgrams}
 
