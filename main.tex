@@ -323,7 +323,6 @@ box/.style={%draw,%
 
 \usepackage{pgfkeys}
 \newcommand{\copr}[3]{% colour & print
-\{\pgfkeysvalueof{/#1/min/#2},\pgfkeysvalueof{/#1/max/#2}\}:#3 
 \ifnum\pgfkeysvalueof{/#1/min/#2}>\eval{round(#3)}%
 \pgfkeys{/#1/min/#2 = \eval{round(#3)-0.5}}%
 \fi%
@@ -334,32 +333,32 @@ box/.style={%draw,%
 \numprint{#3}
 }
 
-\pgfkeys{/obw/min/obw/.initial=1000}
-\pgfkeys{/obw/max/obw/.initial=1}
-\pgfkeys{/obw/min/emea/.initial=1000}
-\pgfkeys{/obw/max/emea/.initial=1}
-\pgfkeys{/obw/min/jrc/.initial=1000}
-\pgfkeys{/obw/max/jrc/.initial=1}
-\pgfkeys{/obw/min/wp/.initial=1000}
-\pgfkeys{/obw/max/wp/.initial=1}
+%for a in obw emea jrc; do for b in obw emea jrc wp; do echo "\pgfkeys{/$a/min/$b/.initial="$(grep -o "\\\copr{$a}{$b}{[^ ]\+}" interpolation.tex | sed 's/[^0-9]\+\([0-9.]\+\)}/\1/g' | sort -n | head -n1)"}"; echo "\pgfkeys{/$a/max/$b/.initial="$(grep -o "\\\copr{$a}{$b}{[^ ]\+}" interpolation.tex | sed 's/[^0-9]\+\([0-9.]\+\)}/\1/g' | sort -nr | head -n1)"}"; done; done
 
-\pgfkeys{/emea/min/obw/.initial=1000}
-\pgfkeys{/emea/max/obw/.initial=1}
-\pgfkeys{/emea/min/emea/.initial=1000}
-\pgfkeys{/emea/max/emea/.initial=1}
-\pgfkeys{/emea/min/jrc/.initial=1000}
-\pgfkeys{/emea/max/jrc/.initial=1}
-\pgfkeys{/emea/min/wp/.initial=1000}
-\pgfkeys{/emea/max/wp/.initial=1}
-
-\pgfkeys{/jrc/min/obw/.initial=1000}
-\pgfkeys{/jrc/max/obw/.initial=1}
-\pgfkeys{/jrc/min/emea/.initial=1000}
-\pgfkeys{/jrc/max/emea/.initial=1}
-\pgfkeys{/jrc/min/jrc/.initial=1000}
-\pgfkeys{/jrc/max/jrc/.initial=1}
-\pgfkeys{/jrc/min/wp/.initial=1000}
-\pgfkeys{/jrc/max/wp/.initial=1}
+\pgfkeys{/obw/min/obw/.initial=114.537}
+\pgfkeys{/obw/max/obw/.initial=157.065}
+\pgfkeys{/obw/min/emea/.initial=692.109}
+\pgfkeys{/obw/max/emea/.initial=1123.89}
+\pgfkeys{/obw/min/jrc/.initial=684.972}
+\pgfkeys{/obw/max/jrc/.initial=1027.3}
+\pgfkeys{/obw/min/wp/.initial=316.727}
+\pgfkeys{/obw/max/wp/.initial=555.01}
+\pgfkeys{/emea/min/obw/.initial=1211.78}
+\pgfkeys{/emea/max/obw/.initial=2007.03}
+\pgfkeys{/emea/min/emea/.initial=5.52968}
+\pgfkeys{/emea/max/emea/.initial=5.82737}
+\pgfkeys{/emea/min/jrc/.initial=650.849}
+\pgfkeys{/emea/max/jrc/.initial=1217.94}
+\pgfkeys{/emea/min/wp/.initial=653.655}
+\pgfkeys{/emea/max/wp/.initial=1329.48}
+\pgfkeys{/jrc/min/obw/.initial=1153.54}
+\pgfkeys{/jrc/max/obw/.initial=1868.78}
+\pgfkeys{/jrc/min/emea/.initial=948.762}
+\pgfkeys{/jrc/max/emea/.initial=1475.07}
+\pgfkeys{/jrc/min/jrc/.initial=12.4544}
+\pgfkeys{/jrc/max/jrc/.initial=14.2414}
+\pgfkeys{/jrc/min/wp/.initial=949.004}
+\pgfkeys{/jrc/max/wp/.initial=1544.06}
 
 \usepackage{array}
 
