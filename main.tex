@@ -312,11 +312,11 @@ box/.style={%draw,%
 
 \usepackage{xintexpr}
 \newcommand{\ptc}[2]{% percentage to colour
-\ifnum#1>50%
-\edef\processme{\noexpand\btc{\eval{round((#1-50)/2)}}}%
+\ifnum#2>50%
+\edef\processme{\noexpand\btc{\eval{round((#2-50)/2)}}}%
     \processme
 \else%
-\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
+\edef\processme{\noexpand\wtc{\eval{round(25-((#2)/2))}}}%
     \processme
 \fi%
 }
