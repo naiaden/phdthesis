@@ -300,8 +300,8 @@ box/.style={%draw,%
 \definecolor{bestemeaclr}{rgb}{1,0,1}
 \definecolor{worstclr}{rgb}{1,0,0}
 \definecolor{avgclr}{rgb}{1,1,1}
-\newcommand{\btc}[1]{\cellcolor{bestclr!#1}}
-\newcommand{\wtc}[1]{\cellcolor{worstclr!#1}}
+\newcommand{\btc}[2]{\cellcolor{bestclr!#2}}
+\newcommand{\wtc}[2]{\cellcolor{worstclr!#2}}
 
 
 
@@ -316,10 +316,10 @@ box/.style={%draw,%
 \usepackage{xintexpr}
 \newcommand{\ptc}[2]{% percentage to colour
 \ifnum#2>50%
-\edef\processme{\noexpand\btc{\eval{round((#2-50)/2)}}}%
+\edef\processme{\noexpand\btc{#1}{\eval{round((#2-50)/2)}}}%
     \processme
 \else%
-\edef\processme{\noexpand\wtc{\eval{round(25-((#2)/2))}}}%
+\edef\processme{\noexpand\wtc{#1}{\eval{round(25-((#2)/2))}}}%
     \processme
 \fi%
 }
