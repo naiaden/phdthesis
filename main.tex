@@ -303,6 +303,10 @@ box/.style={%draw,%
 \newcommand{\btc}[1]{\cellcolor{bestclr!#1}}
 \newcommand{\wtc}[1]{\cellcolor{worstclr!#1}}
 
+\newcommand{\botc}[1]{\cellcolor{bestobwclr!#1}}
+\newcommand{\betc}[1]{\cellcolor{bestjrcclr!#1}}
+\newcommand{\bjtc}[1]{\cellcolor{bestemeaclr!#1}}
+
 
 
 
@@ -314,19 +318,50 @@ box/.style={%draw,%
 \ExplSyntaxOff
 
 \usepackage{xintexpr}
-\newcommand{\ptc}[2]{% percentage to colour
-\ifnum#2>50%
-\edef\processme{\noexpand\btc{\eval{round((#2-50)/2)}}}%
+\newcommand{\ptc}[1]{% percentage to colour
+\ifnum#1>50%
+\edef\processme{\noexpand\btc{\eval{round((#1-50)/2)}}}%
     \processme
 \else%
-\edef\processme{\noexpand\wtc{\eval{round(25-((#2)/2))}}}%
+\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
     \processme
 \fi%
 }
 
+\newcommand{\ptco}[1]{% percentage to colour
+	\ifnum#1>50%
+	\edef\processme{\cellcolor{bestobwclr!\eval{round((#1-50)/2)}}}%
+	\processme
+	\else%
+	\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
+	\processme
+	\fi%
+}
+
+\newcommand{\ptcj}[1]{% percentage to colour
+	\ifnum#1>50%
+	\edef\processme{\cellcolor{bestobwclr!\eval{round((#1-50)/2)}}}%
+	\processme
+	\else%
+	\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
+	\processme
+	\fi%
+}
+
+\newcommand{\ptce}[1]{% percentage to colour
+	\ifnum#1>50%
+	\edef\processme{\cellcolor{bestobwclr!\eval{round((#1-50)/2)}}}%
+	\processme
+	\else%
+	\edef\processme{\noexpand\wtc{\eval{round(25-((#1)/2))}}}%
+	\processme
+	\fi%
+}
 
 \usepackage{pgfkeys}
 \newcommand{\copr}[3]{% colour & print
+%	\ifthenelse{\equal{obw}{#1}}{hoi}{}		\ifthenelse{\equal{jrc}{#1}}{hola}{}
+%	\ifthenelse{\equal{emea}{#1}}{he}{}
 %\{\pgfkeysvalueof{/#1/min/#2},\pgfkeysvalueof{/#1/max/#2}\}
 %\ifdim\pgfkeysvalueof{/#1/min/#2} pt>#3 pt%
 %\pgfkeys{/#1/min/#2 = #3}%
@@ -334,7 +369,7 @@ box/.style={%draw,%
 %\ifdim\pgfkeysvalueof{/#1/max/#2} pt<#3 pt%
 %\pgfkeys{/#1/max/#2 = #3}
 %\fi%
-\ptc{#1}{
+\ptc{
 \eval{round(100*(((#3-\pgfkeysvalueof{/#1/min/#2}))/(\pgfkeysvalueof{/#1/max/#2}-\pgfkeysvalueof{/#1/min/#2})))}
 %\eval{#3}
 }%
