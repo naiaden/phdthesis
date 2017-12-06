@@ -324,6 +324,39 @@ box/.style={%draw,%
 \fi%
 }
 
+
+
+
+
+\usepackage{xifthen}
+\newcommand{\ifequals}[3]{\ifthenelse{\equal{#1}{#2}}{#3}{}}
+\newcommand{\case}[2]{#1 #2} % Dummy, so \renewcommand has something to overwrite...
+\newenvironment{switch}[1]{\renewcommand{\case}{\ifequals{#1}}}{}
+
+% Example: Pick color by ID
+\newcommand{\incolor}[2]{
+	\begin{switch}{#1}
+		\case{obw}{\ifnum#2>50%
+			\cellcolor{bestobwclr!\eval{round((#2-50)/2)}}
+			\else%
+			\cellcolor{bestobwclr!\eval{round(25-((#2)/2))}}
+			\fi%}
+		\case{emea}{\ifnum#2>50%
+			\cellcolor{bestemeaclr!\eval{round((#2-50)/2)}}
+			\else%
+			\cellcolor{bestemeaclr!\eval{round(25-((#2)/2))}}
+			\fi%}
+		\case{jrc}{\ifnum#2>50%
+			\cellcolor{bestjrcclr!\eval{round((#2-50)/2)}}
+			\else%
+			\cellcolor{bestjrcclr!\eval{round(25-((#2)/2))}}
+			\fi%}
+	\end{switch}
+}
+
+
+
+
 \usepackage{pgfkeys}
 \newcommand{\copr}[3]{% colour & print
 %\{\pgfkeysvalueof{/#1/min/#2},\pgfkeysvalueof{/#1/max/#2}\}
