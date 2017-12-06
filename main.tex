@@ -335,23 +335,23 @@ box/.style={%draw,%
 
 % Example: Pick color by ID
 \newcommand{\incolor}[2]{
-	\begin{switch}{#1}
-		\case{obw}{\ifnum#2>50%
-			\cellcolor{bestobwclr!\eval{round((#2-50)/2)}}
-			\else%
-			\cellcolor{bestobwclr!\eval{round(25-((#2)/2))}}
-			\fi%}
-		\case{emea}{\ifnum#2>50%
-			\cellcolor{bestemeaclr!\eval{round((#2-50)/2)}}
-			\else%
-			\cellcolor{bestemeaclr!\eval{round(25-((#2)/2))}}
-			\fi%}
-		\case{jrc}{\ifnum#2>50%
-			\cellcolor{bestjrcclr!\eval{round((#2-50)/2)}}
-			\else%
-			\cellcolor{bestjrcclr!\eval{round(25-((#2)/2))}}
-			\fi%}
-	\end{switch}
+%	\begin{switch}{#1}
+%		\case{obw}{\ifnum#2>50%
+%			\cellcolor{bestobwclr!\eval{round((#2-50)/2)}}
+%			\else%
+%			\cellcolor{bestobwclr!\eval{round(25-((#2)/2))}}
+%			\fi%}
+%		\case{emea}{\ifnum#2>50%
+%			\cellcolor{bestemeaclr!\eval{round((#2-50)/2)}}
+%			\else%
+%			\cellcolor{bestemeaclr!\eval{round(25-((#2)/2))}}
+%			\fi%}
+%		\case{jrc}{\ifnum#2>50%
+%			\cellcolor{bestjrcclr!\eval{round((#2-50)/2)}}
+%			\else%
+%			\cellcolor{bestjrcclr!\eval{round(25-((#2)/2))}}
+%			\fi%}
+%	\end{switch}
 }
 
 
