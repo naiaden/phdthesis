@@ -311,7 +311,7 @@ box/.style={%draw,%
 \ExplSyntaxOff
 
 \usepackage{xintexpr}
-\newcommand{\ptc}[1]{% percentage to colour
+\newcommand{\ptc}[2]{% percentage to colour
 \ifnum#1>50%
 \edef\processme{\noexpand\btc{\eval{round((#1-50)/2)}}}%
     \processme
@@ -330,7 +330,7 @@ box/.style={%draw,%
 %\ifdim\pgfkeysvalueof{/#1/max/#2} pt<#3 pt%
 %\pgfkeys{/#1/max/#2 = #3}
 %\fi%
-\ptc{
+\ptc{#1}{
 \eval{round(100*(((#3-\pgfkeysvalueof{/#1/min/#2}))/(\pgfkeysvalueof{/#1/max/#2}-\pgfkeysvalueof{/#1/min/#2})))}
 %\eval{#3}
 }%
