@@ -314,15 +314,15 @@ box/.style={%draw,%
 \ExplSyntaxOff
 
 \usepackage{xintexpr}
-\newcommand{\ptc}[2]{% percentage to colour
-\ifnum#2>50%
-\edef\processme{\noexpand\btc{\eval{round((#2-50)/2)}}}%
-    \processme
-\else%
-\edef\processme{\noexpand\wtc{\eval{round(25-((#2)/2))}}}%
-    \processme
-\fi%
-}
+%\newcommand{\ptc}[2]{% percentage to colour
+%\ifnum#2>50%
+%\edef\processme{\noexpand\btc{\eval{round((#2-50)/2)}}}%
+%    \processme
+%\else%
+%\edef\processme{\noexpand\wtc{\eval{round(25-((#2)/2))}}}%
+%    \processme
+%\fi%
+%}
 
 
 
@@ -334,7 +334,7 @@ box/.style={%draw,%
 \newenvironment{switch}[1]{\renewcommand{\case}{\ifequals{#1}}}{}
 
 % Example: Pick color by ID
-\newcommand{\incolor}[2]{
+\newcommand{\ptc}[2]{
 	\begin{switch}{#1}
 		\case{obw}{\ifnum#2>50%
 			\cellcolor{bestobwclr!\eval{round((#2-50)/2)}}
