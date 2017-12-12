@@ -1,0 +1,55 @@
+
+\definecolor{cdac4c6}{RGB}{218,196,198}
+
+
+\begin{tikzpicture}[y=0.80pt, x=0.80pt, yscale=-1.000000, xscale=1.000000, inner sep=0pt, outer sep=0pt]
+  \path[draw=black,fill=cdac4c6,dash pattern=on 0.00pt off 4.58pt,miter
+    limit=4.00,line width=0.417pt] (125.3494,153.6099) ellipse (0.1717cm and
+    0.1774cm);
+  \path[draw=black,fill=cdac4c6,dash pattern=on 0.00pt off 3.15pt,miter
+    limit=4.00,line width=0.286pt] (70.7596,156.1824) ellipse (0.1853cm and
+    0.1844cm);
+  \path[draw=black,fill=black,miter limit=4.00,line width=0.342pt]
+    (69.8242,143.6207) ellipse (0.0543cm and 0.0627cm);
+  \path[draw=black,fill=black,miter limit=4.00,line width=0.402pt]
+    (123.2113,140.3467) ellipse (0.0589cm and 0.0617cm);
+  \path[draw=black,line join=round,line cap=round,miter limit=4.00,line
+    width=0.958pt] (100.4344,154.9770)arc(-5.000:79.200:3.354539 and
+    2.693)arc(79.200:163.400:3.354539 and 2.693);
+  \path[draw=black,line join=miter,line cap=butt,even odd rule,line width=0.212pt]
+    (62.9330,89.1131) .. controls (74.7085,76.7500) and (92.6234,70.5442) ..
+    (109.5232,72.9743) .. controls (126.4230,75.4043) and (141.8636,86.4062) ..
+    (149.6786,101.5863) .. controls (149.8720,101.9620) and (150.0610,102.3400) ..
+    (150.2455,102.7202);
+  \path[draw=black,line join=miter,line cap=butt,even odd rule,line width=0.212pt]
+    (182.1845,138.0610) .. controls (183.4385,133.5070) and (183.5252,128.6368) ..
+    (182.4341,124.0411) .. controls (181.3430,119.4453) and (179.0765,115.1338) ..
+    (175.9094,111.6294) .. controls (172.7424,108.1250) and (168.6814,105.4351) ..
+    (164.2192,103.8861) .. controls (159.7569,102.3370) and (154.9028,101.9320) ..
+    (150.2455,102.7202) .. controls (145.8074,103.4714) and (141.5560,105.3027) ..
+    (137.9613,108.0119);
+  \path[draw=black,line join=miter,line cap=butt,even odd rule,line width=0.212pt]
+    (22.4506,186.2435) .. controls (66.7965,201.8798) and (116.9024,200.5201) ..
+    (160.3350,182.5017) .. controls (161.7406,181.9186) and (163.1393,181.3188) ..
+    (164.5307,180.7025) .. controls (169.7540,181.5500) and (175.2540,180.5836) ..
+    (179.8756,178.0064) .. controls (184.4971,175.4291) and (188.2098,171.2578) ..
+    (190.2339,166.3686) .. controls (192.2581,161.4795) and (192.5803,155.9045) ..
+    (191.1330,150.8147) .. controls (189.6857,145.7249) and (186.4783,141.1536) ..
+    (182.1845,138.0610) .. controls (180.2800,136.6893) and (178.1705,135.6026) ..
+    (175.9479,134.8482);
+  \path[draw=black,line join=miter,line cap=butt,even odd rule,line width=0.212pt]
+    (22.8203,186.4042) .. controls (22.7106,186.3588) and (22.6003,186.3147) ..
+    (22.4896,186.2719) .. controls (20.2567,185.4088) and (17.8185,185.0821) ..
+    (15.4371,185.3270) .. controls (9.9377,186.3114) and (4.0742,185.0837) ..
+    (-0.5682,181.9756) .. controls (-5.2106,178.8676) and (-8.5798,173.9141) ..
+    (-9.7649,168.4545) .. controls (-10.9500,162.9948) and (-9.9376,157.0903) ..
+    (-7.0016,152.3373) .. controls (-4.0655,147.5842) and (0.7613,144.0360) ..
+    (6.1739,142.6519) .. controls (7.2949,142.3652) and (8.4387,142.1678) ..
+    (9.5909,142.0621) .. controls (9.2686,141.3685) and (8.9692,140.6643) ..
+    (8.6935,139.9509) .. controls (4.8104,129.9047) and (5.9289,118.1620) ..
+    (11.2163,108.7787) .. controls (16.5037,99.3954) and (25.7601,92.4421) ..
+    (36.1184,89.4911) .. controls (44.8005,87.0176) and (54.0981,87.2581) ..
+    (62.9330,89.1131) .. controls (65.3945,89.6299) and (67.8302,90.2695) ..
+    (70.2280,91.0287);
+
+\end{tikzpicture}
