@@ -223,6 +223,10 @@ We limit the weights to be integers between 0 through 10. We optimise the value 
 
 \input{figvalue}
 
+%\multicolumn{2}{c}{\drawtwoboxes{3em}{4em}{1em}{red}{blue}}
+
+%\multicolumn{2}{c}{\drawtwoboxes{3em}{4em}{1em}{red}{blue}}
+
 \begin{table}[]
 	\centering
 	\caption{1bw}
@@ -286,6 +290,8 @@ From \cref{tab:obwvalues} the first thing that jumps out is that for \emph{abcd}
 
 If we do not read the table from left to right, but from top to bottom, we notice that there seems to be a distinction between within-domain behaviour, and cross-domain behaviour.
 
+
+
 \begin{table}[]
 	\centering
 	\caption{My caption}
@@ -301,25 +307,25 @@ If we do not read the table from left to right, but from top to bottom, we notic
 		            & \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{908} &  
 		        &  \copr{jrc}{obw}{1303.66}  &  \copr{jrc}{emea}{1069.64} 
 			         &  \copr{jrc}{jrc}{13.32} &  \copr{jrc}{wp}{1067.99} \\
-		\obw-\textsf{value}  & \copr{obw}{obw}{114.537} & \copr{obw}{emea}{712.609}  
+		\obw-\textsf{fullvalue}  & \copr{obw}{obw}{114.537} & \copr{obw}{emea}{712.609}  
 				 	& \copr{obw}{jrc}{694.436} & \copr{obw}{wp}{365.706} 
 				 &  & \copr{emea}{obw}{1212.13} & \copr{emea}{emea}{5.56569} 
 				 	& \copr{emea}{jrc}{655.143} & \copr{emea}{wp}{655.143} &  
 				 & \copr{jrc}{obw}{1155.22} & \copr{jrc}{emea}{950.893} 
 				 	& \copr{jrc}{jrc}{12.6641} & \copr{jrc}{wp}{949.983} \\
-        \emea-\textsf{value}  & \copr{obw}{obw}{115.966} & \copr{obw}{emea}{692.109}  
+        \emea-\textsf{fullvalue}  & \copr{obw}{obw}{115.966} & \copr{obw}{emea}{692.109}  
 				 	& \copr{obw}{jrc}{685.726} & \copr{obw}{wp}{366.04} 
 				 &  & \copr{emea}{obw}{1221.16} & \copr{emea}{emea}{5.55541} 
 				 	& \copr{emea}{jrc}{650.849} & \copr{emea}{wp}{804.805} &  
 				 & \copr{jrc}{obw}{1234.75} & \copr{jrc}{emea}{1021.2} 
 				 	& \copr{jrc}{jrc}{12.4544} & \copr{jrc}{wp}{1019.34} \\
-        \jrc-\textsf{value}  & \copr{obw}{obw}{115.186} & \copr{obw}{emea}{694}  
+        \jrc-\textsf{fullvalue}  & \copr{obw}{obw}{115.186} & \copr{obw}{emea}{694}  
 				 	& \copr{obw}{jrc}{684.972} & \copr{obw}{wp}{364.5} 
 				 &  & \copr{emea}{obw}{1372.8} & \copr{emea}{emea}{5.52968} 
 				 	& \copr{emea}{jrc}{708.803} & \copr{emea}{wp}{890.016} &  
 				 & \copr{jrc}{obw}{1155.73} & \copr{jrc}{emea}{948.762} 
 				 	& \copr{jrc}{jrc}{12.6653} & \copr{jrc}{wp}{951.25} \\
-        \wp-\textsf{value}  & \copr{obw}{obw}{115.009} & \copr{obw}{emea}{696.297}  
+        \wp-\textsf{fullvalue}  & \copr{obw}{obw}{115.009} & \copr{obw}{emea}{696.297}  
 				 	& \copr{obw}{jrc}{685.437} & \copr{obw}{wp}{316.727} 
 				 &  & \copr{emea}{obw}{1211.78} & \copr{emea}{emea}{5.56345} 
 				 	& \copr{emea}{jrc}{653.655} & \copr{emea}{wp}{653.655} &  
@@ -327,6 +333,8 @@ If we do not read the table from left to right, but from top to bottom, we notic
 				 	& \copr{jrc}{jrc}{12.6445} & \copr{jrc}{wp}{949.004} \\
          \end{tabular}
 \end{table}
+
+If we are concerned with cross-domain generalisability, we do not want to optimise the parameters for every possible set. According to \cref{tab:allvalues} the parameters learned for \wp-\textsf{fullvalue} seem to be effective on all three training sets, for almost all tests (8 out of 12). For all sets where it is not the best-performing set of parameters, it is a close second with a difference of at most 4 points in perplexity (0.6\%). 
 
 \subsection{Interpolation weights with contextual knowledge}
 In contrast to parameters based on heuristics, or parameters learned on a development set, we can also use knowledge from the training corpus to estimate certain contextual knowledge. Here we investigate three such examples: \textsf{mle}, \textsf{count}, \textsf{ent}, and \textsf{ppl}. \cref{tab:contextbasedinterpol}
@@ -340,31 +348,31 @@ In contrast to parameters based on heuristics, or parameters learned on a develo
 		test     & \obw  & \emea  & \jrc  & \wp    
 		      &  & \obw  & \emea  & \jrc  & \wp 
 		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
-		\textsf{uni}   & \copr{obw}{obw}{124.685} &  \copr{obw}{emea}{728.265} 
+		\textsf{fulluni}   & \copr{obw}{obw}{124.685} &  \copr{obw}{emea}{728.265} 
 					&  \copr{obw}{jrc}{728.987}  &  \copr{obw}{wp}{392.043} &  
 		        & \copr{emea}{obw}{1393.81} & \copr{emea}{emea}{5.6754} 
 		            & \copr{emea}{jrc}{773.116} & \copr{emea}{wp}{908} &  
 		        &  \numprint{1303.66}  &  \numprint{1069.64} 
 			         &  \numprint{13.32} &  \numprint{1067.99} \\
-		\textsf{mle}  & \copr{obw}{obw}{125.17} & \numprint{000}  
+		\textsf{fullmle}  & \copr{obw}{obw}{125.17} & \numprint{000}  
 				 	& \numprint{000} & \numprint{000} 
 				 &  & \copr{emea}{obw}{1931.25} & \copr{emea}{emea}{5.63} 
 				 	& \copr{emea}{jrc}{1015.46} & \copr{emea}{wp}{1225.27} &  
 				 & \copr{jrc}{obw}{1535.75} & \copr{jrc}{emea}{1244.74} 
 				 	& \numprint{000} & \numprint{000} \\
-        \textsf{count}  & \copr{obw}{obw}{122.086} & \copr{obw}{emea}{893.166}  
+        \textsf{fullcount}  & \copr{obw}{obw}{122.086} & \copr{obw}{emea}{893.166}  
 				 	& \copr{obw}{jrc}{885.283} & \copr{obw}{wp}{421.195} 
 				 &  & \copr{emea}{obw}{1681.37} & \copr{emea}{emea}{5.61967} 
 				 	& \copr{emea}{jrc}{888.956} & \copr{emea}{wp}{1075.4} &  
 				 & \copr{jrc}{obw}{1436.12} & \copr{jrc}{emea}{1168.68} 
 				 	& \copr{jrc}{jrc}{12.8619} & \copr{jrc}{wp}{1192.74} \\
-        \textsf{ent}  & \copr{obw}{obw}{132.26} & \copr{obw}{emea}{794.05}  
+        \textsf{fullent}  & \copr{obw}{obw}{132.26} & \copr{obw}{emea}{794.05}  
 				 	& \copr{obw}{jrc}{791.69} & \copr{obw}{wp}{434.24} 
 				 &  & \copr{emea}{obw}{1552.49} & \copr{emea}{emea}{5.69} 
 				 	& \copr{emea}{jrc}{880.78} & \copr{emea}{wp}{1032.07} &  
 				 & \copr{jrc}{obw}{1453.86} & \copr{jrc}{emea}{1179.18} 
 				 	& \copr{jrc}{jrc}{13.4475} & \copr{jrc}{wp}{1197.05} \\
-        \textsf{ppl}  & \copr{obw}{obw}{157.065} & \copr{obw}{emea}{1002.24}  
+        \textsf{fullppl}  & \copr{obw}{obw}{157.065} & \copr{obw}{emea}{1002.24}  
 				 	& \copr{obw}{jrc}{1027.3} & \copr{obw}{wp}{555.01} 
 				 &  & \copr{emea}{obw}{2007.03} & \copr{emea}{emea}{5.82737} 
 				 	& \copr{emea}{jrc}{1217.94} & \copr{emea}{wp}{1329.48} &  
@@ -395,7 +403,7 @@ As a sanity check we have also implemented a random interpolation weight \textsf
 		            & \copr{emea}{jrc}{898} & \copr{emea}{wp}{1123.58} &  
 		        &  \copr{jrc}{obw}{1520.1}  &  \copr{jrc}{emea}{1278.94} 
 			         &  \copr{jrc}{jrc}{12.85} &  \copr{jrc}{wp}{1249.28} \\
-		\textsf{random}  & \copr{obw}{obw}{129.713} & \copr{obw}{emea}{769.142}  
+		\textsf{fullrandom}  & \copr{obw}{obw}{129.713} & \copr{obw}{emea}{769.142}  
 				 	& \copr{obw}{jrc}{769.019} & \copr{obw}{wp}{411.774} 
 				 &  & \copr{emea}{obw}{1483.92} & \copr{emea}{emea}{5.72414} 
 				 	& \copr{emea}{jrc}{826.277} & \copr{emea}{wp}{961.939} &  
@@ -409,6 +417,69 @@ As a sanity check we have also implemented a random interpolation weight \textsf
 \end{table}
 
 \subsection{\textsf{full} backoff versus \textsf{lim}ited backoff strategies}
+In the previous chapter we saw that with the discount-based \textsf{lim}ited backoff strategy, there was a clear effect of testing on either within-domain and cross-domain, in favour of the within-domain setting. We argued that this was the case because \text{lim} stops the backoff procedure once it encounteres a pattern that has also been seen in whole in the training data, and that for already seen patterns, the estimated probability is better than an combinated of estimated patterns up to the uniform probabilities.
+
+But with the \textsf{full} and \textsf{lim}ited backoff strategies in this chapter we do not see this effect. An overview of perplexities is given in \cref{tab:limperplexities}. The colours white through blue show that the perplexities are average on best, and the worst for that training-test combination.
+
+\begin{table}[]
+	\centering
+	\caption{My caption}
+	\label{tab:limperplexities}
+	\begin{tabular}{lllllllllllllll}
+		training & \multicolumn{4}{c}{\obw}            &  & \multicolumn{4}{c}{\emea} &  & \multicolumn{4}{c}{\jrc}             \\
+		test     & \obw  & \emea  & \jrc  & \wp    
+		      &  & \obw  & \emea  & \jrc  & \wp 
+		      &  & \obw  & \emea  & \jrc  & \wp      \\ \cline{2-5}\cline{7-10}\cline{12-15}
+		\textsf{ngram}   & \copr{obw}{obw}{129.47} &  \copr{obw}{emea}{1123.89} 
+					&  \copr{obw}{jrc}{941.4}  &  \copr{obw}{wp}{456.27} &  
+		        & \copr{emea}{obw}{1761.34} & \copr{emea}{emea}{5.63033} 
+		            & \copr{emea}{jrc}{898} & \copr{emea}{wp}{1123.58} &  
+		        &  \copr{jrc}{obw}{1520.1}  &  \copr{jrc}{emea}{1278.94} 
+			         &  \copr{jrc}{jrc}{12.85} &  \copr{jrc}{wp}{1249.28} \\
+	    \textsf{limuni}   & \copr{obw}{obw}{134.17} &  \copr{obw}{emea}{758.54} %limuni done
+					&  \copr{obw}{jrc}{755.7}  &  \copr{obw}{wp}{406.31} &  
+		        & \copr{emea}{obw}{1421.99} & \copr{emea}{emea}{5.9} 
+		            & \copr{emea}{jrc}{793.02} & \copr{emea}{wp}{925.72} &  
+		        &  \copr{jrc}{obw}{1353.05}  &  \copr{jrc}{emea}{1112.07} 
+			         &  \copr{jrc}{jrc}{14.34} &  \copr{jrc}{wp}{1103.96} \\
+	    \textsf{limnpref}   & \copr{obw}{obw}{128.32} &  \copr{obw}{emea}{732.86} %limnpref done
+					&  \copr{obw}{jrc}{723.26}  &  \copr{obw}{wp}{387.39} &  
+		        & \copr{emea}{obw}{1339.55} & \copr{emea}{emea}{5.83} 
+		            & \copr{emea}{jrc}{727.58} & \copr{emea}{wp}{874.17} &  
+		        &  \copr{jrc}{obw}{1271.47}  &  \copr{jrc}{emea}{1048.3} 
+			         &  \copr{jrc}{jrc}{13.89} &  \copr{jrc}{wp}{1041.44} \\
+%		\textsf{limmle}  & \copr{obw}{obw}{138.388} & \copr{obw}{emea}{1027.84}  
+%				 	& \copr{obw}{jrc}{993.144} & \copr{obw}{wp}{465.52} 
+%				 &  & \copr{emea}{obw}{bbb} & \copr{emea}{emea}{bbb} 
+%				 	& \copr{emea}{jrc}{bbb} & \copr{emea}{wp}{bbb} &  
+%				 & \copr{jrc}{obw}{ccc} & \copr{jrc}{emea}{ccc} 
+%				 	& \copr{jrc}{jrc}{ccc} & \copr{jrc}{wp}{ccc} \\
+		\textsf{limcount}   & \copr{obw}{obw}{133.354} &  \copr{obw}{emea}{941.565} 
+					&  \copr{obw}{jrc}{927.673}  &  \copr{obw}{wp}{441.112} &  
+		        & \copr{emea}{obw}{1745.28} & \copr{emea}{emea}{5.85979} 
+		            & \copr{emea}{jrc}{928.113} & \copr{emea}{wp}{1114.12} &  
+		        &  \copr{jrc}{obw}{1528.67}  &  \copr{jrc}{emea}{1243.3} 
+			         &  \copr{jrc}{jrc}{13.949} &  \copr{jrc}{wp}{1260.12} \\
+	    \textsf{liment}   & \copr{obw}{obw}{143.67} &  \copr{obw}{emea}{832.28} 
+					&  \copr{obw}{jrc}{824.78}  &  \copr{obw}{wp}{452.52} &  
+		        & \copr{emea}{obw}{1583.12} & \copr{emea}{emea}{5.96} 
+		            & \copr{emea}{jrc}{903.881} & \copr{emea}{wp}{1052.99} &  
+		        &  \copr{jrc}{obw}{1508.13}  &  \copr{jrc}{emea}{1228.23} 
+			         &  \copr{jrc}{jrc}{14.6535} &  \copr{jrc}{wp}{1238.09} \\
+	    \textsf{limppl}   & \copr{obw}{obw}{172.141} &  \copr{obw}{emea}{1055.32} 
+					&  \copr{obw}{jrc}{1074.87}  &  \copr{obw}{wp}{850.723} &  
+		        & \copr{emea}{obw}{2049.38} & \copr{emea}{emea}{6.13118} 
+		            & \copr{emea}{jrc}{1251.99} & \copr{emea}{wp}{1358.52} &  
+		        &  \copr{jrc}{obw}{1945.12}  &  \copr{jrc}{emea}{1543.46} 
+			         &  \copr{jrc}{jrc}{15.6463} &  \copr{jrc}{wp}{1602.42} \\
+		\textsf{limrandom}  & \copr{obw}{obw}{139.896} & \copr{obw}{emea}{804.404}  
+				 	& \copr{obw}{jrc}{799.865} & \copr{obw}{wp}{427.539} 
+				 &  & \copr{emea}{obw}{1522.77} & \copr{emea}{emea}{5.95858} 
+				 	& \copr{emea}{jrc}{854.708} & \copr{emea}{wp}{985.087} &  
+				 & \copr{jrc}{obw}{1433.02} & \copr{jrc}{emea}{1177.73} 
+				 	& \copr{jrc}{jrc}{14.611} & \copr{jrc}{wp}{1163.32} \\
+	\end{tabular}
+\end{table}
 
 \subsection{A qualitative analysis into the contribution of skipgrams}
 

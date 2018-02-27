@@ -9,6 +9,8 @@ p(w | \mathbf{u}, \mathcal{S}, \Theta) =& \frac{c_{\mathbf{u}w\cdot} - d_{|\math
 \end{split}
 \end{equation}
 
+With each extension to these formulae, we have to proof that the result is a proper probability distribution again.\footnote{Non-normalised language models are also use, i.e.\ Stupid Backoff \autocite{brants2007large}.}
+
 Since these formulae will serve as the basis for our \textsl{limited} backoff strategy, we show its correctness. A step we also have to show for our derivation.
 
 We show its correctness by showing that the probability distribution sums up to one (and that it is not negative, and the elements are not bigger than 1).
@@ -47,6 +49,6 @@ Note that we can compute $\sum_{w\in\mathcal{B}} p(w|\pi(\mathbf{u}), \mathcal{S
     \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \theta_{|\mathbf{u}|}\sum_{w\in\mathcal{B}}\frac{p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  + d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}\sum_{w\in\mathcal{B}}\frac{ p(w | \pi(\mathbf{u}), \mathcal{S}, \Theta)}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}= 1 \\ 
     \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} - \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}Q}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{\theta_{|\mathbf{u}|}P}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  + \frac{ d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}P}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}= 1 \\
     \frac{c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} + \frac{(-1+P+Q)d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} +  \frac{(P+Q)\theta_{|\mathbf{u}|}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}} = \frac{\theta_{|\mathbf{u}|} + c_{\mathbf{u}\cdot\cdot}}{\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}  = 1
-\end{split}
+\end{split}\label{app:der}
 \end{equation}
 

@@ -5,12 +5,10 @@
 	\node[rectangle, minimum size=2cm, right=of bcde](cde) {cde};
 	\node[rectangle, minimum size=2cm, right=of cde](de) {de};
 	\node[rectangle, minimum size=2cm, right=of de](e) {e};
-	\node[rectangle, minimum size=2cm, right=of e](empty) {.};
 	\draw[yshift=-2cm] (abcde) -> (bcde);
     \draw (bcde) -> (cde);
     \draw (cde) -> (de);
     \draw (de) -> (e);
-    \draw (e) -> (empty);
 	\end{tikzpicture}
-    \caption{The backoff scheme for \BON. The example $5$-gram reads \emph{Bananas are my favourite fruit}, which we represent (for sake of brevity) here as abcde, with \emph{Bananas} as a, and \emph{fruit} as e, respectively. The dot represents the empty word, and is the final stage of the backoff procedure. }\label{fig:bon}
+    \caption{The backoff scheme for \BON. The example $5$-gram reads \emph{Bananas are my favourite fruit}, which we represent (for sake of brevity) here as abcde, with \emph{Bananas} as a, and \emph{fruit} as e, respectively. }\label{fig:bon}
     \end{figure*}

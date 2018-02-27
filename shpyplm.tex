@@ -6,34 +6,34 @@
     
   To overcome the traditional problems of overestimating the probabilities of rare occurrences and underestimating the probabilities of unseen events, a range of smoothing algorithms have been proposed in the literature \autocite{goodman2001bit}. Most methods take a heuristic-frequentist approach combining $n$-gram probabilities for various values of $n$, using back-off schemes or interpolation. 
 
-\autocite{teh2006hierarchical} showed that MacKay and Peto's \autocite{mackay1995hierarchical} research on parametric Bayesian language models with a Dirichlet prior could be extended to give better results, but also that one of the best smoothing methods, interpolated Kneser-Ney \autocite{kneser1995improved}, can be derived as an approximation of the Hierarchical Pitman-Yor process language model (HPYLM).
+Teh\autocite{teh2006hierarchical} showed that MacKay and Peto's \autocite{mackay1995hierarchical} research on parametric Bayesian language models with a Dirichlet prior could be extended to give better results, but also that one of the best smoothing methods, interpolated Kneser-Ney \autocite{kneser1995improved}, can be derived as an approximation of the Hierarchical Pitman-Yor process language model (HPYLM).
   
   % Eventueel eruit
-  The success of the Bayesian approach to language modelling is due to the use of statistical distributions such as the Dirichlet distribution, and distributions over distributions, such as the Dirichlet process and its two-parameter generalisation, the Pitman-Yor process. Both are widely studied in the statistics and probability theory communities. Interestingly, language modelling has acquired the status of a ``fruit fly'' problem in these communities, to benchmark the performance of statistical models. In this paper we approach language modelling from a computational linguistics point of view, and consider the statistical methods to be the tool with the future goal of improving language models for extrinsic tasks such as speech recognition.
+  The success of the Bayesian approach to language modelling is due to the use of statistical distributions such as the Dirichlet distribution, and distributions over distributions, such as the Dirichlet process and its two-parameter generalisation, the Pitman-Yor process. Both are widely studied in the statistics and probability theory communities. Interestingly, language modelling has acquired the status of a ``fruit fly'' problem in these communities, to benchmark the performance of statistical models. In this thesis we approach language modelling from a computational linguistics point of view, and consider the statistical methods to be the tool with the future goal of improving language models for extrinsic tasks such as speech recognition.
   
-  We derive our model from \textcite{teh2006hierarchical}, and propose an extension with skipgrams. A frequentist approach to language modelling with skipgrams is described by \textcite{pickhardt2014generalized}, who introduce an approach using skip-$n$-grams which are interpolated using modified Kneser-Ney smoothing. In this paper we show that a Bayesian skip-$n$-gram approach outperforms a frequentist skip-$n$-gram model.%, 
+  We derive our model from \textcite{teh2006hierarchical}, and propose an extension with skipgrams. A frequentist approach to language modelling with skipgrams is described by \textcite{pickhardt2014generalized}, who introduce an approach using skip-$n$-grams which are interpolated using modified Kneser-Ney smoothing. In this thesis we show that a Bayesian skip-$n$-gram approach outperforms a frequentist skip-$n$-gram model.%, 
 
 \section{Method}\marginnote{This section is a recap of \cref{chap:intoblm}, and in particular the Bayesian $n$-gram language model.}
 
 Pitman-Yor Processes (PYP) belong to the family of non-parametric Bayesian models. Let $W$ be a fixed and finite vocabulary of $V$ words. For each word $w\in W$ let $G(w)$ be the probability of $w$, and $G = [G(w)]_{w\in W}$ be the vector of word probabilities. Since word frequencies generally follow a power-law distribution, we use a Pitman-Yor process, which is a distribution over partitions with power-law distributions. 
-In the context of a language model this means that for a space $P(\mathbf{u})$, with $c(\mathbf{u}\cdot)$ elements (tokens), we want to partition $P(\mathbf{u})$ in $V$ subsets such that the partition is a good approximation of the underlying data, in which $c(\mathbf{u}w)$ is the size of subset $w$ of $P(\mathbf{u})$. We assume that the training data is an sample of the underlying data, and for this reason we seek to find an approximation, rather than using the partitions precisely as found in the training data.
+In the context of a language model this means that for a space $P(\mathbf{u})$, with $c(\mathbf{u}\cdot)$ elements (tokens), we want to partition $P(\mathbf{u})$ in $V$ subsets such that the partition is a good approximation of the underlying data, in which $c(\mathbf{u}w)$ is the size of subset $w$ of $P(\mathbf{u})$. We assume that the training data is a sample of the underlying data, and for this reason we seek to find an approximation, rather than using the partitions precisely as found in the training data.
 
-Since we also assume that a power-law distribution on the words in the underlying data, we place a PYP prior on G:
+Since we also assume a power-law distribution on the words in the underlying data, we place a PYP prior on G:
   \begin{equation*}
   	G \sim \operatorname{PY}(d,\theta,G_0),
   \end{equation*}
 with discount parameter $0\leq d<1$, a strength parameter $\theta > -d$ and a mean vector $G_0 = [G_0(w)]_{w\in W}$. $G_0(w)$ is the a-priori probability of word $w$, which we set uniformly: $G_0(w) = 1/V$ for all $w\in W$. In general, there is no known analytic form for the density of $\operatorname{PY}(d,\theta,G_0)$ when the vocabulary is finite. However, we are interested in the distribution over word sequences induced by the PYP, which has a tractable form, and is sufficient for the purpose of language modelling. 
 
-  Let $G$ and $G_0$ be distributions over $W$, and $x_1,x_2,\ldots$ be a sequence of words drawn i.i.d.\ from $G$. The PYP is then described in terms of a generative procedure that takes  $x_1,x_2,\ldots$ to produce a separate sequence of i.i.d.\ draws $y_1,y_2,\ldots$ from the mean distribution $G_0$ as follows. The first word $x_1$ is assigned the value of the first draw $y_1$ from $G_0$. Let $t$ be the current number of draws from $G_0$, $c_k$ the number of words assigned the value of draw $y_k$ and $c_\cdot = \sum^t_{k=1}c_k$ the number of draws from $G_0$. For each subsequent word $x_{c_\cdot+1}$, we either assign it the value of a previous draw $y_k$, with probability $\frac{c_k-d}{\theta+c_\cdot}$, or assign it the value of a new draw from $G_0$ with probability $\frac{\theta+dt}{\theta+c_\cdot}$.
+  Let $G$ and $G_0$ be distributions over $W$, and $x_1,x_2,\ldots$ be a sequence of words drawn i.i.d.\ from $G$. The PYP is then described in terms of a generative procedure that takes  $x_1,x_2,\ldots$ to produce a separate sequence of i.i.d.\ draws $y_1,y_2,\ldots$ from the mean distribution $G_0$ as follows. The first word $x_1$ is assigned the value of the first draw $y_1$ from $G_0$. Let $t$ be the current number of draws from $G_0$, $c_k$ the number of words assigned the value of draw $y_k$ and $c_\cdot = \sum^t_{k=1}c_k$ the number of draws from $G$.\footnote{In the analogy of the Chinese restaurant process, $t$ is the dish, $y_k$ a table, and $c_k$ the number of customers seating the table $y_k$.} For each subsequent word $x_{c_\cdot+1}$, we either assign it the value of a previous draw $y_k$, with probability $\frac{c_k-d}{\theta+c_\cdot}$, or assign it the value of a new draw from $G_0$ with probability $\frac{\theta+dt}{\theta+c_\cdot}$.
 
 For an $n$-gram language model we use a hierarchical extension of the PYP. The hierarchical extension describes the probabilities over the current word given various contexts consisting of up to $n-1$ words. Given a context $\mathbf{u}$, let $G_\mathbf{u}(w)$ be the probability of the current word taking on value $w$. A PYP is used as the prior for $G_\mathbf{u}=[G_\mathbf{u}(w)]_{w\in W}$: 
   \begin{equation*}
   	G_\mathbf{u}\sim\operatorname{PY}(d_{|\mathbf{u}|}, \theta_{|\mathbf{u}|},G_{\pi(\mathbf{u})}),
   \end{equation*}
-where $\pi(\mathbf{u})$ is the suffix of $\mathbf{u}$ consisting of all but the first word, and $|\mathbf{u}|$ being the length of $\mathbf{u}$. The priors are recursively placed with parameters $\theta_{|\pi(\mathbf{u})|}$, $d_{|\pi(\mathbf{u})|}$ and mean vector $G_{\pi(\pi(\mathbf{u}))}$, until we get to $G_\emptyset$: 		\begin{equation*}
+where $\pi(\mathbf{u})$ is the suffix of $\mathbf{u}$ consisting of all but the first word, and $|\mathbf{u}|$ being the length of $\mathbf{u}$. The priors are recursively placed with parameters $\theta_{|\pi(\mathbf{u})|}$, $d_{|\pi(\mathbf{u})|}$ and mean vector $G_{\pi(\pi(\mathbf{u}))}$, until we reach $G_\emptyset$: 		\begin{equation*}
 		G_\emptyset \sim\operatorname{PY}(d_0,\theta_0,G_0),
     \end{equation*}\vspace{-0.05cm}
-with $G_0$ being the uniformly distributed global mean vector for the empty context $\emptyset$.
+with $G_\emptyset$ being the uniformly distributed global mean vector that serves as prior for the empty context $\emptyset$.
 
 \section{Backoff strategies}
 
@@ -41,17 +41,20 @@ Although numerous backoff strategies for $n$-grams have been proposed\autocite{c
 
 The \BON backoff method uses the backoff structure as prescribed by the HPYPLM. Even when trained on skipgrams, \BON only backs off to $n$-grams. \Cref{fig:bon} illustrates the \BON hierarchy.
 
+
 \input{figbon}
 
-\BOF is similar to \BON, in that it always performs full recursive backoff to the a-priori unigram probabilities. But instead of ignoring the skipgrams, \BOF uses both pattern types. In contrast to the straight hierarchical backoff structure of \BON, \BOF yields a graph-like structure, starting with the root, $\mathbf{u}w$, and all steps ending in $\emptyset$. The structure is depicted in \cref{fig:bof}.
+
+
+\BOF is similar to \BON, in that it always performs full recursive backoff to the unigram probabilities. But instead of ignoring the skipgrams, \BOF uses both pattern types. In contrast to the straight hierarchical backoff structure of \BON, \BOF yields a graph-like structure, starting with the root, $\mathbf{u}w$, and all steps ending in $\emptyset$. The structure is depicted in \cref{fig:bof}.
 
 \input{figbof}
 
 Each step we only allow one skip to be introduced, where the first and last\footnote{The focus word $w$.} cannot be a skip. \textbf{HIER een STUKJE over RATIOS}. The intuition is that if a pattern occurs in the data, we do not have to backoff, since we can already estimate a probability.
 
-The \BOL backoff strategy is an extension of the \BOF backoff strategy, in that it also uses both $n$-grams and skipgrams and follows the same backoff rules, that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern.
+The \BOL backoff strategy is an extension of the \BOF backoff strategy, in that it also uses both $n$-grams and skipgrams and follows the same backoff rules, but stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern.
 
-Suppose we have a collected the frequencies of patterns from \obw:\footnote{With the HPYPLM you would in fact look at the frequencies after sampling, since they might not be same as those in the original corpus. Especially in those cases where the sampled frequencies are now zero, or vice versa.}
+Suppose we have a collected the frequencies of patterns from \obw:\footnote{With the HPYPLM one would in fact look at the frequencies after sampling, since they might not be same as those in the original corpus. Especially in those cases where the sampled frequencies are now zero, or vice versa.}
 \begin{multicols}{2}\begin{enumerate}
 	\item[0] bananas are my favourite fruit
 	\item[1] are my favourite fruit
@@ -74,10 +77,14 @@ Suppose we have a collected the frequencies of patterns from \obw:\footnote{With
 %
 \noindent Then for all patterns in \cref{fig:bol} that occur in this corpus, we remove their backoff steps.
 
+
 \input{figbol}
 
-In a setup with only $n$-gram features, \BON and \BOF are functionally the same in terms of backoff strategy. The nuance lies in the way they do the backoff. \BOF tries to backoff to skipgrams,\footnote[][5em]{It tries, does not find the skipgram, since it is not trained on skipgrams, and continues with the backoff procedure.} independent of whether it was trained with skipgrams. The \BON strategy has only one way to get to the a-priori word probability. 
-For \BOF it can get to the word probabilities for each skipgram that is generated, hence it puts more emphasis on the word probabilities.\footnote{Compare the number of paths to e in \cref{fig:bon} and \cref{fig:bof}.}
+In a setup with only $n$-gram features, \BON and \BOF are functionally the same in terms of backoff strategy. The nuance lies in the way they do the backoff. 
+%\BOF tries to backoff to skipgrams,\footnote[][5em]{It tries, does not find the skipgram, since it is not trained on skipgrams, and continues with the backoff procedure.} independent of whether it was trained with skipgrams. 
+\BOF backs off to skipgrams, independently of whether they occurred in the training data.
+The \BON strategy has only one way to get to the a-priori word probability. 
+For \BOF it can get to the unigram word probabilities for each skipgram that is generated, hence it puts more emphasis on the word probabilities.\footnote{Compare the number of paths to e in \cref{fig:bon} and \cref{fig:bof}.}
 
 Now for the formal definition of the strategies, for all strategies, we have that $p(w|\mathbf{u})=G_0(w)$ if $\mathbf{u} = \emptyset$. For \BON, the other case is defined as:
   \begin{equation}\begin{split}
@@ -87,13 +94,11 @@ Now for the formal definition of the strategies, for all strategies, we have tha
 p(w|\pi(\mathbf{u}))
   \end{split}\end{equation}
 %with $c_{\mathbf{u}wk}$ being the count of $w$ having the value $k$ after context $\mathbf{u}$; 
-with $c_{\mathbf{u}w\cdot}$ being the number of $\mathbf{u}w$ tokens, and $c_{\mathbf{u}\cdot\cdot}$ the number of patterns starting with context $\mathbf{u}$. Similarly, $t_{\mathbf{u}wk}$ is 1 if the $k$th draw from $G_{\mathbf{u}}$ was $w$, 0 otherwise. $t_{\mathbf{u}w\cdot}$ then denotes if there is a pattern $\mathbf{u}w$, and $t_{\mathbf{u}\cdot\cdot}$ is the number of types following context $\mathbf{u}$.
+with $c_{\mathbf{u}w\cdot}$ being the number of $\mathbf{u}w$ tokens, and $c_{\mathbf{u}\cdot\cdot}$ the number of patterns starting with context $\mathbf{u}$. Similarly, $t_{\mathbf{u}wk}$ is 1 if the $k$th draw from $G_{\mathbf{u}}$ was $w$, $0$ otherwise. $t_{\mathbf{u}w\cdot}$ then denotes if there is a pattern $\mathbf{u}w$, and $t_{\mathbf{u}\cdot\cdot}$ is the number of types following context $\mathbf{u}$.
   
+
 Recall\footnote{See \cref{ch:languagemodels}.} that $\sigma_n$ is the operator that adds a skip to a pattern $\mathbf{u}$ on the $n$th position if there is not already a skip. Then $\boldsymbol\sigma(\mathbf{u}) = \left[\sigma_n(\mathbf{u})\right]_{n=2}^{|\mathbf{u}|}$ is the set of patterns with one skip more than the number of skips currently in $\mathbf{u}$. The number of generated patterns is $\boldsymbol\varsigma=|\boldsymbol\sigma(\mathbf{u})|$.
-We also introduce the indicator function $S$, which for the {\sf full} backoff strategy always returns its argument: $S_{\mathbf{u}w}(y) = y$.
-%
-%
-The {\sf full} backoff strategy is defined as follows, with $\mathbf{u}_x = \boldsymbol\sigma_x(\mathbf{u})$, and discount frequency $\delta_{\mathbf{u}} = 1$:
+
  \begin{equation}
  \begin{split}
 p(w|\mathbf{u}) =& \sum_{m=1}^{\boldsymbol\varsigma}\left\{ \frac{1}{\mathbf{\boldsymbol\varsigma}+1}\left[
@@ -106,18 +111,29 @@ p(w|\pi(\mathbf{u}_m))\right)\right] \right\} \\
 \frac{c_{\mathbf{u}w\cdot}-\delta_{\mathbf{u}}d_{|\mathbf{u}|}t_{\mathbf{u}w\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}+ S_{\mathbf{u}w}\left(\frac{\theta_{|\mathbf{u}|}+d_{|\mathbf{u}|}t_{\mathbf{u}\cdot\cdot}}{\delta_{\mathbf{u}}\theta_{|\mathbf{u}|}+c_{\mathbf{u}\cdot\cdot}}
 p(w|\pi(\mathbf{u}))\right)\right]
   \end{split}\label{eq:interpolform}\end{equation}
+
+We also introduce the indicator function $S$, which for the {\sf full} backoff strategy always returns its argument: $S_{\mathbf{u}w}(y) = y$.
+%
+%
+The {\sf full} backoff strategy is defined as follows, with $\mathbf{u}_x = \boldsymbol\sigma_x(\mathbf{u})$, and discount frequency $\delta_{\mathbf{u}} = 1$.
  
- The \BOL backoff strategy is an extension of the \BOF backoff strategy that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern. $S$ is the indicator function which tells if a pattern has been seen during training: $S_{\mathbf{u}w}(\cdot) = 0$ if $\mathrm{count}(\mathbf{u}w) > 0$, $1$ otherwise; and $\delta_{\mathbf{u}} = V-\sum_{w\in W} S_{\mathbf{u}w}(\cdot)$. Setting $S_{\mathbf{u}w}(\cdot) = 0$ stops the recursion.
+ The \BOL backoff strategy is an extension of the \BOF backoff strategy that stops the recursion if a test pattern $\mathbf{u}w$ has already occurred in the training data. This means that the count is not zero, and hence at training time a probability has been assigned to that pattern. $S$ is the indicator function which tells if a pattern has been seen during training: $S_{\mathbf{u}w}(\cdot) = 0$ if $\mathrm{count}(\mathbf{u}w) > 0$, $1$ otherwise; and $\delta_{\mathbf{u}} = V-\sum_{w\in W} S_{\mathbf{u}w}(\cdot)$. Setting $S_{\mathbf{u}w}(\cdot) = 0$ stops the recursion.\footnote{Although it feels unncessary to add an expensive term $\delta_{\mathbf{u}}$ to the formula, in \cref{app:der} we show that we have to add an extra term to keep $p(w|\mathbf{u})$ a proper distribution.}
 
 The backoff strategies \BON and \BOF always use the same number of backoff probabilities, for $5$-grams 5 and 53 respectively\footnote{For $4$-grams, 5 and 22 respectively.}. For \BOL this is dependent on the training material. If a top level pattern matches the training material, then only one probability is used. In the worst scenario, \BOL equals \BOF.
 
+\section{Sampling the parameters}
+
+Hoe komen we aan d, theta en de t's tijdens training?
+
 \section{Experimental Setup}
 
-We train $4$-gram language models with the HPYPLM as described in this chapter, on three corpora as described in \cref{chap:data}. In this chapter we do not use sentences markers to denote the begin or end of a sentence. Since we do not compute the perplexity on sentence-level, but rather on individual patterns that comprise the test corpus.
+We train $4$-gram language models with the HPYPLM as described in this chapter, on three corpora as described in \cref{chap:data}. 
+%In this chapter we do not use sentences markers to denote the begin or end of a sentence. 
+%Since we do not compute the perplexity on sentence-level, but rather on individual patterns that comprise the test corpus.
 
 At the core of our experimental framework we use \texttt{cpyp}\footnote{\url{https://github.com/redpony/cpyp}}, which is an existing library for non-parametric Bayesian modelling with Pitman-Yor priors with histogram-based sampling\autocite{blunsom2009note}. This library has an example application to showcase its performance with $n$-gram-based language modelling. Limitations of the library, such as not natively supporting skip- and flexgrams, and other functionality, such as thresholding and discarding of certain patterns, led us to extend the library with \texttt{Colibri Core}\footnote{\url{https://proycon.github.io/colibri-core/}}, a pattern modelling library. \texttt{Colibri Core} can handle these limitations\autocite{gompel2016efficient}, and together the libraries are a complete Bayesian language model that handles skipgrams.\footnote{The code and documentation is available at \url{https://github.com/naiaden/SLM}.}.
 
-Each model is run for 50 iterations\footnote{Without an explicit burn-in phase, as we are not using statistics or samples from any but the last iteration.}, with hyperparameters $\theta = 1.0$, and $\gamma = 0.8$. The hyperparameters are resampled every 30 iterations\footnote{Which in practice results in one resampling of the hyperparameters.} with slice sampling\autocite{walker2007sampling}.
+Each model is run for 50 iterations\footnote{Without an explicit burn-in phase, as we are not using statistics or samples from any but the last iteration.}, with hyperparameters $\theta = 1.0$ for discount, and $\gamma = 0.8$ for strength. The hyperparameters are resampled every 30 iterations\footnote{Which in practice results in one resampling of the hyperparameters. The value is chosen empirically.} with slice sampling\autocite{walker2007sampling}.
 
 We test each model on different test sets, and we collect their intrinsic performance by means of perplexity. For the words in the test set that were unseen in the training data, we discard their probability.
 
@@ -125,7 +141,7 @@ We test each model on different test sets, and we collect their intrinsic perfor
 In this section we describe the results of multiple experiments. First we compare the HPYPLM approach to a traditional $n$-gram language model. We then show the influence of using skipgrams in addition to $n$-grams, and investigate whether this influence holds in a cross-domain evaluation. Second, we compare the backoff strategies, and investigate which domains fit which backoff strategy best.
 \clearpage
 Pickhardt and colleagues\autocite{pickhardt2014generalized} report perplexity values on two subsets of the test material of jrc-p and wp-p\footnote{Both consist of 100 thousand $4$-gram patterns sampled from their respective test set, as described in \cref{chap:data}.}. Of particular interest are the values for $n =4$, where for training on \wp and testing on wp-p a perplexity of 404 is reported with MKN smoothing, and 378 with their generalised language model (GLM). Similarly for the \jrc and jrc-p, they show a reduction of perplexity from 83 with MKN to 81 with their GLM. In our attempts to reproduce these values with SRILM\autocite{stolcke2002srilm}, we found substantially lower perplexity values for MKN,\footnote{Lower perplexity values indicate a higher intrinsic performance, which is better.} as can be seen in \cref{tab:mknvsglm}.\footnote{We used the following program call: \texttt{ngram-count -kndiscount -gt3min 1 -gt4min 1 -order 4 -interpolate -kndiscount -unk}.}
- The rows represent the train corpora; columns represent the test corpora. Comparing our results with the perplexity values reported for the GLM thus yields an unfair comparison. For this reason we choose the baseline to be the perplexity values from SRILM.
+ The rows represent the train corpora; columns represent the test corpora. Comparing our results with the perplexity values reported for the GLM with modified Kneser-Ney thus yields an unfair comparison. For this reason we choose the baseline to be the perplexity values from SRILM with modified Kneser-Ney.
 
 \begin{table*}
 	\begin{tabular}{l*{6}{l}l*{6}{l}}
@@ -146,9 +162,9 @@ Bayesian language models are more complex than their frequentist counterparts su
 Yet, in the remainder of this chapter we use 50 iterations for Gibbs sampling. For testing, once the model has been loaded into memory, there is no time penalty involved when choosing HPYPLM over MKN, which is an important property for extrinsic and time-dependent evaluation.
 
 \subsection{Influence of adding skipgrams to an $n$-gram language model}
-The results for English language models with skipgrams are reported in \cref{ta:ngramvsskipgram} in terms of perplexity. The rows represent the train corpora, and columns the test corpora. On the diagonals the perplexity always has the lowest value for that column, since the best performance on a test set is achieved by training on the same domain, for all domains. 
+The results for English language models with skipgrams are reported in \cref{ta:ngramvsskipgram} in terms of perplexity. We chose to report the values with the best-performing backoff strategy The rows represent the train corpora, and columns the test corpora. On the diagonals the perplexity always has the lowest value for that column, since the best performance on a test set is achieved by training on the same domain, for all domains. 
 
-We also observe an effect of domain-specific versus generic corpora. The within-domain performance of domain-specific corpora yields very low perplexities (13 on \jrc, 4 on \emea), while these are higher for within-domain evaluation for generic corpora (158 for \obw, 216 for \wp). There is no difference between training with only $n$-grams and training with skipgrams on within-domain test sets.
+We also observe an effect of domain-specific versus generic corpora. The within-domain performance of domain-specific corpora yields very low perplexities (13 on \jrc, 4 on \emea), while these are higher for within-domain evaluation for generic corpora (158 for \obw, 216 for \wp). There is no significant difference between training with only $n$-grams and training with skipgrams on within-domain test sets.
 
      \begin{table*}
 	\begin{tabular}{lllllllllllllll}
@@ -170,7 +186,7 @@ In particular we focus on \obw for the remainder of this thesis, since compared 
 \subsection{Effect of different backoff methods}
 In the previous subsection we compared pure $n$-gram models with skipgram models, where we used the best performing backoff methods. In this subsection we study the effect of different backoff methods in more detail. 
 
-Although skipgram models also contain all $n$-grams as an $n$-gram model trained on the same data, the $n$-gram probabilities differ between the two models. If we train with skipgram features, but only use the $n$-gram during testing (\BON), one would expect the same perplexity. However, a side-effect of training with skipgrams is that the lower-order patterns contained in the skipgrams are seen more often, compared to training with only $n$-grams.
+Although skipgram models also contain all $n$-grams as an $n$-gram model trained on the same data, the $n$-gram probabilities differ between the two models. If we train with skipgram features, but only use the $n$-gram during testing (\BON), one would expect the same perplexity. However, a side-effect of training with skipgrams is that the lower-order patterns contained in the skipgrams are seen more often, compared to training with only $n$-grams.\footnote{In a setting without thresholding, the relative frequencies of words stay the same, with only $n$-grams, and with skipgrams. The absolute frequencies are different because an $n$-gram spawns multiple skipgrams. However, in a situation with thresholding, only the frequently occurring skipgrams will make the threshold. In particular this is the case for $n$-grams where words are OOV due to thresholding, and the skipgram count is the same as the $n$-gram count.}
 
 In our analyses we included this strategy to see the negative effects of using skipgrams, because even in scenarios where they do not contribute, \BON may still yield a perplexity similar to HPYPLM trained on only $n$-grams. If that is the case, we can opt to use skipgrams whenever possible, without risking a deterioration in performance.
 
@@ -182,17 +198,23 @@ For a within-domain experiment on \obw, we notice that throughout the learning c
 
 The learning curves for \obw are shown in \cref{fig:1bwlc}. The pure $n$-gram models are outperformed by the skipgram models, for all four test sets. We are mostly interested in comparing \BON with the best performing skipgram backoff method.
 
-The first observation is that the skipgrams are especially useful in the beginning, when the perplexity is very low. However, we have to `discard' these values, since at this point there are still too many OOV words and therefore it models only few words. Only after the learning curve drops, we consider the values to be of use. Here the perplexity of the skipgram models is consistently lower than those of \BON. Since the \BON models have a higher peak in the learning curve, it is also easier to gain a reduction in perplexity with an increasing number of training words. But with the amount of training data we have the models do not converge for cross-domain testing. For none of the eight models plotted in \cref{fig:1bwlc} we see any plateauing behaviour, indicating that all eight models gain from having (yet even) more train data.
+The first observation is that the skipgrams are especially useful in the beginning, when the perplexity is very low. However, these values are discarded,\footnote{Per definition of the way perplexity normally is computed.} since at this point there are still too many OOV words and therefore it models only few words.\footnote{Note that this experiment is a test on only words in the vocabulary. This is in line with all other experimental results in this thesis.} Only after the learning curve drops, we consider the values to be of use. Here the perplexity of the skipgram models is consistently lower than those of \BON. Since the \BON models have a higher peak in the learning curve, it is also easier to gain a reduction in perplexity with an increasing number of training words. With the amount of training data we have the models do not converge for cross-domain testing. For none of the eight models plotted in \cref{fig:1bwlc} we see any plateauing behaviour, indicating that all eight models gain from having (yet even) more train data.
 
-In the same plot we can also see that there is a clear distinction between the test sets. The behaviour of testing on \obw, is different compared to testing on \jrc, \emea, or \wp. They share the same progression, with \wp's course shifted downwards\footnote{Since it shares the same property of being more generic than \jrc and \emea.}, unlike the domain-specific sets. \BON and \BOF of these models also seem to have a gap, whereas \BON and \BOL of \obw are converging at the end. This seems to confirm that skipgrams are especially useful in cross-domain settings, where with order of magnitude more data, the lines do not seem to converge.\footnote{Although we do not have in fact more data, we extrapolated this bevahiour on the basis of the plots.}
+In the same plot we can also see that there is a clear distinction between the test sets. The behaviour of testing on \obw is different compared to testing on \jrc, \emea, or \wp. They share the same progression, with \wp's course shifted downwards\footnote{Since it shares the same property of being more generic than \jrc and \emea.}, unlike the domain-specific sets. \BON and \BOF of these models also seem to have a gap, whereas \BON and \BOL of \obw are converging at the end. This seems to confirm that skipgrams are especially useful in cross-domain settings, where with order of magnitude more data, the lines do not seem to converge.\footnote{Although we do not have in fact more data, we extrapolated this bevahiour on the basis of the plots.}
 
-For within-domain we have reached a point where we have seen enough $n$-grams to estimate the probabilities, and the patterns modelled by skipgrams are also covered sufficiently by $n$-grams. We verified this by checking to which level the models backoff, and find that with an increasing amount of training material, the average backoff depth is smaller, and that for out-of-domain experiments the average backoff depth is larger.
+For within-domain \cref{afiga} we have reached a point where we have seen enough $n$-grams to estimate the probabilities, and the patterns modelled by skipgrams are also covered sufficiently by $n$-grams. We verified this by checking to which level the models backoff, and find that with an increasing amount of training material, the average backoff depth is smaller, and that for out-of-domain experiments the average backoff depth is larger.
 
 \begin{figure*}
-	\begin{tikzpicture}
+%\captionsetup[subfigure]{labelformat=empty}
+\centering
+
+\subfloat[Learning curve for training on \obw, and testing on \obw and \wp. \BOL was chosen because it is the best-performing backoff strategy for \obw.]{%
+\label{afiga}
+\begin{tikzpicture}
 	\begin{axis}[
+	name={afiga},
 	height=6cm, width=8cm, legend cell align=left, legend style={legend pos=north west, fill=none, font=\small},
-	title=Testing on general texts,
+	title=a) Testing on general texts,
 	xmode = log,
 	xmin=800,xmax=2048576000,
 	%ymin=-100,ymax=40,
@@ -209,7 +231,13 @@ For within-domain we have reached a point where we have seen enough $n$-grams to
 	\addplot[black,thick,dashed] table [x=wp, y=full,mark=*]{data/1bw-wp.dat};
 	\addlegendentry{\wp \BOF}
 	\end{axis}
+\end{tikzpicture}%
+}
+\subfloat[Learning curve for training on \jrc and \emea. ]{%
+\label{afigb}
+\begin{tikzpicture}
 	\begin{axis}[
+	name={afigb},
 	height=6cm, width=8cm, legend cell align=left, legend style={legend pos=north west, fill=none, font=\small},
 	title=Testing on domain-specific texts,
 	xmode = log,
@@ -226,15 +254,17 @@ For within-domain we have reached a point where we have seen enough $n$-grams to
 	\addplot[red,thick, dashed] table [x=emea, y=full,mark=*]{data/1bw-emea.dat};
 	\addlegendentry{\emea \BOF}
 	\end{axis}
-	\end{tikzpicture}
-	\caption[][1.5em]{Learning curve for training on \obw, and testing on \obw and \wp on the left, and \jrc and \emea on the right. The solid lines indicate the perplexity of the \BON model, the dotted line \BOL for testing on \obw, and the dashed lines \BOF for \jrc, \emea, and \wp.}\label{fig:1bwlc}
+\end{tikzpicture}%
+}
+	\caption{The solid lines indicate the perplexity of the \BON model, the dotted line \BOL for testing on \obw, and the dashed lines \BOF for \jrc, \emea, and \wp.}\label{fig:1bwlc}
 \end{figure*}
+
 
  \section{Behaviour of the Language Models}
 Aside from a quantitative analysis in terms of perplexity, we are also interested in the qualitative differences between the compared approaches. In this section we analyse the skipgrams that contribute the most, and which are most prominent. We finish the section with a look at the models from a Zipfian point of view, and compare the frequentist and Bayesian rank-ordered frequencies.
 
 \subsection{When do skipgrams work?}
-Earlier we stated that skipgrams can be part of the solution for modelling long-range dependencies and shorter-range non-contiguous patterns. In the experiments described in this paper we have limited ourselves to modelling each skip with one token, where skips must be surrounded by word tokens. This limits the skipgrams of length $4$ as used in this paper to at most two position skips.
+Earlier we stated that skipgrams can be part of the solution for modelling long-range dependencies and shorter-range non-contiguous patterns. In the experiments described in this thesis we have limited ourselves to modelling each skip with one token, where skips must be surrounded by word tokens. This limits the skipgrams of length $4$ as used in this thesis to at most two position skips.
 
 To understand which patterns can be modelled with these skipgrams, and in particular, which of these patterns contribute positively to a better score, we analysed all $4$-grams in the test data which have a higher posterior probability with skipgram features added to the training model. 
 %
